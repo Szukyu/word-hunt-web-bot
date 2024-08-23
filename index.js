@@ -1,7 +1,10 @@
 document.addEventListener('DOMContentLoaded', function() {
-  let fr = new FileReader();
-  fr.onload = function() {
-    document.getElementById('file').textContent = fr.result;
-  }
-  fr.readAsText("words.txt")
+  fetch('words.txt')
+  .then(function(response) {
+      return response.text();
+    })
+  .then(function(words){
+      console.log(words);
+      document.getElementById('file').textContent = words;
+    })
 })
