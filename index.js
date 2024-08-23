@@ -3,5 +3,5 @@ document.addEventListener('DOMContentLoaded', function() {
   fr.onload = function() {
     document.getElementById('file').textContent = fr.result;
   }
-  fr.readAsText(this.files[0])
+  fr.readAsText("words.txt")
 })
