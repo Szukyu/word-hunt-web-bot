@@ -1,12 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
-  fetch('words.txt')
-    .then(response => {
-      return response.text();
-    })
-    .then(text => {
-      document.getElementByID('file').textContent = text;
-    })
-    .catch(error => {
-      console.log("Fetch Error")
-    })
+  let fr = new FileReader();
+  fr.onload = function() {
+    document.getElementById('file').textContent = fr.result;
+  }
+  fr.readAsText(this.files[0])
 })
