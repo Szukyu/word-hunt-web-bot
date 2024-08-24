@@ -12,6 +12,9 @@ const DIRECTIONS = [UPLEFT, UP, UPRIGHT, RIGHT, DOWNRIGHT, DOWN, DOWNLEFT, LEFT]
 
 const MAX_LENGTH = 10;
 
+const englishWords = set();
+const validWordsOnly = set();
+const valids = set();
 const wordStarts = new Set();
 
 // Classes
@@ -127,8 +130,18 @@ document.addEventListener('DOMContentLoaded', function() {
   .then(function(response) {
       return response.text();
     })
-  .then(function(words){
-      console.log(words);
+  .then(function(words) {
+      words.split("\n").forEach(word => {
+        const strippedWord = word.trim();
+        if (strippedWord.length > MAX_LENGTH) {
+          return ;
+        }
+        englishWords.add(strippedWord);
+        for (let i = 3; i <= strippedWord.length; i++) {
+          wordStarts.add(strippedWord.substring(0, i));
+        }
+      })
+      console.log(englishWords);
       document.getElementById('file').textContent = words;
     })
 })
@@ -172,5 +185,7 @@ function findValidWords(board) {
 function findValidFrom(board, word, letter, length, pos) {
   if (length >= 3 && !wordStarts.has(word)) {
     return ;
+  } else if (englishWords.has(word) && !validWordsOnly.has(word)) {
+    validWordsOnly.add(word);
   }
 }
