@@ -170,6 +170,7 @@ document.getElementById("submit").onclick = function() {
   }
 
   findValidWords(board)
+
 }
 
 function findValidWords(board) {
@@ -185,7 +186,20 @@ function findValidWords(board) {
 function findValidFrom(board, word, letter, length, pos) {
   if (length >= 3 && !wordStarts.has(word)) {
     return ;
-  } else if (englishWords.has(word) && !validWordsOnly.has(word)) {
+  }
+  if (englishWords.has(word) && !validWordsOnly.has(word)) {
     validWordsOnly.add(word);
+    const tup = (pos, word)
+    valids.add(tup)
+  }
+  if (length >= MAX_LENGTH) {
+    return ;
+  }
+  for (let dir of DIRECTIONS) {
+    const copyBoard = board.copyBoard();
+    const neighborLetter = copyBoard.visitDirection(letter.pos, dir);
+    if (neighborLetter !== -1) {
+      findValidFrom(copyBoard, word + neighborLetter.char, neighborLetter, length + 1, pos)
+    }
   }
 }
