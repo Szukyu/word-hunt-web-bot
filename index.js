@@ -12,9 +12,9 @@ const DIRECTIONS = [UPLEFT, UP, UPRIGHT, RIGHT, DOWNRIGHT, DOWN, DOWNLEFT, LEFT]
 
 const MAX_LENGTH = 10;
 
-const englishWords = set();
-const validWordsOnly = set();
-const valids = set();
+const englishWords = new Set();
+const validWordsOnly = new Set();
+const valids = new Set();
 const wordStarts = new Set();
 
 // Classes
