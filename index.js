@@ -162,6 +162,7 @@ document.getElementById("submit").onclick = function() {
       }
       const board = new Board(lettersObjs);
       findValidWords(board);
+      printOutput();
     }
   }
 }
@@ -195,17 +196,17 @@ function findValidFrom(board, word, letter, length, pos) {
   }
 }
 
-function wordCompare(a, b) {
-  if (a[1].length < b[1].length) {
-    return -1;
-  } else if (a[1].length === b[1].length) {
-    if (a[1] > b[1]) {
-      return -1;
-    } else if (a[1] < b[1]) {
-      return -1;
-    } else {
-      return 0;
-    }
-  }
-  return -1;
+function word_compare(a, b) {
+  if (a.word.length < b.word.length) return -1;
+  if (a.word.length > b.word.length) return 1;
+  return a.word.localeCompare(b.word);
+}
+
+function printOutput() {
+  const outputDiv = document.getElementById('output');
+  outputDiv.innerHTML = `<h2>${valids.size} words were found.</h2>`;
+  const sortedWords = Array.from(valids).sort(word_compare);
+  sortedWords.forEach((entry, index) => {
+    outputDiv.innerHTML += `<p>${index + 1}: ${entry.word} at position ${entry.pos + 1}</p>`;
+  });
 }
