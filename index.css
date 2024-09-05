@@ -66,3 +66,8 @@ body {
 .input-wrapper input:valid {
     outline: 2px solid rgba(101, 40, 247, 0.6);
 }
+
+#output {
+  width: 400px;
+  position: relative;
+}
