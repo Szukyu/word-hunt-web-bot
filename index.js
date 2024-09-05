@@ -164,7 +164,6 @@ document.getElementById("submit").onclick = function() {
       findValidWords(board);
     }
   }
-  const 
 }
 
 function findValidWords(board) {
