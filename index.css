@@ -21,16 +21,14 @@ body {
   border: 1px solid rgba(39, 40, 41, 0.6);
   font-size: 1.1rem;
   outline: none;
-  background: transparent;
 }
 
 .input-wrapper span {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  left: 10px;
-  padding: 0 5px;
-  background: rgb(237, 234, 226);
+  left: 0px;
+  padding: 10px;
   color: rgba(39, 40, 41, 0.6);
   pointer-events: none;
   transition: all 0.4s ease;
@@ -38,6 +36,7 @@ body {
 }
 
 .input-wrapper input:focus ~ span,
+.input-wrapper input:valid ~ span,
 .input-wrapper input:not(:placeholder-shown) ~ span {
   transform: translateY(-33px);
   font-size: 0.8rem;
@@ -48,7 +47,7 @@ body {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  right: 10px;
+  right: 0px;
   padding: 10px;
   border: none;
   background: none;
@@ -61,4 +60,9 @@ body {
 .input-wrapper input:focus ~ button,
 .input-wrapper input:not(:placeholder-shown) ~ button {
   color: rgba(101, 40, 247, 0.6);
+}
+
+.input-wrapper input:focus, 
+.input-wrapper input:valid {
+    outline: 2px solid rgba(101, 40, 247, 0.6);
 }
