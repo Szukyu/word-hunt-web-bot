@@ -11,10 +11,10 @@ body {
 
 .input-wrapper {
   position: relative;
+  background: rgb(255, 0, 0);
 }
 
 .input-wrapper input {
-  width: 100%;
   padding: 20px 50px 10px 10px;
   border-radius: 10px;
   border: 1px solid rgba(39, 40, 41, 0.6);
