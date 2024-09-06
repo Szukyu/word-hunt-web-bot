@@ -10,7 +10,6 @@ body {
 }
 
 .input-wrapper {
-  width: 400px;
   position: relative;
 }
 
@@ -68,6 +67,5 @@ body {
 }
 
 #output {
-  width: 400px;
   position: relative;
 }
