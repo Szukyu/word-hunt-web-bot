@@ -11,14 +11,13 @@ body {
 
 .input-wrapper {
   position: relative;
-  background: rgb(255, 0, 0);
 }
 
 .input-wrapper input {
   padding: 20px 50px 10px 10px;
   border-radius: 10px;
   border: 1px solid rgba(39, 40, 41, 0.6);
-  font-size: 1.1rem;
+  font-size: 1rem;
   outline: none;
 }
 
@@ -63,9 +62,15 @@ body {
 
 .input-wrapper input:focus, 
 .input-wrapper input:valid {
-    outline: 2px solid rgba(101, 40, 247, 0.6);
+  outline: 2px solid rgba(101, 40, 247, 0.6);
 }
 
 #output {
   position: relative;
+  width: 100%;
+  max-width: 400px; 
+  max-height: 100vh;
+  overflow: auto;
+  padding: 10px;
+  box-sizing: border-box;
 }
