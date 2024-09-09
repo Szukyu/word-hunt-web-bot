@@ -124,6 +124,96 @@ class Board {
   }
 }
 
+class Boarder {
+  constructor(lettersArr) {
+    this.lb = lettersArr;
+  }
+
+  copyBoard() {
+    const newArr = []
+    for (let i = 0; i < this.lb.length; i++) {
+      newArr.push(this.lb[i].copyLetter());
+    }
+    return new Boarder(newArr);
+  }
+
+  peekUpperLeft(pos) {
+    if (pos % 5 == 0 || pos  < 5) {
+      return -1;
+    }
+    return this.lb[pos - 6]; 
+  }
+
+  peekUp(pos) {
+    if (pos < 5) {
+      return -1;
+    }
+    return this.lb[pos - 5];
+  }
+
+  peekUpperRight(pos) {
+    if (pos < 5 || pos % 5 == 4) {
+      return -1;
+    }
+    return this.lb[pos - 4];
+  }
+
+  peekRight(pos) {
+    if (pos % 5 == 4) {
+      return -1;
+    }
+    return this.lb[pos + 1];
+  }
+
+  peekLowerRight(pos) {
+    if (pos >= 20 || pos % 5 == 4) {
+      return -1;
+    }
+    return this.lb[pos + 6];
+  }
+
+  peekDown(pos) {
+    if (pos >= 20) {
+      return -1;
+    }
+    return this.lb[pos + 5];
+  }
+
+  peekLowerLeft(pos) {
+    if (pos % 5 == 0 || pos >= 20) {
+      return -1;
+    }
+    return this.lb[pos + 4];
+  }
+
+  peekLeft(pos) {
+    if (pos % 5 == 0) {
+      return -1;
+    }
+    return this.lb[pos - 1];
+  }
+  
+  visitDirection(pos, dir) {
+    const directionDict = {
+      [UPLEFT]: this.peekUpperLeft.bind(this),
+      [UP]: this.peekUp.bind(this),
+      [UPRIGHT]: this.peekUpperRight.bind(this),
+      [RIGHT]: this.peekRight.bind(this),
+      [DOWNRIGHT]: this.peekLowerRight.bind(this),
+      [DOWN]: this.peekDown.bind(this),
+      [DOWNLEFT]: this.peekLowerLeft.bind(this),
+      [LEFT]: this.peekLeft.bind(this)
+    };
+
+    const visitedLetter = directionDict[dir](pos);
+    if (visitedLetter === -1 || visitedLetter.visited) {
+      return -1;
+    }
+    visitedLetter.markVisited();
+    return visitedLetter;
+  }
+}
+
 // Main
 document.addEventListener('DOMContentLoaded', function() {
   fetch('words.txt')
@@ -144,26 +234,32 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 document.getElementById("submit").onclick = function() {
-  const layout = "BOARD";
   const inputLetters = [];
 
   let letters = document.getElementById("letters").value.trim().toLowerCase();
   document.querySelector(".input-wrapper").style.display = "none";
-  if (layout === "BOARD") {
-    if (letters.length !== 16) {
-      throw new Error("Not 16 Letters");
-    } else {
-      for (let i = 0; i < 16; i++) {
-        inputLetters.push(letters[i]);
-      }
-      const lettersObjs = [];
-      for (let i = 0; i < 16; i++) {
-        lettersObjs.push(new Letter(inputLetters[i], i));
-      }
-      const board = new Board(lettersObjs);
-      findValidWords(board);
-      printOutput();
+  if (letters.length == 16) {
+    for (let i = 0; i < 16; i++) {
+      inputLetters.push(letters[i]);
     }
+    const lettersObjs = []
+    for (let i = 0; i < 16; i++) {
+      lettersObjs.push(new Letter(inputLetters[i], i));
+    }
+    const board = new Board(lettersObjs);
+    findValidWords(board);
+    printOutput();
+  } else if (letters.length == 25) {
+    for (let i = 0; i < 25; i++) {
+      inputLetters.push(letters[i]));
+    }
+    const lettersObjs = []
+    for (let i = 0; i < 25; i++) {
+      lettersObjs.push(new Letter(inputLetters[i], i));
+    }
+    const board = new Boarder(lettersObjs);
+    findValidWords(board);
+    printOutput();
   }
 }
 
