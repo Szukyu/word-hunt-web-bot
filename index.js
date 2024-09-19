@@ -224,7 +224,7 @@ class Donut {
     for (let i = 0; i < this.lb.length; i++) {
       newArr.push(this.lb[i].copyLetter());
     }
-    return new Boarder(newArr);
+    return new Donut(newArr);
   }
 
   peekUpperLeft(pos) {
