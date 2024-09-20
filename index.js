@@ -192,7 +192,7 @@ class Boarder {
     }
     return this.lb[pos - 1];
   }
-  
+
   visitDirection(pos, dir) {
     const directionDict = {
       [UPLEFT]: this.peekUpperLeft.bind(this),
@@ -230,8 +230,7 @@ class Donut {
   peekUpperLeft(pos) {
     if (pos <= 4 || pos == 8 || pos == 12 || pos == 15) {
       return -1;
-    }
-    else if (pos == 9 || pos == 16) {
+    } else if (pos == 9 || pos == 16) {
       return this.lb[pos - 6];
     } else {
       return this.lb[pos -5];
@@ -249,7 +248,7 @@ class Donut {
   }
 
   peekUpperRight(pos) {
-    if (pos < 3 || pos == 6 || pos == 7 || pos == 11 || pos == 16 || pos == 13) {
+    if (pos < 3 || pos == 6 || pos == 7 || pos == 11 || pos == 13 || pos == 16) {
       return -1;
     } else if (pos == 8 || pos ==  9 || pos == 14 || pos == 15) {
       return this.lb[pos - 4];
@@ -277,9 +276,9 @@ class Donut {
   }
 
   peekDown(pos) {
-    if (pos == 5 || pos == 12 || pos >= 17) {
+    if (pos == 5 || pos == 12 || pos >= 16) {
       return -1;
-    } else if (pos == 4 || pos == 5 || pos == 10 || pos == 11) {
+    } else if (pos == 3 || pos == 4 || pos == 10 || pos == 11) {
       return this.lb[pos + 5];
     } else {
       return this.lb[pos + 4];
