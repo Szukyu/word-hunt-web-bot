@@ -1,14 +1,13 @@
 import { useState, useCallback } from 'react';
 import { MAX_LENGTH, DIRECTIONS, Letter, Board, Boarder, Donut } from '../utils/Board.jsx';
-import { englishWords, wordStarts } from './load';
 
-const validWordsOnly = new Set();
-const valids = new Set();
-
-const search = () => {
+const search = (englishWords, wordStarts) => {
   const [foundWords, setFoundWords] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState(null);
+
+  const validWordsOnly = new Set();
+  const valids = new Set();
 
   const wordCompare = useCallback((a, b) => {
     if (a.word.length < b.word.length) return 1;
@@ -17,6 +16,11 @@ const search = () => {
   }, []);
 
   const findValidFrom = useCallback((board, word, letter, length, startPos) => {
+    if (!englishWords || !wordStarts) {
+      console.warn("Word List Not Loaded");
+      return;
+    }
+
     if (length >= 3 && !wordStarts.has(word)) {
       return;
     }
@@ -37,7 +41,7 @@ const search = () => {
         findValidFrom(copyBoard, word + neighborLetter.char, neighborLetter, length + 1, startPos);
       }
     }
-  }, []);
+  }, [englishWords, wordStarts]);
 
   const findValidWords = useCallback((board) => {
     validWordsOnly.clear();
@@ -57,26 +61,18 @@ const search = () => {
     setSearchError(null);
     setFoundWords([]);
 
-    const inputLetters = [];
     let board;
 
     try {
-      if (letters.length === 16) {
-        for (let i = 0; i < 16; i++) {
-          inputLetters.push(letters[i]);
-        }
+      const inputLetters = letters.split('');
+
+      if (inputLetters.length === 16) {
         const lettersObjs = inputLetters.map((char, i) => new Letter(char, i));
         board = new Board(lettersObjs);
-      } else if (letters.length === 25) {
-        for (let i = 0; i < 25; i++) {
-          inputLetters.push(letters[i]);
-        }
+      } else if (inputLetters.length === 25) {
         const lettersObjs = inputLetters.map((char, i) => new Letter(char, i));
         board = new Boarder(lettersObjs);
-      } else if (letters.length === 20) {
-        for (let i = 0; i < 20; i++) {
-          inputLetters.push(letters[i]);
-        }
+      } else if (inputLetters.length === 20) {
         const letterObjs = inputLetters.map((char, i) => new Letter(char, i));
         board = new Donut(letterObjs);
       } else {
