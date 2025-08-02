@@ -1,13 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import useSearch from '../../hooks/search';
 import useLoad from '../../hooks/load';
+import Board from '../Board/Board.jsx';
 import './Input.css';
 
 function Input() {
   const [contentVisible, setContentVisible] = useState(true);
   const [inputValue, setInputValue] = useState('');
+  const [boardLetters, setBoardLetters] = useState('');
 
-  const { englishWords, wordStarts, loading, error: loadError } = useLoad();
+  const { englishWords, wordStarts } = useLoad();
   const { foundWords, isSearching, searchError, searchWords } = useSearch(englishWords, wordStarts);
 
   const handleInputChange = (event) => {
@@ -18,17 +20,9 @@ function Input() {
     if (event.key === 'Enter') {
       const trimmedLetters = inputValue.trim().toLowerCase();
 
-      if (loading) {
-        alert("Please wait, word list is still loading.");
-        return;
-      }
-      if (loadError) {
-        alert(`Error loading word list: ${loadError.message}`);
-        return;
-      }
-
       if (trimmedLetters.length === 16 || trimmedLetters.length === 20 || trimmedLetters.length === 25) {
         searchWords(trimmedLetters);
+        setBoardLetters(trimmedLetters);
         setContentVisible(false);
       } else {
         alert("Please enter 16, 20, or 25 letters for the board.");
@@ -36,14 +30,6 @@ function Input() {
       setInputValue('');
     }
   };
-
-  if (loading) {
-    return <div className="input-wrapper">Loading word dictionary...</div>;
-  }
-
-  if (loadError) {
-    return <div className="input-wrapper error-message">Error loading word dictionary: {loadError.message}</div>;
-  }
 
   return (
     <>
@@ -55,7 +41,7 @@ function Input() {
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             placeholder="Enter Letters (16, 20, or 25)"
-            disabled={isSearching} // Disable input while searching
+            disabled={isSearching}
           />
           {isSearching && <p>Searching...</p>}
         </div>
@@ -65,12 +51,20 @@ function Input() {
 
       {foundWords.length > 0 && (
         <div id="output">
-          <h2>{foundWords.length} words were found.</h2>
-          <ul>
-            {foundWords.map((entry, index) => (
-              <li key={index}>{index + 1}: {entry.word}</li>
-            ))}
-          </ul>
+          <div className="left">
+            {/* Pass the boardLetters to the Board component */}
+            <Board letters={boardLetters}></Board>
+          </div>
+          <div className="right">
+            <h2>{foundWords.length} words were found.</h2>
+            <div className="word-list-container"> {/* New container for scrollbar */}
+              <ul>
+                {foundWords.map((entry, index) => (
+                  <li key={index}>{entry.word}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       )}
     </>

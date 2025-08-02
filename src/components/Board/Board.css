@@ -1,0 +1,17 @@
+.board-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+  background-color: #0a0d1f;
+  border-radius: 16px;
+  border: 2px solid #1a1f3a;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.board-row {
+  display: flex;
+  gap: 8px;
+}

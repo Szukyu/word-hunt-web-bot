@@ -26,7 +26,7 @@ const search = (englishWords, wordStarts) => {
     }
 
     if (englishWords.has(word) && !validWordsOnly.has(word)) {
-      validWordsOnly.add(word);
+      validWordsOnly.add(word.toUpperCase());
       valids.add({ pos: startPos, word });
     }
 
