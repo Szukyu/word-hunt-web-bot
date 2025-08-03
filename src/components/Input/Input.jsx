@@ -9,7 +9,7 @@ function Input() {
   const [inputValue, setInputValue] = useState('');
   const [boardLetters, setBoardLetters] = useState('');
   const { englishWords, wordStarts } = useLoad();
-  const { foundWords, isSearching, searchError, searchWords } = useSearch(englishWords, wordStarts);
+  const { foundWords, isSearching, searchWords } = useSearch(englishWords, wordStarts);
   
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
@@ -45,11 +45,9 @@ function Input() {
         </div>
       )}
       
-      {searchError && <p className="error-message">Error: {searchError}</p>}
-      
       {foundWords.length > 0 && (
         <div id="output">
-          <div className="main-container">
+          <div className="container">
             <div className="left">
               <Board letters={boardLetters}></Board>
             </div>
