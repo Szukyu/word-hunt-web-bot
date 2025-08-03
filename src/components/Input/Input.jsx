@@ -8,18 +8,16 @@ function Input() {
   const [contentVisible, setContentVisible] = useState(true);
   const [inputValue, setInputValue] = useState('');
   const [boardLetters, setBoardLetters] = useState('');
-
   const { englishWords, wordStarts } = useLoad();
   const { foundWords, isSearching, searchError, searchWords } = useSearch(englishWords, wordStarts);
-
+  
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
   };
-
+  
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
       const trimmedLetters = inputValue.trim().toLowerCase();
-
       if (trimmedLetters.length === 16 || trimmedLetters.length === 20 || trimmedLetters.length === 25) {
         searchWords(trimmedLetters);
         setBoardLetters(trimmedLetters);
@@ -30,7 +28,7 @@ function Input() {
       setInputValue('');
     }
   };
-
+  
   return (
     <>
       {contentVisible && (
@@ -46,23 +44,24 @@ function Input() {
           {isSearching && <p>Searching...</p>}
         </div>
       )}
-
+      
       {searchError && <p className="error-message">Error: {searchError}</p>}
-
+      
       {foundWords.length > 0 && (
         <div id="output">
-          <div className="left">
-            {/* Pass the boardLetters to the Board component */}
-            <Board letters={boardLetters}></Board>
-          </div>
-          <div className="right">
-            <h2>{foundWords.length} words were found.</h2>
-            <div className="word-list-container"> {/* New container for scrollbar */}
-              <ul>
-                {foundWords.map((entry, index) => (
-                  <li key={index}>{entry.word}</li>
-                ))}
-              </ul>
+          <div className="main-container">
+            <div className="left">
+              <Board letters={boardLetters}></Board>
+            </div>
+            <div className="right">
+              <h2>{foundWords.length} words were found.</h2>
+              <div className="word-list-container">
+                <ul>
+                  {foundWords.map((entry, index) => (
+                    <li key={index}>{entry.word}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
         </div>
