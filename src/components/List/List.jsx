@@ -118,7 +118,7 @@ const List = ({
             }}
           >
             <div className={`item ${selectedIndex === index ? 'selected' : ''} ${itemClassName}`}>
-              <p className="item-text">{item}</p>
+              <p className="item-text">{item.word}</p>
             </div>
           </Item>
         ))}
@@ -140,4 +140,3 @@ const List = ({
 };
 
 export default List;
-
