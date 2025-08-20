@@ -27,7 +27,7 @@ const List = ({
     'Item 6', 'Item 7', 'Item 8', 'Item 9', 'Item 10',
     'Item 11', 'Item 12', 'Item 13', 'Item 14', 'Item 15'
   ],
-  onItemSelect,
+  onItemHover,
   showGradients = true,
   enableArrowNavigation = true,
   className = '',
@@ -64,8 +64,8 @@ const List = ({
       } else if (e.key === 'Enter') {
         if (selectedIndex >= 0 && selectedIndex < items.length) {
           e.preventDefault();
-          if (onItemSelect) {
-            onItemSelect(items[selectedIndex], selectedIndex);
+          if (onItemHover) {
+            onItemHover(items[selectedIndex], selectedIndex);
           }
         }
       }
@@ -73,7 +73,7 @@ const List = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [items, selectedIndex, onItemSelect, enableArrowNavigation]);
+  }, [items, selectedIndex, onItemHover, enableArrowNavigation]);
 
   useEffect(() => {
     if (!keyboardNav || selectedIndex < 0 || !listRef.current) return;
@@ -109,11 +109,10 @@ const List = ({
             key={index}
             delay={0.1}
             index={index}
-            onMouseEnter={() => setSelectedIndex(index)}
-            onClick={() => {
+            onMouseEnter={() => {
               setSelectedIndex(index);
-              if (onItemSelect) {
-                onItemSelect(item, index);
+              if (onItemHover) {
+                onItemHover(item, index);
               }
             }}
           >

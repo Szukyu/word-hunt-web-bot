@@ -1,11 +1,10 @@
-import React from 'react';
-
-function Tile({ value, onClick }) {
+const Tile = ({ value, part }) => {
   return (
-    <div className="tile" onClick={onClick}>
+    <div className={`tile ${part ? 'part' : ''}`}>
       {value}
     </div>
   );
-}
+};
 
 export default Tile;
+

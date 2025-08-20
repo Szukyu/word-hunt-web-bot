@@ -9,6 +9,7 @@ function Input() {
   const [contentVisible, setContentVisible] = useState(true);
   const [inputValue, setInputValue] = useState('');
   const [boardLetters, setBoardLetters] = useState('');
+  const [boardPositions, setBoardPositions] = useState([]);
   const { englishWords, wordStarts } = useLoad();
   const { foundWords, isSearching, searchWords } = useSearch(englishWords, wordStarts);
 
@@ -20,8 +21,8 @@ function Input() {
     if (event.key === 'Enter') {
       const trimmedLetters = inputValue.trim().toLowerCase();
       if (trimmedLetters.length === 16 || trimmedLetters.length === 20 || trimmedLetters.length === 25) {
-        searchWords(trimmedLetters);
         setBoardLetters(trimmedLetters);
+        searchWords(trimmedLetters);
         setContentVisible(false);
       } else {
         alert("Please enter 16, 20, or 25 letters for the board.");
@@ -50,12 +51,12 @@ function Input() {
         <div id="output">
           <div className="container">
             <div className="left">
-              <Board letters={boardLetters}></Board>
+              <Board letters={boardLetters} positions={boardPositions}></Board>
             </div>
             <div className="right">
               <List
                 items={foundWords}
-                onItemSelect={(item, _) => console.log(item, item.pos)}
+                onItemHover={(item, _) => setBoardPositions(item.pos)}
                 showGradients={true}
                 enableArrowNavigation={true}
                 displayScrollbar={true}

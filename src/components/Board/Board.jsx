@@ -1,29 +1,27 @@
-import React, { useState } from 'react';
-import Tile from "../Tile/Tile.jsx"
+import { useState, useEffect } from 'react';
+import Tile from "../Tile/Tile.jsx";
 
-const Board = ({ letters = '' }) => {
+const Board = ({ letters = '', positions = [] }) => {
   const initializeTiles = () => {
-    if (letters && letters.length >= 16) {
-      return letters.slice(0, 16).split('').map(letter => letter.toUpperCase());
+    if (letters && letters.length === 16) {
+      return letters.split('').map(letter => letter.toUpperCase());
     }
     return Array(16).fill(null);
   };
-  
+
   const [tiles, setTiles] = useState(initializeTiles());
-  
-  React.useEffect(() => {
+
+  useEffect(() => {
     setTiles(initializeTiles());
   }, [letters]);
-  
+
   const renderTile = (i) => {
+    const isPart = positions.includes(i);
     return (
-      <Tile
-        key={i}
-        value={tiles[i]}
-      />
+      <Tile key={i} value={tiles[i]} part={isPart} />
     );
   };
-  
+
   const rows = [];
   for (let i = 0; i < 4; i++) {
     const rowTiles = [];
@@ -37,9 +35,9 @@ const Board = ({ letters = '' }) => {
       </div>
     );
   }
-  
+
   return (
-    <div className="app" style={{backgroundColor: '#080A18'}}>
+    <div className="app" style={{ backgroundColor: '#080A18' }}>
       <div className="board-container">
         {rows}
       </div>

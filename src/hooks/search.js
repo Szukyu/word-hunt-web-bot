@@ -15,7 +15,7 @@ const search = (englishWords, wordStarts) => {
     return a.word.localeCompare(b.word);
   }, []);
 
-  const findValidFrom = useCallback((board, word, letter, length, startPos) => {
+  const findValidFrom = useCallback((board, word, letter, length, startPos, positions) => {
     if (!englishWords || !wordStarts) {
       console.warn("Word List Not Loaded");
       return;
@@ -27,18 +27,20 @@ const search = (englishWords, wordStarts) => {
 
     if (englishWords.has(word) && !validWordsOnly.has(word)) {
       validWordsOnly.add(word.toUpperCase());
-      valids.add({ pos: startPos, word });
+      valids.add({ pos: positions, word });
     }
 
     if (length >= MAX_LENGTH) {
       return;
     }
+    
+    positions.push(letter.pos);
 
     for (const dir of DIRECTIONS) {
       const copyBoard = board.copyBoard();
       const neighborLetter = copyBoard.visitDirection(letter.pos, dir);
       if (neighborLetter !== -1) {
-        findValidFrom(copyBoard, word + neighborLetter.char, neighborLetter, length + 1, startPos);
+        findValidFrom(copyBoard, word + neighborLetter.char, neighborLetter, length + 1, startPos, [...positions]);
       }
     }
   }, [englishWords, wordStarts]);
@@ -49,7 +51,7 @@ const search = (englishWords, wordStarts) => {
 
     board.lb.forEach(letter => {
       letter.markVisited();
-      findValidFrom(board, letter.char, letter, 1, letter.pos);
+      findValidFrom(board, letter.char, letter, 1, letter.pos, []);
       letter.visited = false;
     });
 
