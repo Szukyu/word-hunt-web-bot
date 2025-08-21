@@ -1,4 +1,4 @@
-.tile {
+.invisibleTile {
   width: 70px;
   height: 70px;
   background: linear-gradient(135deg, rgba(0, 170, 255, 0.2) 0%, rgba(0, 130, 255, 0.1) 100%);
@@ -18,7 +18,7 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
-.tile::before {
+.invisibleTile::before {
   content: '';
   position: absolute;
   top: 0;
@@ -27,12 +27,4 @@
   bottom: 0;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
   pointer-events: none;
-}
-
-.tile.part {
-  background: linear-gradient(135deg, rgba(0, 255, 85, 0.4) 0%, rgba(0, 255, 85, 0.15) 100%);
-  border: 2px solid rgba(0, 255, 85, 0.8);
-  box-shadow: 
-    0 4px 15px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(0, 255, 85, 0.5);
 }
