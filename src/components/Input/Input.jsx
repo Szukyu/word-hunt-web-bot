@@ -81,6 +81,7 @@ function Input() {
                 showGradients={true}
                 enableArrowNavigation={true}
                 displayScrollbar={true}
+                listSize={listSize}
               />
             </div>
           </div>
