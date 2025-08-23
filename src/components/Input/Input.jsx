@@ -55,17 +55,14 @@ function Input() {
   return (
     <>
       {contentVisible && (
-        <div className="input-wrapper">
-          <input
-            type="text"
-            value={inputValue}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            placeholder="Enter Letters (16, 20, or 25)"
-            disabled={isSearching}
-          />
-          {isSearching && <p>Searching...</p>}
-        </div>
+        <input
+          type="text"
+          value={inputValue}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          placeholder="Enter Letters (16, 20, or 25)"
+          disabled={isSearching}
+        />
       )}
 
       {foundWords.length > 0 && (
