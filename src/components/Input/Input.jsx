@@ -3,6 +3,7 @@ import useSearch from '../../hooks/search';
 import useLoad from '../../hooks/load';
 import Board from '../Board/Board.jsx';
 import Boarder from '../Boarder/Boarder.jsx';
+import Donut from '../Donut/Donut.jsx'
 import List from '../List/List.jsx';
 import './Input.css';
 
@@ -48,6 +49,8 @@ function Input() {
       return <Board letters={boardLetters} positions={boardPositions}> </Board>
     } else if (boardLetters.length === 25) {
       return <Boarder letters={boardLetters} positions={boardPositions}> </Boarder>
+    } else if (boardLetters.length === 20) {
+      return <Donut letters={boardLetters} positions={boardPositions}> </Donut>
     }
     // Other Boards go Here
   } 

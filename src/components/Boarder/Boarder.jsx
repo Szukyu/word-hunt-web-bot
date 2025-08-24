@@ -46,4 +46,3 @@ const Boarder = ({ letters = '', positions = [] }) => {
 };
 
 export default Boarder;
-
