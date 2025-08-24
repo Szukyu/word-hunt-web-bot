@@ -321,3 +321,109 @@ export class Donut {
     return visitedLetter;
   }
 }
+
+// X Board Class
+export class X {
+  constructor(lettersArr) {
+    this.lb = lettersArr;
+  }
+
+  copyBoard() {
+    const newArr = []
+    for (let i = 0; i < this.lb.length; i++) {
+      newArr.push(this.lb[i].copyLetter());
+    }
+    return new X(newArr);
+  }
+
+  peekUpperLeft(pos) {
+    if (pos <= 4 || pos == 7 || pos == 12 || pos == 13 || pos == 17) {
+      return -1;
+    } else if (pos == 8 || pos == 18) {
+      return this.lb[pos - 6];
+    } else {
+      return this.lb[pos - 5];
+    }
+  }
+
+  peekUp(pos) {
+    if (pos <= 3 || pos === 6 || pos === 12 || pos === 16) {
+      return -1;
+    } else if (pos === 7 || pos === 8 || pos === 17 || pos === 18) {
+      return this.lb[pos - 5];
+    } else {
+      return this.lb[pos - 4];
+    }
+  }
+
+  peekUpperRight(pos) {
+    if (pos <= 3 || pos === 5 || pos === 8 || pos === 15 || pos === 16 || pos === 20) {
+      return -1;
+    } else if (pos === 6 || pos === 7 || pos === 17 || pos === 18) {
+      return this.lb[pos - 4];
+    } else {
+      return this.lb[pos - 3];
+    }
+  }
+
+  peekRight(pos) {
+    if (pos === 1 || pos === 3 || pos === 8 || pos === 11 || pos === 16 || pos === 18 || pos === 20) {
+      return -1;
+    }
+    return this.lb[pos + 1];
+  }
+
+  peekLowerRight(pos) {
+    if (pos === 3 || pos === 7 || pos === 8 || pos === 13 || pos >= 16) {
+      return -1;
+    } else if (pos === 2 || pos === 12) {
+      return this.lb[pos + 6];
+    }
+    return this.lb[pos + 5];
+  }
+
+  peekDown(pos) {
+    if (pos === 4 || pos === 8 || pos === 14 || pos >= 17) {
+      return -1;
+    } else if (pos === 2 || pos === 12 || pos === 3 || pos === 13) {
+      return this.lb[pos + 5];
+    }
+    return this.lb[pos + 4];
+  }
+
+  peekLowerLeft(pos) {
+    if (pos >= 17 || pos === 15 || pos === 5 || pos === 12 || pos === 4 || pos === 0) {
+      return -1;
+    } else if (pos === 2 || pos === 3 || pos === 13 || pos === 14) {
+      return this.lb[pos + 4];
+    }
+    return this.lb[pos + 3];
+  }
+
+  peekLeft(pos) {
+    if (pos === 0 || pos === 2 || pos === 4 || pos === 9 || pos === 12 || pos === 17 || pos === 19) {
+      return -1;
+    }
+    return this.lb[pos - 1];
+  }
+
+  visitDirection(pos, dir) {
+    const directionDict = {
+      [UPLEFT]: this.peekUpperLeft.bind(this),
+      [UP]: this.peekUp.bind(this),
+      [UPRIGHT]: this.peekUpperRight.bind(this),
+      [RIGHT]: this.peekRight.bind(this),
+      [DOWNRIGHT]: this.peekLowerRight.bind(this),
+      [DOWN]: this.peekDown.bind(this),
+      [DOWNLEFT]: this.peekLowerLeft.bind(this),
+      [LEFT]: this.peekLeft.bind(this)
+    };
+
+    const visitedLetter = directionDict[dir](pos);
+    if (visitedLetter === -1 || visitedLetter.visited) {
+      return -1;
+    }
+    visitedLetter.markVisited();
+    return visitedLetter;
+  }
+}
