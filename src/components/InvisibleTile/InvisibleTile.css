@@ -1,7 +1,8 @@
 .invisibleTile {
   width: 70px;
   height: 70px;
-  background: #080A18;
+  background: #05060e;
+  border: 2px solid #05060e;
   display: flex;
   align-items: center;
   justify-content: center;
