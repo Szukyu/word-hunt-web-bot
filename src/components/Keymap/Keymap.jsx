@@ -3,6 +3,7 @@ import './Keymap.css'
 
 const Keymap = () => {
   const [flashingKeys, setFlashingKeys] = useState(new Set());
+  const [word, setWord] = useState('');
 
   const layoutData = {
     row1: [
@@ -45,6 +46,11 @@ const Keymap = () => {
     const key = keyCodeMap[e.code];
     if (key) {
       flashKey(key);
+      if (key === "Enter") {
+        setWord('')
+      } else {
+        setWord(prev => prev + key.toUpperCase());
+      }
     }
   }, [flashKey]);
 
@@ -106,11 +112,14 @@ const Keymap = () => {
   };
 
   return (
-    <div className="keymap-layout">
-      {renderRow(layoutData.row1, 0)}
-      {renderRow(layoutData.row2, 1)}
-      {renderRow(layoutData.row3, 2)}
-      {renderRow(layoutData.row4, 3)}
+    <div>
+      <div className="word">{word} </div>
+      <div className="keymap-layout">
+        {renderRow(layoutData.row1, 0)}
+        {renderRow(layoutData.row2, 1)}
+        {renderRow(layoutData.row3, 2)}
+        {renderRow(layoutData.row4, 3)}
+      </div>
     </div>
   );
 };
