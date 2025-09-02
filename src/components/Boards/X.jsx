@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import Tile from "../Tile/Tile.jsx";
-import InvisibleTile from "../InvisibleTile/InvisibleTile.jsx"
+import InvisibleTile from "../InvisibleTile/InvisibleTile.jsx";
 
 const X = ({ letters = '', positions = [] }) => {
   const initializeTiles = () => {
@@ -19,13 +19,13 @@ const X = ({ letters = '', positions = [] }) => {
   const renderTile = (i) => {
     const isPart = positions.includes(i);
     return (
-      <Tile key={i} value={tiles[i]} part={isPart} />
+      <Tile key={`tile${i}`} value={tiles[i]} part={isPart} />
     );
   };
   
-  const renderInvis = () => {
+  const renderInvis = (i) => {
     return (
-      <InvisibleTile />
+      <InvisibleTile key={`invis${i}`} />
     );
   };
 
@@ -37,7 +37,7 @@ const X = ({ letters = '', positions = [] }) => {
   tileIndex++;
   rowTiles.push(renderTile(tileIndex));
   tileIndex++;
-  rowTiles.push(renderInvis());
+  rowTiles.push(renderInvis(tileIndex));
   rowTiles.push(renderTile(tileIndex));
   tileIndex++;
   rowTiles.push(renderTile(tileIndex));
@@ -66,14 +66,14 @@ const X = ({ letters = '', positions = [] }) => {
   );
   i++
   rowTiles = [];
-  rowTiles.push(renderInvis());
+  rowTiles.push(renderInvis(tileIndex));
   rowTiles.push(renderTile(tileIndex));
   tileIndex++;
   rowTiles.push(renderTile(tileIndex));
   tileIndex++;
   rowTiles.push(renderTile(tileIndex));
   tileIndex++;
-  rowTiles.push(renderInvis());
+  rowTiles.push(renderInvis(tileIndex));
   rows.push(
     <div key={i} className="board-row">
       {rowTiles}
@@ -102,7 +102,7 @@ const X = ({ letters = '', positions = [] }) => {
   tileIndex++;
   rowTiles.push(renderTile(tileIndex));
   tileIndex++;
-  rowTiles.push(renderInvis());
+  rowTiles.push(renderInvis(tileIndex));
   rowTiles.push(renderTile(tileIndex));
   tileIndex++;
   rowTiles.push(renderTile(tileIndex));

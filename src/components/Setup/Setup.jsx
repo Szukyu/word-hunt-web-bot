@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Board from "../Boards/Board"
+import Board from "../oards/Board"
 import Boarder from "../Boards/Boarder";
 import Donut from "../Boards/Donut";
 import X from "../Boards/X";

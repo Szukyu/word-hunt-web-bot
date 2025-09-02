@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import useSearch from '../../hooks/search';
 import useLoad from '../../hooks/load';
-import Board from '../Board/Board.jsx';
-import Boarder from '../Boarder/Boarder.jsx';
-import Donut from '../Donut/Donut.jsx'
-import X from '../X/X'
+import Board from '../Boards/Board.jsx';
+import Boarder from '../Boards/Boarder.jsx';
+import Donut from '../Boards/Donut.jsx'
+import X from '../Boards/X.jsx'
 import List from '../List/List.jsx';
 import './Input.css';
 

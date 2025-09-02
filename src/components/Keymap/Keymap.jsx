@@ -28,7 +28,7 @@ const Keymap = () => {
     'KeyH': 'h', 'KeyJ': 'j', 'KeyK': 'k', 'KeyL': 'l',
     'KeyZ': 'z', 'KeyX': 'x', 'KeyC': 'c', 'KeyV': 'v', 'KeyB': 'b',
     'KeyN': 'n', 'KeyM': 'm',
-    'Enter': 'Enter'
+    'Enter': 'Enter', 'Space': 'Space', 'Backspace': 'Backspace'
   };
 
   const flashKey = useCallback((key) => {
@@ -45,9 +45,18 @@ const Keymap = () => {
   const handleKeyDown = useCallback((e) => {
     const key = keyCodeMap[e.code];
     if (key) {
-      flashKey(key);
-      if (key === "Enter") {
+      console.log(key);
+      
+      if (key === "Space") {
+        flashKey("Enter");
+      } else {
+        flashKey(key);
+      }
+
+      if (key === "Enter" || key === "Space") {
         setWord('')
+      } else if (key === "Backspace") {
+        setWord(prev => prev.substring(0, prev.length - 1));
       } else {
         setWord(prev => prev + key.toUpperCase());
       }
@@ -90,7 +99,7 @@ const Keymap = () => {
 
     return (
       <div key={index} className={keyClasses}>
-        <span>{isEnter ? 'Enter' : (upperCase || lowerCase)}</span>
+        <span>{isEnter ? 'Enter / Space' : (upperCase || lowerCase)}</span>
         {hasBump && <div className="bump"></div>}
       </div>
     );
