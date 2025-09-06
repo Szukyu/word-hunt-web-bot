@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import useSearch from '../../hooks/search';
-import useLoad from '../../hooks/load';
 import Board from '../Boards/Board.jsx';
 import Boarder from '../Boards/Boarder.jsx';
 import Donut from '../Boards/Donut.jsx'
@@ -8,14 +7,13 @@ import X from '../Boards/X.jsx'
 import List from '../List/List.jsx';
 import './Input.css';
 
-function Input() {
+function Input({ englishWords, wordStarts }) {
   const [contentVisible, setContentVisible] = useState(true);
   const [inputValue, setInputValue] = useState('');
   const [boardSize, setBoardSize] = useState(null);
   const [listSize, setListSize] = useState(0);
   const [boardLetters, setBoardLetters] = useState('');
   const [boardPositions, setBoardPositions] = useState([]);
-  const { englishWords, wordStarts } = useLoad();
   const { foundWords, isSearching, searchWords } = useSearch(englishWords, wordStarts);
 
   const handleInputChange = (event) => {
