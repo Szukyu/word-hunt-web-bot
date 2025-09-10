@@ -9,6 +9,6 @@ Thank you.
 Hosted on Vercel. Link at About Page
 
 
-#### PLANNED: PLAYING WORD HUNT #####
+#### CURRENTLY WIP: PLAYING WORD HUNT #####
 
 P.S. Temporary README
