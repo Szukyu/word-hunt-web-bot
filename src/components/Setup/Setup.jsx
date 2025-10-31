@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Board from "../Boards/Board";
 import Boarder from "../Boards/Boarder";
 import Donut from "../Boards/Donut";
@@ -7,7 +7,26 @@ import './Setup.css';
 
 const Setup = ({ englishWords, wordStarts }) => {
   const [selectedBoard, setSelectedBoard] = useState(0);
-  const [gameTime, setGameTime] = useState(30); // 30 Seconds Default
+  const [gameTime, setGameTime] = useState(30);
+  const [windowSize, setWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight
+  });
+
+  const MIN_WIDTH = 970;
+  const MIN_HEIGHT = 660;
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const boardOptions = [
     { 
@@ -36,7 +55,6 @@ const Setup = ({ englishWords, wordStarts }) => {
 
   const renderBoard = (option) => {
     const props = { letters: option.letters, positions: [] };
-
     switch(option.component) {
       case 'Board': return <Board {...props} />;
       case 'Boarder': return <Boarder {...props} />;
@@ -50,10 +68,6 @@ const Setup = ({ englishWords, wordStarts }) => {
     setSelectedBoard(index);
   };
 
-  const handleTimeChange = (e) => {
-    // Pass to Timer Hook
-  };
-
   const formatTime = (sec) => {
     return `${sec} seconds`;
   };
@@ -62,54 +76,86 @@ const Setup = ({ englishWords, wordStarts }) => {
     // TEMP
   };
 
+  // Check if window is too small
+  if (windowSize.width < MIN_WIDTH || windowSize.height < MIN_HEIGHT) {
+    return (
+      <div className="size-warning-container">
+        <div className="size-warning-content">
+          <div className="warning-icon">📱</div>
+          <h1 className="warning-title">Screen Too Small</h1>
+          <p className="warning-message">
+            Please resize your window to at least {MIN_WIDTH} × {MIN_HEIGHT} pixels 
+            to play the game comfortably.
+          </p>
+          <div className="current-size">
+            Current: {windowSize.width} × {windowSize.height}
+          </div>
+          <div className="required-size">
+            Required: {MIN_WIDTH} × {MIN_HEIGHT} or larger
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="setup-container">
       <div className="setup-content">
         <h1 className="setup-title">Choose Your Arena</h1>
 
-        <div className="main-layout">
-          {/* Left side - Board Preview */}
+        <div className="setup-grid">
+          {/* Board Preview */}
           <div className="preview-section">
-            <div className="preview-container">
-              {renderBoard(boardOptions[selectedBoard])}
+            <div className="preview-wrapper">
+              <div className="preview-container">
+                {renderBoard(boardOptions[selectedBoard])}
+              </div>
             </div>
           </div>
 
-          {/* Right side - Board Options and Timer */}
-          <div className="options-section">
-            <div className="board-options-grid">
-              {boardOptions.map((option, index) => (
-                <div 
-                  key={index}
-                  onClick={() => selectBoard(index)}
-                  className={`board-option ${selectedBoard === index ? 'selected' : ''}`}
-                >
-                  <h3 className="board-name">{option.name}</h3>
-                  <span className="letter-count">{option.letters.length} letters</span>
-                </div>
-              ))}
+          {/* Controls Section */}
+          <div className="controls-section">
+            {/* Board Selection */}
+            <div className="controls-group">
+              <h3 className="controls-title">Board Type</h3>
+              <div className="board-grid">
+                {boardOptions.map((option, index) => (
+                  <button
+                    key={index}
+                    onClick={() => selectBoard(index)}
+                    className={`board-btn ${selectedBoard === index ? 'selected' : ''}`}
+                  >
+                    <span className="board-name">{option.name}</span>
+                    <span className="board-letters">{option.letters.length} letters</span>
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div className="time-section">
-              <h3 className="time-title">Game Duration</h3>
-              <div className="time-slider-container">
-                <input
-                  type="range"
-                  min="0"
-                  max={timeOptions.length - 1}
-                  value={timeOptions.indexOf(gameTime)}
-                  onChange={(e) => setGameTime(timeOptions[parseInt(e.target.value)])}
-                  className="time-slider"
-                />
+            {/* Time Selection */}
+            <div className="controls-group">
+              <h3 className="controls-title">Game Duration</h3>
+              <div className="time-controls">
+                <div className="time-slider-container">
+                  <input
+                    type="range"
+                    min="0"
+                    max={timeOptions.length - 1}
+                    value={timeOptions.indexOf(gameTime)}
+                    onChange={(e) => setGameTime(timeOptions[parseInt(e.target.value)])}
+                    className="time-slider"
+                  />
+                </div>
                 <div className="time-display">
                   {formatTime(gameTime)}
                 </div>
               </div>
             </div>
 
-            <button onClick={startGame} className="start-button">
-              <span className="button-text">Launch Game</span>
-              <span className="button-arrow">→</span>
+            {/* Start Button */}
+            <button onClick={startGame} className="start-btn">
+              <span>Launch Game</span>
+              <span className="arrow">→</span>
             </button>
           </div>
         </div>

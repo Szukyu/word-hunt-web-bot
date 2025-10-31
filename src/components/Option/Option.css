@@ -4,9 +4,12 @@
   justify-content: center;
   align-items: center;
   padding: 20px;
+  flex-wrap: wrap;
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 
-button {
+button.option {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -24,13 +27,17 @@ button {
   transition: all 0.3s ease;
   outline: none;
   min-width: 140px;
+  max-width: 200px;
+  width: auto;
+  flex-shrink: 1;
+  box-sizing: border-box;
   box-shadow: 
     0 8px 32px rgba(0, 0, 0, 0.3),
     0 0 20px rgba(101, 188, 255, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
-button:hover {
+button.option:hover {
   border-color: #65BCFF;
   transform: translateY(-2px);
   box-shadow: 
@@ -39,7 +46,7 @@ button:hover {
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
-button:active {
+button.option:active {
   transform: translateY(0);
   box-shadow: 
     0 4px 20px rgba(0, 0, 0, 0.3),
@@ -47,7 +54,7 @@ button:active {
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-button svg {
+button.option svg {
   font-size: 1.4rem;
   flex-shrink: 0;
 }
@@ -66,4 +73,71 @@ button.cheat:hover {
     0 12px 40px rgba(0, 0, 0, 0.4),
     0 0 30px rgba(101, 188, 255, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 768px) {
+  .option-container {
+    gap: 16px;
+    padding: 16px;
+  }
+  
+  button.option {
+    padding: 16px 24px;
+    font-size: 1rem;
+    min-width: 120px;
+    max-width: 180px;
+  }
+  
+  button.option svg {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .option-container {
+    gap: 12px;
+    padding: 12px;
+  }
+  
+  button.option {
+    padding: 14px 20px;
+    font-size: 0.95rem;
+    min-width: 100px;
+    max-width: 160px;
+  }
+  
+  button.option svg {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 375px) {
+  .option-container {
+    gap: 8px;
+    padding: 8px;
+  }
+  
+  button.option {
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    min-width: 90px;
+    max-width: 140px;
+  }
+  
+  button.option svg {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 320px) {
+  .option-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  button.option {
+    width: 100%;
+    max-width: 200px;
+    min-width: auto;
+  }
 }
