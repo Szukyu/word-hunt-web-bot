@@ -76,7 +76,7 @@ const Setup = ({ englishWords, wordStarts }) => {
     // TEMP
   };
 
-  // Check if window is too small
+  // Window Size Check
   if (windowSize.width < MIN_WIDTH || windowSize.height < MIN_HEIGHT) {
     return (
       <div className="size-warning-container">

@@ -7,8 +7,8 @@ const Navbar = ({ onReset }) => {
         <button className="nav-title" onClick={onReset}>
           Word Hunt
         </button>
-        <a 
-          href="https://github.com/Szukyu/word-hunt-web-bot" 
+        <a
+          href="https://github.com/Szukyu/word-hunt-web-bot"
           target="_blank" 
           rel="noopener noreferrer"
           className="nav-link"

@@ -8,6 +8,9 @@ Thank you.
 
 Hosted on Vercel. Link at About Page
 
+HUGE PROJECT OVERHAUL COMING (No Code Commit for Week or 2)
+BETTER USER INTERFACE (MORE FRIENDLY)
+
 
 #### CURRENTLY WIP: PLAYING WORD HUNT #####
 
