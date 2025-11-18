@@ -6,7 +6,7 @@ Make an Issue if a Word is Missing or a Word Does Not Count
 
 Thank you.
 
-Hosted on Vercel. Link at About Page
+Hosted on Cloudfare. 
 
 HUGE PROJECT OVERHAUL COMING (No Code Commit for Week or 2)
 BETTER USER INTERFACE (MORE FRIENDLY)
