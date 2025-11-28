@@ -1,143 +1,305 @@
-.option-container {
+.option-landing {
   display: flex;
+  align-items: center;
+  gap: 40px;
+  padding: 60px 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+  min-height: 80vh;
+  justify-content: center;
+}
+
+.option-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.option-welcome {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.option-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0;
+}
+
+.option-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
   gap: 24px;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  flex-wrap: wrap;
-  min-height: 100vh;
-  box-sizing: border-box;
+  width: 100%;
+  max-width: 800px;
 }
 
-button.option {
+.option-card {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-card);
+  background: var(--surface-glass-heavy);
+  padding: 28px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  color: var(--text-primary);
+  box-shadow: var(--shadow-soft);
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(20px);
+}
+
+.option-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-medium);
+}
+
+.option-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.option-card-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--surface-glass-light);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 20px 32px;
-  background: rgba(4, 5, 11, 0.75);
-  backdrop-filter: blur(15px);
-  border: 2px solid rgba(101, 188, 255, 0.35);
-  border-radius: 16px;
-  color: #ffffff;
-  font-size: 1.1rem;
-  font-weight: 600;
-  letter-spacing: 0.05rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  outline: none;
-  min-width: 140px;
-  max-width: 200px;
-  width: auto;
-  flex-shrink: 1;
-  box-sizing: border-box;
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.3),
-    0 0 20px rgba(101, 188, 255, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  font-size: 1.8rem;
+  color: var(--accent);
+  box-shadow: var(--shadow-soft);
 }
 
-button.option:hover {
-  border-color: #65BCFF;
-  transform: translateY(-2px);
-  box-shadow: 
-    0 12px 40px rgba(0, 0, 0, 0.4),
-    0 0 30px rgba(101, 188, 255, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+.option-card.play .option-card-icon {
+  background: linear-gradient(135deg, rgba(90, 216, 255, 0.2), rgba(140, 111, 255, 0.2));
+  color: var(--success);
 }
 
-button.option:active {
-  transform: translateY(0);
-  box-shadow: 
-    0 4px 20px rgba(0, 0, 0, 0.3),
-    0 0 20px rgba(101, 188, 255, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+.option-card.cheat .option-card-icon {
+  background: linear-gradient(135deg, rgba(140, 111, 255, 0.2), rgba(255, 143, 177, 0.2));
+  color: var(--accent-strong);
 }
 
-button.option svg {
+.option-card-content {
+  flex: 1;
+}
+
+.option-card h3 {
+  margin: 0 0 12px 0;
   font-size: 1.4rem;
-  flex-shrink: 0;
+  font-weight: 600;
 }
 
-button.play:hover {
-  border-color: #2989FF;
-  box-shadow: 
-    0 12px 40px rgba(0, 0, 0, 0.4),
-    0 0 30px rgba(41, 137, 255, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+.option-card p {
+  margin: 0 0 16px 0;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  font-size: 0.95rem;
 }
 
-button.cheat:hover {
-  border-color: #65BCFF;
-  box-shadow: 
-    0 12px 40px rgba(0, 0, 0, 0.4),
-    0 0 30px rgba(101, 188, 255, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+.option-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.option-features li {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.option-features li::before {
+  content: "✓";
+  color: var(--success);
+  font-weight: bold;
+  font-size: 0.8rem;
+}
+
+.option-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.option-card-cta {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.option-state-card {
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  background: var(--surface-glass-mid);
+  border: 1px solid var(--border-card);
+  text-align: center;
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  max-width: 400px;
+  margin: 100px auto;
+  backdrop-filter: blur(20px);
+}
+
+.option-loading-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.loading-text {
+  text-align: left;
+  flex: 1;
+}
+
+.loading-text p {
+  margin: 0 0 4px 0;
+  font-weight: 600;
+}
+
+.loading-progress {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--border-soft);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+  border-radius: 2px;
+  animation: progress 2s ease-in-out infinite;
+}
+
+.option-state-card.error {
+  border-color: var(--danger);
+}
+
+.retry-button {
+  padding: 10px 24px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 8px;
+}
+
+.retry-button:hover {
+  background: var(--accent-strong);
+  transform: translateY(-1px);
+}
+
+.option-spinner {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid var(--border-soft);
+  border-top-color: var(--accent);
+  animation: spin 1s linear infinite;
+}
+
+.state-subtext {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.option-active {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.option-active-panel {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-card);
+  background: var(--bg-panel);
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+  min-height: 600px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes progress {
+  0% {
+    width: 0%;
+    transform: translateX(0);
+  }
+  50% {
+    width: 100%;
+    transform: translateX(0);
+  }
+  100% {
+    width: 100%;
+    transform: translateX(100%);
+  }
 }
 
 @media (max-width: 768px) {
-  .option-container {
-    gap: 16px;
-    padding: 16px;
+  .option-landing {
+    padding: 40px 16px;
+    gap: 32px;
   }
   
-  button.option {
-    padding: 16px 24px;
-    font-size: 1rem;
-    min-width: 120px;
-    max-width: 180px;
+  .option-header h1 {
+    font-size: 2rem;
   }
   
-  button.option svg {
-    font-size: 1.2rem;
+  .option-card-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .option-card {
+    padding: 24px;
   }
 }
 
 @media (max-width: 480px) {
-  .option-container {
-    gap: 12px;
-    padding: 12px;
+  .option-landing {
+    padding: 32px 12px;
   }
   
-  button.option {
-    padding: 14px 20px;
-    font-size: 0.95rem;
-    min-width: 100px;
-    max-width: 160px;
-  }
-  
-  button.option svg {
-    font-size: 1.1rem;
-  }
-}
-
-@media (max-width: 375px) {
-  .option-container {
-    gap: 8px;
-    padding: 8px;
-  }
-  
-  button.option {
-    padding: 12px 16px;
-    font-size: 0.9rem;
-    min-width: 90px;
-    max-width: 140px;
-  }
-  
-  button.option svg {
-    font-size: 1rem;
-  }
-}
-
-@media (max-width: 320px) {
-  .option-container {
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  button.option {
-    width: 100%;
-    max-width: 200px;
-    min-width: auto;
+  .option-card {
+    padding: 20px;
   }
 }

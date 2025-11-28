@@ -1,74 +1,58 @@
 .tile {
-  width: 70px;
-  height: 70px;
-  background: linear-gradient(135deg, rgba(0, 170, 255, 0.2) 0%, rgba(0, 130, 255, 0.1) 100%);
-  border: 2px solid rgba(0, 170, 255, 0.6);
-  border-radius: 10px;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-md);
+  background: var(--surface-glass-mid);
+  border: 1px solid var(--border-soft);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.6rem;
+  font-size: 1.3rem;
   font-weight: 700;
-  color: #ffffff;
-  user-select: none;
+  letter-spacing: 0.08em;
+  color: var(--text-primary);
+  text-transform: uppercase;
   position: relative;
-  overflow: hidden;
-  box-shadow: 
-    0 4px 15px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  flex-shrink: 0;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
 }
 
-.tile::before {
+.tile:hover {
+  background: var(--surface-glass-heavy);
+  border-color: var(--border-strong);
+}
+
+.tile.part {
+  background: var(--surface-accent);
+  border-color: var(--accent);
+  color: var(--text-primary);
+  box-shadow: 0 4px 16px rgba(90, 216, 255, 0.2);
+}
+
+.tile.part::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, rgba(90, 216, 255, 0.1), transparent);
   pointer-events: none;
-}
-
-.tile.part {
-  background: linear-gradient(135deg, rgba(0, 255, 85, 0.4) 0%, rgba(0, 255, 85, 0.15) 100%);
-  border: 2px solid rgba(0, 255, 85, 0.8);
-  box-shadow: 
-    0 4px 15px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(0, 255, 85, 0.5);
 }
 
 @media (max-width: 768px) {
   .tile {
-    width: 60px;
-    height: 60px;
-    font-size: 1.4rem;
+    width: 52px;
+    height: 52px;
+    font-size: 1.1rem;
   }
 }
 
 @media (max-width: 480px) {
   .tile {
-    width: 50px;
-    height: 50px;
-    font-size: 1.2rem;
-    border-radius: 8px;
-  }
-}
-
-@media (max-width: 375px) {
-  .tile {
-    width: 45px;
-    height: 45px;
-    font-size: 1.1rem;
-    border-radius: 7px;
-  }
-}
-
-@media (max-width: 320px) {
-  .tile {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     font-size: 1rem;
-    border-radius: 6px;
   }
 }

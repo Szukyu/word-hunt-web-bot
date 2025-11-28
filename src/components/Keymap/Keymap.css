@@ -7,7 +7,9 @@
   font-size: 1rem;
   font-weight: 600;
   letter-spacing: 0.1rem;
-  color: #ffffff;
+  color: var(--text-primary);
+  background: var(--surface-glass-light);
+  border: 1px solid var(--border-soft);
   transition: all 0.3s ease;
   min-width: 300px;
   text-align: center;
@@ -36,13 +38,13 @@
   justify-content: center;
   position: relative;
   border-radius: 0.5rem;
-  border: 2px solid rgba(156, 163, 175, 0.6);
+  border: 2px solid var(--border-soft);
   transition: all 0.15s ease-out;
   user-select: none;
   cursor: default;
   font-weight: 600;
   background-color: transparent;
-  color: rgba(209, 213, 219, 0.9);
+  color: var(--text-secondary);
   width: 2rem;
   height: 2rem;
   font-size: 0.875rem;
@@ -55,9 +57,9 @@
 }
 
 .keymap-key.flashing {
-  background-color: #0db9d7;
-  color: white;
-  border-color: #0db9d7;
+  background-color: var(--surface-accent);
+  color: var(--text-primary);
+  border-color: var(--border-strong);
   box-shadow: 0 0 12px rgba(13, 185, 215, 0.4);
   transform: scale(1.02);
 }
@@ -67,7 +69,7 @@
   bottom: 0.125rem;
   width: 0.5rem;
   height: 0.125rem;
-  background-color: rgba(107, 114, 128, 0.7);
+  background-color: var(--text-muted);
   border-radius: 0.125rem;
 }
 
@@ -78,6 +80,6 @@
 .keymap-instruction {
   margin-top: 1rem;
   text-align: center;
-  color: rgba(156, 163, 175, 0.8);
+  color: var(--text-muted);
   font-size: 0.875rem;
 }
