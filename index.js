@@ -148,7 +148,7 @@ document.getElementById("submit").onclick = function() {
   const inputLetters = [];
 
   let letters = document.getElementById("letters").value.trim().toLowerCase();
-  document.querySelector(".input-wrapper")
+  document.querySelector(".input-wrapper").style.visibility = "hidden";
   if (layout === "BOARD") {
     if (letters.length !== 16) {
       throw new Error("Not 16 Letters");
