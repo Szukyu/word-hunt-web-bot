@@ -1,4 +1,3 @@
-import Input from './components/Input/Input.jsx';
 import './App.css';
 import Option from './components/Option/Option.jsx';
 
