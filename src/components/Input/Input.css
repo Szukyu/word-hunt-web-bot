@@ -1,0 +1,17 @@
+input[type="text"] {
+  border: 3px solid;
+  border-radius: 15px;
+  background-color: #04050B;
+  border-color: #65BCFF;
+  padding: 10px 15px;
+  position: relative;
+  width: 300px;
+  height: 20px;
+  letter-spacing: 0.01rem;
+  display: block;
+  outline: none;
+}
+
+input:focus {
+  border-color: #2989FF;
+}
