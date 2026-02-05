@@ -12,7 +12,7 @@
 input[type="text"] {
   border: 3px solid #65BCFF;
   border-radius: 16px;
-  background: rgba(4, 5, 11, 0.9);
+  background: rgba(4, 5, 11, 0.85);
   backdrop-filter: blur(10px);
   padding: 18px 24px;
   width: 400px;
@@ -23,21 +23,21 @@ input[type="text"] {
   outline: none;
   transition: all 0.3s ease;
   box-shadow: 
-    0 8px 32px rgba(101, 188, 255, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 8px 32px rgba(101, 188, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 input[type="text"]:focus {
   border-color: #2989FF;
   box-shadow: 
-    0 0 40px rgba(41, 137, 255, 0.4),
-    0 8px 32px rgba(101, 188, 255, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    0 0 40px rgba(41, 137, 255, 0.5),
+    0 8px 32px rgba(101, 188, 255, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
   transform: translateY(-2px);
 }
 
 input[type="text"]::placeholder {
-  color: rgba(101, 188, 255, 0.6);
+  color: rgba(101, 188, 255, 0.7);
   font-weight: 400;
 }
 
@@ -59,15 +59,15 @@ input[type="text"]:disabled {
 .container {
   display: flex;
   gap: 40px;
-  background: rgba(4, 5, 11, 0.7);
+  background: rgba(4, 5, 11, 0.75);
   backdrop-filter: blur(15px);
-  border: 2px solid rgba(101, 188, 255, 0.3);
+  border: 2px solid rgba(101, 188, 255, 0.35);
   border-radius: 24px;
   padding: 40px;
   box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 0.5),
-    0 0 40px rgba(101, 188, 255, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 20px 60px rgba(0, 0, 0, 0.4),
+    0 0 40px rgba(101, 188, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
   max-width: 1000px;
   height: 400px;
 }
@@ -85,18 +85,17 @@ input[type="text"]:disabled {
   gap: 20px;
 }
 
-/* Board */
 .board-container {
   display: flex;
   flex-direction: column;
   gap: 8px;
   padding: 24px;
-  background: rgba(0, 0, 0, 0.2);
-  border: 2px solid rgba(101, 188, 255, 0.2);
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(101, 188, 255, 0.25);
   border-radius: 20px;
   box-shadow: 
-    0 10px 30px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 10px 30px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .board-row {
@@ -107,8 +106,8 @@ input[type="text"]:disabled {
 .tile {
   width: 70px;
   height: 70px;
-  background: linear-gradient(135deg, rgba(101, 188, 255, 0.15) 0%, rgba(41, 137, 255, 0.1) 100%);
-  border: 2px solid rgba(101, 188, 255, 0.4);
+  background: linear-gradient(135deg, rgba(0, 170, 255, 0.2) 0%, rgba(0, 130, 255, 0.1) 100%);
+  border: 2px solid rgba(0, 170, 255, 0.6);
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -121,7 +120,7 @@ input[type="text"]:disabled {
   overflow: hidden;
   box-shadow: 
     0 4px 15px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 .tile::before {
@@ -133,4 +132,12 @@ input[type="text"]:disabled {
   bottom: 0;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
   pointer-events: none;
+}
+
+.tile.part {
+  background: linear-gradient(135deg, rgba(0, 255, 85, 0.4) 0%, rgba(0, 255, 85, 0.15) 100%);
+  border: 2px solid rgba(0, 255, 85, 0.8);
+  box-shadow: 
+    0 4px 15px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(0, 255, 85, 0.5);
 }
