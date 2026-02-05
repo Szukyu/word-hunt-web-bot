@@ -158,11 +158,11 @@ document.getElementById("submit").onclick = function() {
       throw new Error("Not 16 Letters")
     } else {
       for (let i = 0; i < 16; i++) {
-        inputLetters.append(letters[i]);
+        inputLetters.push(letters[i]);
       }
       lettersObjs = [];
       for (let i = 0; i < 16; i++) {
-        lettersObjs.append(Letter(inputLetters[i]), i);
+        lettersObjs.push(Letter(inputLetters[i]), i);
       }
       let board = Board(lettersObjs)
     }
