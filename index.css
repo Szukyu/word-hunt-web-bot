@@ -3,7 +3,6 @@ body {
   background: rgb(237, 234, 226);
   color: rgb(39, 40, 41);
   height: 100vh;
-  width: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -11,7 +10,6 @@ body {
 }
 
 .input-wrapper {
-  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
