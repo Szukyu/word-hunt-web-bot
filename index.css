@@ -33,6 +33,20 @@ body {
     transition: all 0.4s ease;
 }
 
+.input-wrapper button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 0;
+    padding: 10px;
+    border: none;
+    background: none;
+    font-size: 2rem;
+    color: rgba(39, 40, 41, 0.6);
+    cursor: pointer;
+    transition: all 0.4s ease;
+}
+
 .input-wrapper input:focus, 
 .input-wrapper input:valid {
     outline: 2px solid rgba(101, 40, 247, 0.6);
