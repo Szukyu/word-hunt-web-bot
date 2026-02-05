@@ -11,7 +11,6 @@ function Input() {
   const [boardLetters, setBoardLetters] = useState('');
   const { englishWords, wordStarts } = useLoad();
   const { foundWords, isSearching, searchWords } = useSearch(englishWords, wordStarts);
-  const items = ['Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5', 'Item 6', 'Item 7', 'Item 8', 'Item 9', 'Item 10'];
 
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
@@ -43,13 +42,6 @@ function Input() {
             placeholder="Enter Letters (16, 20, or 25)"
             disabled={isSearching}
           />
-          <List
-            items={items}
-            onItemSelect={(item, index) => console.log(item, index)}
-            showGradients={true}
-            enableArrowNavigation={true}
-            displayScrollbar={true}
-          />
           {isSearching && <p>Searching...</p>}
         </div>
       )}
@@ -62,13 +54,13 @@ function Input() {
             </div>
             <div className="right">
               <h2>{foundWords.length} words were found.</h2>
-              <div className="word-list-container">
-                <ul>
-                  {foundWords.map((entry, index) => (
-                    <li key={index}>{entry.word}</li>
-                  ))}
-                </ul>
-              </div>
+              <List
+                items={foundWords}
+                onItemSelect={(item, _) => console.log(item, item.pos)}
+                showGradients={true}
+                enableArrowNavigation={true}
+                displayScrollbar={true}
+              />
             </div>
           </div>
         </div>
