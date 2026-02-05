@@ -1,3 +1,19 @@
+// Constants
+const UPLEFT = 0;
+const UP = 1;
+const UPRIGHT = 2;
+const RIGHT = 3;
+const DOWNRIGHT = 4;
+const DOWN = 5;
+const DOWNLEFT = 6;
+const LEFT = 7;
+
+const DIRECTIONS = [UPLEFT, UP, UPRIGHT, RIGHT, DOWNRIGHT, DOWN, DOWNLEFT, LEFT];
+
+const MAX_LENGTH = 10;
+
+const wordStarts = new Set();
+
 // Classes
 class Letter {
   constructor(ch, index, visit = False) {
@@ -127,7 +143,7 @@ document.getElementById("submit").onclick = function() {
   
   if (layout == "BOARD") {
     if (len(letters) != 16) {
-      return "a";
+      throw new Error("Not 16 Letters")
     } else {
       for (let i = 0; i < 16; i++) {
         inputLetters.append(letters[i]);
@@ -144,5 +160,17 @@ document.getElementById("submit").onclick = function() {
 }
 
 function findValidWords(board) {
-  return "a"
+  board.lb.forEach(letter => {
+    letter.markVisited();
+
+    findValidFrom(board, letter.char, letter, 1, letter.pos);
+
+    letter.visited = false;
+  });
+}
+
+function findValidFrom(board, word, letter, length, pos) {
+  if (length >= 3 && !wordStarts.has(word)) {
+    return ;
+  }
 }
