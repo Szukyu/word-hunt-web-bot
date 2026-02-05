@@ -4,6 +4,7 @@ import useLoad from '../../hooks/load';
 import Board from '../Board/Board.jsx';
 import Boarder from '../Boarder/Boarder.jsx';
 import Donut from '../Donut/Donut.jsx'
+import X from '../X/X'
 import List from '../List/List.jsx';
 import './Input.css';
 
@@ -24,7 +25,7 @@ function Input() {
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
       const trimmedLetters = inputValue.trim().toLowerCase();
-      if (trimmedLetters.length === 16 || trimmedLetters.length === 20 || trimmedLetters.length === 25) {
+      if (trimmedLetters.length === 16 || trimmedLetters.length === 20 || trimmedLetters.length === 21 || trimmedLetters.length === 25) {
         setBoardLetters(trimmedLetters);
         searchWords(trimmedLetters);
         setContentVisible(false);
@@ -38,7 +39,7 @@ function Input() {
         }
 
       } else {
-        alert("Please enter 16, 20, or 25 letters for the board.");
+        alert("Please Enter 16, 20, 21 or 25 letters For Their Corresponding Board");
       }
       setInputValue('');
     }
@@ -51,8 +52,9 @@ function Input() {
       return <Boarder letters={boardLetters} positions={boardPositions}> </Boarder>
     } else if (boardLetters.length === 20) {
       return <Donut letters={boardLetters} positions={boardPositions}> </Donut>
+    } else {
+      return <X letters={boardLetters} positions={boardPositions}> </X>
     }
-    // Other Boards go Here
   } 
 
   return (
@@ -63,7 +65,7 @@ function Input() {
           value={inputValue}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
-          placeholder="Enter Letters (16, 20, or 25)"
+          placeholder="Enter Letters (16, 20, 21, or 25)"
           disabled={isSearching}
         />
       )}
