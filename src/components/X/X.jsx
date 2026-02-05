@@ -4,10 +4,10 @@ import InvisibleTile from "../InvisibleTile/InvisibleTile.jsx"
 
 const X = ({ letters = '', positions = [] }) => {
   const initializeTiles = () => {
-    if (letters && letters.length === 20) {
+    if (letters && letters.length === 21) {
       return letters.split('').map(letter => letter.toUpperCase());
     }
-    return Array(20).fill(null);
+    return Array(21).fill(null);
   };
 
   const [tiles, setTiles] = useState(initializeTiles());
@@ -33,14 +33,15 @@ const X = ({ letters = '', positions = [] }) => {
   let tileIndex = 0;
   let i = 0;
   let rowTiles = [];
+  rowTiles.push(renderTile(tileIndex));
+  tileIndex++;
+  rowTiles.push(renderTile(tileIndex));
+  tileIndex++;
   rowTiles.push(renderInvis());
   rowTiles.push(renderTile(tileIndex));
   tileIndex++;
   rowTiles.push(renderTile(tileIndex));
   tileIndex++;
-  rowTiles.push(renderTile(tileIndex));
-  tileIndex++;
-  rowTiles.push(renderInvis());
   rows.push(
     <div key={i} className="board-row">
       {rowTiles}
@@ -65,15 +66,14 @@ const X = ({ letters = '', positions = [] }) => {
   );
   i++
   rowTiles = [];
-  rowTiles.push(renderTile(tileIndex));
-  tileIndex++;
-  rowTiles.push(renderTile(tileIndex));
-  tileIndex++;
   rowTiles.push(renderInvis());
   rowTiles.push(renderTile(tileIndex));
   tileIndex++;
   rowTiles.push(renderTile(tileIndex));
   tileIndex++;
+  rowTiles.push(renderTile(tileIndex));
+  tileIndex++;
+  rowTiles.push(renderInvis());
   rows.push(
     <div key={i} className="board-row">
       {rowTiles}
@@ -98,14 +98,15 @@ const X = ({ letters = '', positions = [] }) => {
   );
   i++;
   rowTiles = [];
+  rowTiles.push(renderTile(tileIndex));
+  tileIndex++;
+  rowTiles.push(renderTile(tileIndex));
+  tileIndex++;
   rowTiles.push(renderInvis());
   rowTiles.push(renderTile(tileIndex));
   tileIndex++;
   rowTiles.push(renderTile(tileIndex));
   tileIndex++;
-  rowTiles.push(renderTile(tileIndex));
-  tileIndex++;
-  rowTiles.push(renderInvis());
   rows.push(
     <div key={i} className="board-row">
       {rowTiles}
@@ -121,5 +122,4 @@ const X = ({ letters = '', positions = [] }) => {
   );
 };
 
-export default Donut;
-
+export default X;

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { MAX_LENGTH, DIRECTIONS, Letter, Board, Boarder, Donut } from '../utils/Board.jsx';
+import { MAX_LENGTH, DIRECTIONS, Letter, Board, Boarder, Donut, X} from '../utils/Board.jsx';
 
 const search = (englishWords, wordStarts) => {
   const [foundWords, setFoundWords] = useState([]);
@@ -51,7 +51,7 @@ const search = (englishWords, wordStarts) => {
 
     board.lb.forEach(letter => {
       letter.markVisited();
-      findValidFrom(board, letter.char, letter, 1, letter.pos, []);
+      findValidFrom(board, letter.char, letter, 1, letter.pos, [letter.pos]);
       letter.visited = false;
     });
 
@@ -77,8 +77,11 @@ const search = (englishWords, wordStarts) => {
       } else if (inputLetters.length === 20) {
         const letterObjs = inputLetters.map((char, i) => new Letter(char, i));
         board = new Donut(letterObjs);
+      } else if (inputLetters.length === 21) {
+        const lettersObjs = inputLetters.map((char, i) => new Letter(char, i));
+        board = new X(lettersObjs);
       } else {
-        throw new Error("Invalid number of letters. Please enter 16, 20, or 25 letters.");
+        throw new Error("Please Enter 16, 20, 21 or 25 letters For Their Corresponding Board");
       }
 
       if (board) {
