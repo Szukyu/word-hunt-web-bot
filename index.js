@@ -19,18 +19,18 @@ const wordStarts = new Set();
 
 // Classes
 class Letter {
-  constructor(ch, index, visit = False) {
+  constructor(ch, index, visit = false) {
     this.char = ch;
     this.pos = index;
     this.visited = visit;
   }
 
   copyLetter() {
-    return new Letter(this.char, this.pos, this.visited)
+    return new Letter(this.char, this.pos, this.visited);
   }
 
   markVisited() {
-    this.visited = True
+    this.visited = true;
   }
 }
 
@@ -105,14 +105,14 @@ class Board {
 
   visitDirection(pos, dir) {
     const directionDict = {
-      0: this.peekUpperLeft.bind(this),
-      1: this.peekUp.bind(this),
-      2: this.peekUpperRight.bind(this),
-      3: this.peekRight.bind(this),
-      4: this.peekLowerRight.bind(this),
-      5: this.peekDown.bind(this),
-      6: this.peekLowerLeft.bind(this),
-      7: this.peekLeft.bind(this)
+      [UPLEFT]: this.peekUpperLeft.bind(this),
+      [UP]: this.peekUp.bind(this),
+      [UPRIGHT]: this.peekUpperRight.bind(this),
+      [RIGHT]: this.peekRight.bind(this),
+      [DOWNRIGHT]: this.peekLowerRight.bind(this),
+      [DOWN]: this.peekDown.bind(this),
+      [DOWNLEFT]: this.peekLowerLeft.bind(this),
+      [LEFT]: this.peekLeft.bind(this)
     };
 
     const visitedLetter = directionDict[dir](pos);
@@ -127,78 +127,70 @@ class Board {
 // Main
 document.addEventListener('DOMContentLoaded', function() {
   fetch('words.txt')
-  .then(function(response) {
-      return response.text();
-    })
-  .then(function(words) {
+    .then(response => response.text())
+    .then(words => {
       words.split("\n").forEach(word => {
         const strippedWord = word.trim();
         if (strippedWord.length > MAX_LENGTH) {
-          return ;
+          return;
         }
         englishWords.add(strippedWord);
         for (let i = 3; i <= strippedWord.length; i++) {
           wordStarts.add(strippedWord.substring(0, i));
         }
-      })
+      });
       console.log(englishWords);
     })
-})
+});
 
 document.getElementById("submit").onclick = function() {
-  layout = "BOARD";
+  const layout = "BOARD";
+  const inputLetters = [];
 
-  inputLetters = [];
+  let letters = document.getElementById("letters").value.trim().toLowerCase();
 
-  let letters = document.getElementById("letters").value;
-  letters = letters.toLowerCase();
-  
-  if (layout == "BOARD") {
-    if (letters.length != 16) {
-      throw new Error("Not 16 Letters")
+  if (layout === "BOARD") {
+    if (letters.length !== 16) {
+      throw new Error("Not 16 Letters");
     } else {
       for (let i = 0; i < 16; i++) {
         inputLetters.push(letters[i]);
       }
-      lettersObjs = [];
+      const lettersObjs = [];
       for (let i = 0; i < 16; i++) {
-        lettersObjs.push(Letter(inputLetters[i]), i);
+        lettersObjs.push(new Letter(inputLetters[i], i));
       }
-      let board = Board(lettersObjs)
+      const board = new Board(lettersObjs);
+      findValidWords(board);
     }
   }
-
-  findValidWords(board)
-
 }
 
 function findValidWords(board) {
   board.lb.forEach(letter => {
     letter.markVisited();
-
     findValidFrom(board, letter.char, letter, 1, letter.pos);
-
     letter.visited = false;
   });
 }
 
 function findValidFrom(board, word, letter, length, pos) {
   if (length >= 3 && !wordStarts.has(word)) {
-    return ;
+    return;
   }
   if (englishWords.has(word) && !validWordsOnly.has(word)) {
     validWordsOnly.add(word);
-    const tup = (pos, word)
-    valids.add(tup)
+    const tup = { pos, word };
+    valids.add(tup);
   }
   if (length >= MAX_LENGTH) {
-    return ;
+    return;
   }
   for (let dir of DIRECTIONS) {
     const copyBoard = board.copyBoard();
     const neighborLetter = copyBoard.visitDirection(letter.pos, dir);
     if (neighborLetter !== -1) {
-      findValidFrom(copyBoard, word + neighborLetter.char, neighborLetter, length + 1, pos)
+      findValidFrom(copyBoard, word + neighborLetter.char, neighborLetter, length + 1, pos);
     }
   }
 }
