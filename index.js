@@ -154,7 +154,7 @@ document.getElementById("submit").onclick = function() {
   letters = letters.toLowerCase();
   
   if (layout == "BOARD") {
-    if (len(letters) != 16) {
+    if (letters.length != 16) {
       throw new Error("Not 16 Letters")
     } else {
       for (let i = 0; i < 16; i++) {
@@ -164,7 +164,7 @@ document.getElementById("submit").onclick = function() {
       for (let i = 0; i < 16; i++) {
         lettersObjs.append(Letter(inputLetters[i]), i);
       }
-      board = Board(lettersObjs)
+      let board = Board(lettersObjs)
     }
   }
 
