@@ -1,19 +1,9 @@
-Basic Website Works. 
+## Website is a Work In Progress
 
-Just Does Not Look Good.
+Supports 4x4 and 5x5 Board as Of Right Now
 
-Will Be Done. 
+Make an Issue if a Word is Missing or a Word Does Not Count
 
-Along With Extra Functionality
+Thank you. Going to be Hosted on Vercel SOON. Github Pages Does Not Support
 
-Create A Request If Word Hunt Does Not Recognize a Word
-
-Will Have That Removed From The List
-
-Also Create A Request If I Missed a Word
-
-Will Have that Added To the List
-
-Thank you
-
-P.S. TEMP README :D
+P.S. Temporary README
