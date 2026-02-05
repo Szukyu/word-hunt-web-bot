@@ -225,7 +225,38 @@ class Donut {
       newArr.push(this.lb[i].copyLetter());
     }
     return new Boarder(newArr);
-  } 
+  }
+
+  peekUpperLeft(pos) {
+    if (pos <= 4 || pos == 8 || pos == 12 || pos == 15) {
+      return -1;
+    }
+    else if (pos == 9 || pos == 16) {
+      return this.lb[pos - 6];
+    } else {
+      return this.lb[pos -5];
+    }
+  }
+
+  peekUp(pos) {
+    if (pos <= 3 || pos % 7 == 0) {
+      return -1;
+    } else if (pos == 8 || pos == 9 || pos == 15 || pos == 16) {
+      return this.lb[pos - 5];
+    } else {
+      return this.lb[pos - 4];
+    }
+  }
+
+  peekUpperRight(pos) {
+    if (pos < 3 || pos == 6 || pos == 7 || pos == 11 || pos == 16 || pos == 13) {
+      return -1;
+    } else if (pos == 8 || pos ==  9 || pos == 14 || pos == 15) {
+      return this.lb[pos - 4];
+    } else {
+      return this.lb[pos - 3];
+    }
+  }
 }
 
 // Main
