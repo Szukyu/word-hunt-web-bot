@@ -2,6 +2,7 @@ import { useState } from 'react';
 import useSearch from '../../hooks/search';
 import useLoad from '../../hooks/load';
 import Board from '../Board/Board.jsx';
+import List from '../List/List.jsx';
 import './Input.css';
 
 function Input() {
@@ -10,11 +11,12 @@ function Input() {
   const [boardLetters, setBoardLetters] = useState('');
   const { englishWords, wordStarts } = useLoad();
   const { foundWords, isSearching, searchWords } = useSearch(englishWords, wordStarts);
-  
+  const items = ['Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5', 'Item 6', 'Item 7', 'Item 8', 'Item 9', 'Item 10'];
+
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
   };
-  
+
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
       const trimmedLetters = inputValue.trim().toLowerCase();
@@ -28,7 +30,7 @@ function Input() {
       setInputValue('');
     }
   };
-  
+
   return (
     <>
       {contentVisible && (
@@ -41,10 +43,17 @@ function Input() {
             placeholder="Enter Letters (16, 20, or 25)"
             disabled={isSearching}
           />
+          <List
+            items={items}
+            onItemSelect={(item, index) => console.log(item, index)}
+            showGradients={true}
+            enableArrowNavigation={true}
+            displayScrollbar={true}
+          />
           {isSearching && <p>Searching...</p>}
         </div>
       )}
-      
+
       {foundWords.length > 0 && (
         <div id="output">
           <div className="container">
