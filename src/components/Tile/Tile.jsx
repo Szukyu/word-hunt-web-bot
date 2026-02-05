@@ -1,5 +1,4 @@
 import React from 'react';
-import './Tile.css';
 
 function Tile({ value, onClick }) {
   return (
