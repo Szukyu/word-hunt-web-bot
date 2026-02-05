@@ -9,6 +9,8 @@ import './Input.css';
 function Input() {
   const [contentVisible, setContentVisible] = useState(true);
   const [inputValue, setInputValue] = useState('');
+  const [boardSize, setBoardSize] = useState(null);
+  const [listSize, setListSize] = useState(0);
   const [boardLetters, setBoardLetters] = useState('');
   const [boardPositions, setBoardPositions] = useState([]);
   const { englishWords, wordStarts } = useLoad();
@@ -25,6 +27,15 @@ function Input() {
         setBoardLetters(trimmedLetters);
         searchWords(trimmedLetters);
         setContentVisible(false);
+
+        if (trimmedLetters.length === 16) {
+          setBoardSize('four');
+          setListSize(320);
+        } else {
+          setBoardSize('five');
+          setListSize(402);
+        }
+
       } else {
         alert("Please enter 16, 20, or 25 letters for the board.");
       }
@@ -59,7 +70,7 @@ function Input() {
 
       {foundWords.length > 0 && (
         <div id="output">
-          <div className="container">
+          <div className={`container ${boardSize}`}>
             <div className="left">
               { render() }
             </div>
