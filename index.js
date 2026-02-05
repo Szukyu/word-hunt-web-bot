@@ -214,6 +214,20 @@ class Boarder {
   }
 }
 
+class Donut {
+  constructor(lettersArr) {
+    this.lb = lettersArr;
+  }
+
+  copyBoard() {
+    const newArr = []
+    for (let i = 0; i < this.lb.length; i++) {
+      newArr.push(this.lb[i].copyLetter());
+    }
+    return new Boarder(newArr);
+  } 
+}
+
 // Main
 document.addEventListener('DOMContentLoaded', function() {
   fetch('words.txt')
