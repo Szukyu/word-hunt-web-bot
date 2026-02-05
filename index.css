@@ -83,43 +83,6 @@ section {
   color: rgba(101, 40, 247, 0.6);
 }
 
-.board-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.board {
-  display: flex;
-  margin-top: 15px;
-}
-
-.board label {
-  display: flex;
-  align-items: center;
-  padding: 10px 20px;
-  border-radius: 10px;
-  border: 1px solid rgba(39, 40, 41, 0.6);
-  font-size: 1.1rem;
-  cursor: pointer;
-  margin: 5px; 
-}
-
-.board input[type="radio"] {
-  display: none;
-}
-
-.board input[type="radio"]:checked + label {
-  border-color: blue;
-}
-
-.board input[type="radio"]:checked + label:before {
-  opacity: 1;
-  visibility: visible;
-  transform: scale(1);
-}
-
 #output {
   position: relative;
   width: 100%;
