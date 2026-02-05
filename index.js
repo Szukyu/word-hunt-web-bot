@@ -197,8 +197,8 @@ function findValidFrom(board, word, letter, length, pos) {
 }
 
 function word_compare(a, b) {
-  if (a.word.length < b.word.length) return -1;
-  if (a.word.length > b.word.length) return 1;
+  if (a.word.length < b.word.length) return 1;
+  if (a.word.length > b.word.length) return -1;
   return a.word.localeCompare(b.word);
 }
 
