@@ -9,4 +9,3 @@ const Tile = ({ value, part }) => {
 };
 
 export default Tile;
-

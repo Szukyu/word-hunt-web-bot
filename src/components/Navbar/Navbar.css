@@ -1,4 +1,4 @@
-nav {
+.navbar {
   position: fixed;
   top: 0;
   left: 0;
@@ -8,62 +8,104 @@ nav {
   background: rgba(4, 5, 11, 0.9);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-content {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-nav h1 {
-  margin: 0;
-  display: flex;
-  justify-content: flex-start;
-}
-
-nav h1 button {
+.nav-title {
   background: none;
   border: none;
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: 800;
   color: #ffffff;
   cursor: pointer;
-  letter-spacing: 0.02em;
-  transition: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  transform: none;
-  box-shadow: none;
-}
-
-nav h1 button:hover {
-  background: linear-gradient(135deg, #ffffff 0%, #65BCFF 100%);
+  letter-spacing: 0.03em;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  background: linear-gradient(135deg, #ffffff 0%, #65BCFF 50%, #ffffff 100%);
+  background-size: 200% 100%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  transform: none;
-  box-shadow: none;
-  border: none;
 }
 
-a {
+.nav-title:hover {
+  background-position: 100% 0;
+  transform: translateY(-1px);
+  text-shadow: 0 5px 15px rgba(101, 188, 255, 0.3);
+}
+
+.nav-link {
   color: #ffffff;
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1.2rem;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
-  transition: none;
+  transition: all 0.2s ease;
   letter-spacing: 0.01em;
-  display: inline-flex;
-  align-items: center;
-  text-align: center;
+  white-space: nowrap;
 }
 
-a:hover {
-  background: linear-gradient(135deg, #ffffff 0%, #65BCFF 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  transform: none;
-  box-shadow: none;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+.nav-link:hover {
+  color: #65BCFF;
+  border-color: rgba(101, 188, 255, 0.4);
+  background: rgba(101, 188, 255, 0.05);
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0.8rem 1.5rem;
+  }
+  
+  .nav-title {
+    font-size: 1.6rem;
+    padding: 0.5rem 1rem;
+  }
+  
+  .nav-link {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 0.6rem 1rem;
+  }
+  
+  .nav-title {
+    font-size: 1.4rem;
+    padding: 0.4rem 0.8rem;
+  }
+  
+  .nav-link {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+  }
+}
+
+@media (max-width: 375px) {
+  .navbar {
+    padding: 0.5rem 0.8rem;
+  }
+  
+  .nav-title {
+    font-size: 1.3rem;
+    padding: 0.4rem 0.7rem;
+  }
+  
+  .nav-link {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.7rem;
+  }
 }

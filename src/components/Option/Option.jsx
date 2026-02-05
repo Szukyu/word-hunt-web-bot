@@ -14,14 +14,14 @@ function Option() {
     return (
       <div className="option-container">
         <button 
-          className="play"
+          className="play option"
           onClick={() => setActiveComponent('play')}
         >
           <IoGameController />
           Play
         </button>
         <button 
-          className="cheat"
+          className="cheat option"
           onClick={() => setActiveComponent('cheat')}
         >
           <IoCodeSlash />
