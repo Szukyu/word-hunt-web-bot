@@ -2,6 +2,7 @@ import { useState } from 'react';
 import useSearch from '../../hooks/search';
 import useLoad from '../../hooks/load';
 import Board from '../Board/Board.jsx';
+import Boarder from '../Boarder/Boarder.jsx';
 import List from '../List/List.jsx';
 import './Input.css';
 
@@ -31,6 +32,15 @@ function Input() {
     }
   };
 
+  const render = () => {
+    if (boardLetters.length === 16) {
+      return <Board letters={boardLetters} positions={boardPositions}> </Board>
+    } else if (boardLetters.length === 25) {
+      return <Boarder letters={boardLetters} positions={boardPositions}> </Boarder>
+    }
+    // Other Boards go Here
+  } 
+
   return (
     <>
       {contentVisible && (
@@ -51,7 +61,7 @@ function Input() {
         <div id="output">
           <div className="container">
             <div className="left">
-              <Board letters={boardLetters} positions={boardPositions}></Board>
+              { render() }
             </div>
             <div className="right">
               <List
