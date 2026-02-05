@@ -7,6 +7,7 @@ import './Setup.css';
 
 const Setup = ({ englishWords, wordStarts }) => {
   const [selectedBoard, setSelectedBoard] = useState(0);
+  const [gameTime, setGameTime] = useState(30); // 30 Seconds Default
 
   const boardOptions = [
     { 
@@ -31,9 +32,11 @@ const Setup = ({ englishWords, wordStarts }) => {
     }
   ];
 
+  const timeOptions = [10, 15, 30, 60, 90, 120];
+
   const renderBoard = (option) => {
     const props = { letters: option.letters, positions: [] };
-    
+
     switch(option.component) {
       case 'Board': return <Board {...props} />;
       case 'Boarder': return <Boarder {...props} />;
@@ -47,15 +50,23 @@ const Setup = ({ englishWords, wordStarts }) => {
     setSelectedBoard(index);
   };
 
+  const handleTimeChange = (e) => {
+    // Pass to Timer Hook
+  };
+
+  const formatTime = (sec) => {
+    return `${sec} seconds`;
+  };
+
   const startGame = () => {
-    // Temp
+    // TEMP
   };
 
   return (
     <div className="setup-container">
       <div className="setup-content">
         <h1 className="setup-title">Choose Your Arena</h1>
-        
+
         <div className="main-layout">
           {/* Left side - Board Preview */}
           <div className="preview-section">
@@ -64,7 +75,7 @@ const Setup = ({ englishWords, wordStarts }) => {
             </div>
           </div>
 
-          {/* Right side - Board Options */}
+          {/* Right side - Board Options and Timer */}
           <div className="options-section">
             <div className="board-options-grid">
               {boardOptions.map((option, index) => (
@@ -77,6 +88,23 @@ const Setup = ({ englishWords, wordStarts }) => {
                   <span className="letter-count">{option.letters.length} letters</span>
                 </div>
               ))}
+            </div>
+
+            <div className="time-section">
+              <h3 className="time-title">Game Duration</h3>
+              <div className="time-slider-container">
+                <input
+                  type="range"
+                  min="0"
+                  max={timeOptions.length - 1}
+                  value={timeOptions.indexOf(gameTime)}
+                  onChange={(e) => setGameTime(timeOptions[parseInt(e.target.value)])}
+                  className="time-slider"
+                />
+                <div className="time-display">
+                  {formatTime(gameTime)}
+                </div>
+              </div>
             </div>
 
             <button onClick={startGame} className="start-button">
