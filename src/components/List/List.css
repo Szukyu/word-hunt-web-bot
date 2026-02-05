@@ -1,7 +1,6 @@
 .scroll-list-container {
   flex: 1;
   overflow-y: hidden;
-  max-height: 402px;
   background: rgba(0, 0, 0, 0.3);
   border: 2px solid rgba(101, 188, 255, 0.2);
   border-radius: 20px;

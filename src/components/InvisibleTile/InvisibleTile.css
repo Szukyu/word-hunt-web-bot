@@ -1,9 +1,7 @@
 .invisibleTile {
   width: 70px;
   height: 70px;
-  background: linear-gradient(135deg, rgba(0, 170, 255, 0.2) 0%, rgba(0, 130, 255, 0.1) 100%);
-  border: 2px solid rgba(0, 170, 255, 0.6);
-  border-radius: 10px;
+  background: #080A18;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -13,9 +11,6 @@
   user-select: none;
   position: relative;
   overflow: hidden;
-  box-shadow: 
-    0 4px 15px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 .invisibleTile::before {
@@ -25,6 +20,5 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
   pointer-events: none;
 }

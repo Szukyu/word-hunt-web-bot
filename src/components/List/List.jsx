@@ -34,6 +34,7 @@ const List = ({
   itemClassName = '',
   displayScrollbar = true,
   initialSelectedIndex = -1,
+  listSize,
 }) => {
   const listRef = useRef(null);
   const [selectedIndex, setSelectedIndex] = useState(initialSelectedIndex);
@@ -98,7 +99,7 @@ const List = ({
   }, [selectedIndex, keyboardNav]);
 
   return (
-    <div className={`scroll-list-container ${className}`}>
+    <div className={`scroll-list-container ${className}`} style={{ maxHeight: listSize}}>
       <div
         ref={listRef}
         className={`scroll-list ${!displayScrollbar ? 'no-scrollbar' : ''}`}
