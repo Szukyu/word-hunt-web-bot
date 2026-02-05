@@ -164,6 +164,7 @@ document.getElementById("submit").onclick = function() {
       findValidWords(board);
     }
   }
+  const 
 }
 
 function findValidWords(board) {
@@ -193,4 +194,19 @@ function findValidFrom(board, word, letter, length, pos) {
       findValidFrom(copyBoard, word + neighborLetter.char, neighborLetter, length + 1, pos);
     }
   }
+}
+
+function wordCompare(a, b) {
+  if (a[1].length < b[1].length) {
+    return -1;
+  } else if (a[1].length === b[1].length) {
+    if (a[1] > b[1]) {
+      return -1;
+    } else if (a[1] < b[1]) {
+      return -1;
+    } else {
+      return 0;
+    }
+  }
+  return -1;
 }
