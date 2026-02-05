@@ -1,3 +1,18 @@
+.word {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80px;
+  backdrop-filter: blur(10px);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.1rem;
+  color: #ffffff;
+  transition: all 0.3s ease;
+  min-width: 300px;
+  text-align: center;
+}
+
 .keymap-layout {
   display: flex;
   flex-direction: column;
