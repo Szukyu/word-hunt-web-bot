@@ -251,9 +251,9 @@ document.getElementById("submit").onclick = function() {
     printOutput();
   } else if (letters.length == 25) {
     for (let i = 0; i < 25; i++) {
-      inputLetters.push(letters[i]));
+      inputLetters.push(letters[i]);
     }
-    const lettersObjs = []
+    const lettersObjs = [];
     for (let i = 0; i < 25; i++) {
       lettersObjs.push(new Letter(inputLetters[i], i));
     }
