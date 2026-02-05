@@ -1,58 +1,22 @@
 import { useState } from 'react';
+import Input from './components/Input/Input.jsx';
 import './App.css';
 
 function App() {
-  const [inputValue, setInputValue] = useState('');
-  const [wordList, setWordList] = useState([]);
   const [contentVisible, setContentVisible] = useState(true);
 
-  const handleInputChange = (event) => {
-    setInputValue(event.target.value);
-  };
-
-  const handleKeyDown = (event) => {
-    if (event.key === 'Enter') {
-      if (inputValue.trim() !== '') {
-        setWordList([...wordList, inputValue.trim()]);
-      }
-
-      setInputValue('');
-      setContentVisible(false);
-    }
-  };
-
-  const resetContent = () => {
-    setInputValue('');
-    setWordList([]);
+  const resetAppContent = () => {
     setContentVisible(true);
   };
 
   return (
     <div className="App">
       {contentVisible ? (
-        <>
-          <input
-            type="text"
-            value={inputValue}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            placeholder="Type something and press Enter to make it disappear..."
-          />
-          {wordList.length > 0 && (
-            <div>
-              <h2>Your Words:</h2>
-              <ul>
-                {wordList.map((word, index) => (
-                  <li key={index}>{word}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </>
+        <Input setContentVisible={setContentVisible} />
       ) : (
         <div>
           <p>Content disappeared!</p>
-          <button onClick={resetContent}>Start Over</button>
+          <button onClick={resetAppContent}>Start Over</button>
         </div>
       )}
     </div>
