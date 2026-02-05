@@ -83,6 +83,63 @@ section {
   color: rgba(101, 40, 247, 0.6);
 }
 
+.board-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.board {
+  display: none;
+  margin-top: 15px;
+}
+
+.board label {
+  display: block;
+  padding: 20px 50px 10px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(39, 40, 41, 0.6);
+  font-size: 1.1rem;
+  outline: none;
+  position: relative;
+}
+
+.board label:after,
+.board label:before {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+}
+
+.board label:after {
+  height: 20px;
+  width: 20px;
+  border: 2px solid rgba(39, 40, 41, 0.6);
+  top: calc(50% - 12px);
+}
+
+.board label:before {
+  background: grey;
+  height: 10px;
+  width: 10px;
+  left: 27px;
+  top: calc(50% - 5px);
+  transform: scale(5);
+  opacity: 0;
+  visibility: hidden;
+  transition: .4s ease-in-out 0s;
+}
+
+.board [type="radio"]:checked ~ label {
+  border-color: blue;
+}
+
+.board [type="radio"]:checked ~ label:before {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+}
+
 #output {
   position: relative;
   width: 100%;
