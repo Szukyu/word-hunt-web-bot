@@ -67,6 +67,7 @@ function Input() {
           onKeyDown={handleKeyDown}
           placeholder="Enter Letters (16, 20, 21, or 25)"
           disabled={isSearching}
+          autoFocus
         />
       )}
 

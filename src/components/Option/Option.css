@@ -1,0 +1,69 @@
+.option-container {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px 32px;
+  background: rgba(4, 5, 11, 0.75);
+  backdrop-filter: blur(15px);
+  border: 2px solid rgba(101, 188, 255, 0.35);
+  border-radius: 16px;
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.05rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+  min-width: 140px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(101, 188, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+button:hover {
+  border-color: #65BCFF;
+  transform: translateY(-2px);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    0 0 30px rgba(101, 188, 255, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(101, 188, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+button svg {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+button.play:hover {
+  border-color: #2989FF;
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    0 0 30px rgba(41, 137, 255, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+button.cheat:hover {
+  border-color: #65BCFF;
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    0 0 30px rgba(101, 188, 255, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
