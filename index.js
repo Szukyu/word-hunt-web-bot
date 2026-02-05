@@ -305,6 +305,17 @@ document.getElementById("submit").onclick = function() {
     const board = new Boarder(lettersObjs);
     findValidWords(board);
     printOutput();
+  } else if (letters.length == 21) {
+    for (let i = 0; i < 21; i++) {
+      inputLetters.push(letters[i]);
+    }
+    const letterObjs = [];
+    for (let i = 0; i < 21; i++) {
+      letterObjs.push(new Letter(inputLetters[i], i));
+    }
+    const board = new Donut(letterObjs);
+    findValidWords(board);
+    printOutput();
   }
 }
 
