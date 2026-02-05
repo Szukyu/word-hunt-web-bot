@@ -142,7 +142,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       })
       console.log(englishWords);
-      document.getElementById('file').textContent = words;
     })
 })
 
