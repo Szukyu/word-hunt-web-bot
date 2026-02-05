@@ -53,7 +53,6 @@ function Input() {
               <Board letters={boardLetters}></Board>
             </div>
             <div className="right">
-              <h2>{foundWords.length} words were found.</h2>
               <List
                 items={foundWords}
                 onItemSelect={(item, _) => console.log(item, item.pos)}
