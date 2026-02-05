@@ -118,5 +118,31 @@ document.addEventListener('DOMContentLoaded', function() {
 })
 
 document.getElementById("submit").onclick = function() {
-  document.getElementById("testing").textContent = document.getElementById("letters").value;
+  layout = "BOARD";
+
+  inputLetters = [];
+
+  let letters = document.getElementById("letters").value;
+  letters = letters.toLowerCase();
+  
+  if (layout == "BOARD") {
+    if (len(letters) != 16) {
+      return "a";
+    } else {
+      for (let i = 0; i < 16; i++) {
+        inputLetters.append(letters[i]);
+      }
+      lettersObjs = [];
+      for (let i = 0; i < 16; i++) {
+        lettersObjs.append(Letter(inputLetters[i]), i);
+      }
+      board = Board(lettersObjs)
+    }
+  }
+
+  findValidWords(board)
+}
+
+function findValidWords(board) {
+  return "a"
 }
