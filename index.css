@@ -10,9 +10,11 @@ body {
 }
 
 .input-wrapper {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
+  max-width: 400px;
 }
 
 .input-wrapper input {
