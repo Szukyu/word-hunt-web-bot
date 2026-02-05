@@ -1,16 +1,19 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-  font-family: Helvetica, sans-serif;
-  font-weight: light;
+  min-height: 100vh;
 }
 
-body {
-  background-color: #080A18;
-  overflow-y: hidden;
-  overflow-x: hidden;
-  height: 100%;
-  margin: 0;
+.App {
+  min-height: 100vh;
+  padding: 110px 32px 48px;
+  max-width: 1300px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+@media (max-width: 768px) {
+  .App {
+    padding: 96px 20px 32px;
+  }
 }

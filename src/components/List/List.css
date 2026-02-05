@@ -1,35 +1,76 @@
-.scroll-list-container {
-  flex: 1;
-  overflow-y: hidden;
-  background: rgba(0, 0, 0, 0.3);
-  border: 2px solid rgba(101, 188, 255, 0.2);
-  border-radius: 20px;
-  padding: 20px;
-  box-shadow: 
-    inset 0 2px 10px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+.list-container {
   position: relative;
-  width: 350px;
+  border-radius: var(--radius-lg);
+  background: var(--surface-glass-heavy);
+  border: 1px solid var(--border-card);
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+  backdrop-filter: blur(20px);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-.scroll-list {
-  max-height: 402px;
+.list-container.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.empty-state p {
+  margin: 0 0 8px 0;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.empty-subtitle {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.list-scroll {
+  flex: 1;
   overflow-y: auto;
-  padding: 12px;
+  padding: 16px;
+  min-height: 0;
+  scroll-behavior: smooth;
 }
 
-.scroll-list::-webkit-scrollbar {
-  width: 8px;
+.list-scroll::-webkit-scrollbar {
+  width: 4px;
 }
 
-.scroll-list::-webkit-scrollbar-track {
-  background: rgba(101, 188, 255, 0.1);
+.list-scroll::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 2px;
 }
 
-.scroll-list::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #65BCFF 0%, #2989FF 100%);
-  border-radius: 4px;
-  box-shadow: 0 2px 10px rgba(101, 188, 255, 0.3);
+.list-scroll::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+  border-radius: 2px;
+  opacity: 0.2;
+  transition: all 0.3s ease;
+}
+
+.list-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+  opacity: 0.5;
+}
+
+.list-scroll::-webkit-scrollbar-thumb:active {
+  background: var(--accent-strong);
+  opacity: 0.7;
+}
+
+.list-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-muted) transparent;
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -41,111 +82,167 @@
   scrollbar-width: none;
 }
 
-.item {
-  background: rgba(101, 188, 255, 0.1);
-  border: 1px solid rgba(101, 188, 255, 0.3);
-  border-radius: 8px;
-  padding: 10px 12px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #ffffff;
-  text-align: center;
-  transition: all 0.3s ease;
+.list-item-wrapper {
+  margin-bottom: 8px;
   cursor: pointer;
-  margin: 0;
-  padding: 16px;
-  border-radius: 8px;
-  margin-bottom: 0.5rem;
+  position: relative;
+  z-index: 1;
 }
 
-.item.selected {
-  background: rgba(101, 188, 255, 0.2);
-  border-color: #65BCFF;
-  color: #65BCFF;
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 
-    0 6px 20px rgba(101, 188, 255, 0.3),
-    0 0 15px rgba(101, 188, 255, 0.2);
+.list-item-wrapper:last-child {
+  margin-bottom: 0;
 }
 
-.item-text {
-  color: white;
-  margin: 0;
+.list-item-wrapper:hover .list-item {
+  border-color: var(--border-strong);
+  background: var(--surface-glass-heavy);
+  transform: translateY(-1px);
 }
 
-.top-gradient {
+.list-item-wrapper.selected .list-item {
+  border-color: var(--accent);
+  background: var(--surface-accent);
+}
+
+.list-item-wrapper.selected:hover .list-item {
+  border-color: var(--accent);
+  background: var(--surface-accent);
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-soft);
+  background: var(--surface-glass-mid);
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.list-item-wrapper::before {
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 30px;
-  background: linear-gradient(to bottom, #060010, transparent);
-  pointer-events: none;
-  transition: opacity 0.3s ease;
+  bottom: 0;
+  z-index: -1;
 }
 
-.bottom-gradient {
+.list-item::before {
+  content: '';
   position: absolute;
-  bottom: 0;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+  transition: left 0.6s ease;
+  pointer-events: none;
+}
+
+.list-item-wrapper:hover .list-item::before {
+  left: 100%;
+}
+
+.item-rank {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  min-width: 32px;
+  text-align: center;
+  padding: 4px 0;
+  background: var(--surface-glass-light);
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+}
+
+.item-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  pointer-events: none;
+}
+
+.item-word {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+  pointer-events: none;
+}
+
+.item-meta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  pointer-events: none;
+}
+
+.list-gradient {
+  position: absolute;
   left: 0;
   right: 0;
-  height: 70px;
-  background: linear-gradient(to top, #060010, transparent);
+  height: 32px;
   pointer-events: none;
+  z-index: 2;
   transition: opacity 0.3s ease;
 }
 
-@media (max-width: 850px) {
-  .scroll-list-container {
-    width: 390px;
-    padding: 20px;
-  }
-
-  .scroll-list {
-    padding: 15px;
-  }
+.list-gradient.top {
+  top: 0;
+  background: linear-gradient(to bottom, var(--surface-glass-heavy) 0%, transparent 100%);
 }
+
+.list-gradient.bottom {
+  bottom: 0;
+  background: linear-gradient(to top, var(--surface-glass-heavy) 0%, transparent 100%);
+}
+
 @media (max-width: 768px) {
-  .scroll-list-container {
-    width: 340px;
-    padding: 16px;
+  .list-scroll {
+    padding: 12px;
   }
   
-  .scroll-list {
-    padding: 10px;
+  .list-item {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+  
+  .item-word {
+    font-size: 0.95rem;
+  }
+  
+  .item-rank {
+    min-width: 28px;
+    font-size: 0.75rem;
   }
 }
 
 @media (max-width: 480px) {
-  .scroll-list-container {
-    width: 290px;
-    padding: 14px;
-  }
-  
-  .scroll-list {
-    max-height: 320px;
+  .list-scroll {
     padding: 8px;
   }
   
-  .item {
-    padding: 14px;
-    margin-bottom: 0.4rem;
-  }
-}
-
-@media (max-width: 375px) {
-  .scroll-list-container {
-    width: 265px;
-    padding: 12px;
+  .list-item {
+    padding: 8px 10px;
   }
   
-  .scroll-list {
-    max-height: 300px;
-    padding: 6px;
+  .item-content {
+    gap: 1px;
   }
   
-  .item {
-    padding: 12px;
+  .item-word {
     font-size: 0.9rem;
+  }
+  
+  .item-meta {
+    font-size: 0.75rem;
   }
 }

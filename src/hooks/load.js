@@ -6,6 +6,7 @@ const load = () => {
   const [englishWords, setEnglishWords] = useState(new Set());
   const [wordStarts, setWordStarts] = useState(new Set());
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     try {
@@ -26,17 +27,18 @@ const load = () => {
       setEnglishWords(newEnglishWords);
       setWordStarts(newWordStarts);
       setLoading(false);
+      setError(null);
       
       console.log(`Loaded ${newEnglishWords.size} Words`);
       
     } catch (err) {
       console.error("Fail to Load Word List:", err);
-      setError(err);
+      setError(err.message || 'Unknown error');
       setLoading(false);
     }
   }, []);
 
-  return { englishWords, wordStarts, loading };
+  return { englishWords, wordStarts, loading, error };
 };
 
 export default load;
