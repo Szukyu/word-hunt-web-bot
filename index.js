@@ -207,6 +207,6 @@ function printOutput() {
   outputDiv.innerHTML = `<h2>${valids.size} words were found.</h2>`;
   const sortedWords = Array.from(valids).sort(word_compare);
   sortedWords.forEach((entry, index) => {
-    outputDiv.innerHTML += `<p>${index + 1}: ${entry.word} at position ${entry.pos + 1}</p>`;
+    outputDiv.innerHTML += `<p>${index + 1}: ${entry.word}</p>`;
   });
 }
