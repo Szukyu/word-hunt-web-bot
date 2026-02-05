@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import './Keyboard.css'
+import './Keymap.css'
 
-const KeymapComponent = () => {
+const Keymap = () => {
   const [flashingKeys, setFlashingKeys] = useState(new Set());
 
   const layoutData = {
@@ -78,7 +78,6 @@ const KeymapComponent = () => {
       keyClasses += ' enter';
     }
 
-    // Only show flashing state when key is pressed
     if (isFlashing) {
       keyClasses += ' flashing';
     }
@@ -116,4 +115,4 @@ const KeymapComponent = () => {
   );
 };
 
-export default KeymapComponent;
+export default Keymap;
