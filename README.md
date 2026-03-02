@@ -15,5 +15,3 @@ npm run dev
 ```
 
 Or Head Over to the Website Hosted on Cloudfare.
-
-Be Back Soon. Working on Different Project
