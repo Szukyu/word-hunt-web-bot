@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Play from "../Play/Play";
 import Board from "../Boards/Board";
 import Boarder from "../Boards/Boarder";
 import Donut from "../Boards/Donut";
@@ -8,27 +9,32 @@ import './Setup.css';
 const Setup = ({ englishWords, wordStarts }) => {
   const [selectedBoard, setSelectedBoard] = useState(0);
   const [gameTime, setGameTime] = useState(30);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const boardOptions = [
     { 
       name: '4×4 Grid', 
       component: 'Board', 
-      letters: 'abcdefghijklmnop'
+      letters: 'abcdefghijklmnop',
+      size: 16
     },
     { 
       name: '5×5 Grid', 
       component: 'Boarder', 
-      letters: 'abcdefghijklmnopqrstuvwxy'
+      letters: 'abcdefghijklmnopqrstuvwxy',
+      size: 25
     },
     { 
       name: 'Donut Ring', 
       component: 'Donut', 
-      letters: 'abcdefghijklmnopqrst'
+      letters: 'abcdefghijklmnopqrst',
+      size: 20
     },
     { 
       name: 'X Shape', 
       component: 'X', 
-      letters: 'abcdefghijklmnopqrstu'
+      letters: 'abcdefghijklmnopqrstu',
+      size: 21
     }
   ];
 
@@ -54,10 +60,26 @@ const Setup = ({ englishWords, wordStarts }) => {
   };
 
   const startGame = () => {
-    // TEMP
+    setIsPlaying(true);
+  };
+
+  const handleBackToSetup = () => {
+    setIsPlaying(false);
   };
 
   const activeBoard = boardOptions[selectedBoard];
+
+  if (isPlaying) {
+    return (
+      <Play 
+        boardType={activeBoard.size}
+        gameTime={gameTime}
+        onBack={handleBackToSetup}
+        englishWords={englishWords}
+        wordStarts={wordStarts}
+      />
+    );
+  }
 
   return (
     <section className="setup-area">
