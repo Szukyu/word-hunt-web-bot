@@ -1,0 +1,3 @@
+- Only 4x4 and 5x5 works in generation
+- For example, if there are two letters that are the same. It always goes to only one of them even though you want to go the other way (IF YOU TYPE)
+- Need to add drag feature over clicking feature

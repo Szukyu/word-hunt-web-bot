@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { FREQ } from '../../data/freq';
 import Board from '../Boards/Board';
 import Boarder from '../Boards/Boarder';
 import Donut from '../Boards/Donut';
@@ -48,9 +49,19 @@ const Play = ({ boardType, gameTime, onBack, englishWords }) => {
   const generateRandomBoard = useCallback(() => {
     const letters = 'abcdefghijklmnopqrstuvwxyz';
     const length = boardType;
+    const cumulativeWeights = [];
+    let sum = 0;
+    for (const freq of FREQ) {
+      sum += freq;
+      cumulativeWeights.push(sum);
+    }
+    const random = () => {
+      const r = Math.random() * cumulativeWeights[cumulativeWeights.length - 1];
+      return cumulativeWeights.findIndex(w => r <= w);
+    };
     let board = '';
     for (let i = 0; i < length; i++) {
-      board += letters[Math.floor(Math.random() * letters.length)];
+      board += letters[random()];
     }
     setBoardLetters(board);
     setSelectedTiles([]);
