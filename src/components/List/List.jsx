@@ -10,6 +10,8 @@ const List = ({
   displayScrollbar = true,
   initialSelectedIndex = -1,
   listSize,
+  showPoints = false,
+  highlightFound = false,
 }) => {
   const listRef = useRef(null);
   const [selectedIndex, setSelectedIndex] = useState(initialSelectedIndex);
@@ -200,11 +202,13 @@ const List = ({
             // Use onClick for immediate selection/action
             onClick={() => handleItemHover(item, index)}
           >
-            <div className="list-item">
+            <div className={`list-item ${highlightFound && item.found ? 'found' : ''}`}>
               <div className="item-rank">#{index + 1}</div>
               <div className="item-content">
                 <span className="item-word">{item.word.toUpperCase()}</span>
-                <span className="item-meta">{item.word.length} letters</span>
+                <span className="item-meta">
+                  {showPoints ? `${item.score} pts` : `${item.word.length} letters`}
+                </span>
               </div>
             </div>
           </div>

@@ -1,0 +1,3 @@
+- Only 4x4 and 5x5 works in generation
+- game does not handle any sort of duplicate letters that appears. Handles first one that appears rows, then column. 
+- Need to add drag feature over clicking feature

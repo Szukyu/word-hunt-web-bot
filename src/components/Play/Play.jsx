@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { FREQ } from '../../data/freq';
 import Board from '../Boards/Board';
 import Boarder from '../Boards/Boarder';
 import Donut from '../Boards/Donut';
@@ -6,6 +7,7 @@ import X from '../Boards/X';
 import List from '../List/List';
 import { IoTimeOutline, IoCheckmarkCircle, IoArrowBack, IoRefresh, IoClose } from 'react-icons/io5';
 import useTimer from '../../hooks/timer';
+import { Letter, MAX_LENGTH, DIRECTIONS, Board as BoardClass, Boarder as BoarderClass, Donut as DonutClass, X as XClass } from '../../utils/Board.jsx';
 import './Play.css';
 
 const BOARD_CONFIG = {
@@ -15,7 +17,7 @@ const BOARD_CONFIG = {
   25: { name: '5×5 Grid', component: Boarder },
 };
 
-const Play = ({ boardType, gameTime, onBack, englishWords }) => {
+const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
   const { secondsLeft, isRunning, start, pause } = useTimer();
   const [boardLetters, setBoardLetters] = useState('');
   const [selectedTiles, setSelectedTiles] = useState([]);
@@ -25,6 +27,9 @@ const Play = ({ boardType, gameTime, onBack, englishWords }) => {
   const [gameOver, setGameOver] = useState(false);
   const [message, setMessage] = useState(null);
   const [isValidating, setIsValidating] = useState(false);
+  const [allPossibleWords, setAllPossibleWords] = useState([]);
+  const [totalPossibleScore, setTotalPossibleScore] = useState(0);
+  const englishWordsRef = useRef(englishWords);
 
   const boardConfig = BOARD_CONFIG[boardLetters.length];
   const BoardComponent = boardConfig?.component;
@@ -41,6 +46,28 @@ const Play = ({ boardType, gameTime, onBack, englishWords }) => {
     if (secondsLeft === 0 && boardLetters.length > 0 && !gameOver) {
       setGameOver(true);
       pause();
+      
+      const allWords = findAllValidWords(boardLetters);
+      const wordsWithScores = allWords.map(word => ({
+        word,
+        score: calculateScore(word.length)
+      })).sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        return a.word.localeCompare(b.word);
+      });
+      
+      const total = wordsWithScores.reduce((sum, w) => sum + w.score, 0);
+      setAllPossibleWords(wordsWithScores);
+      setTotalPossibleScore(total);
+      
+      if (onGameEnd) {
+        onGameEnd({
+          score,
+          foundWords,
+          allPossibleWords: wordsWithScores,
+          totalPossibleScore: total
+        });
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [secondsLeft]);
@@ -48,9 +75,19 @@ const Play = ({ boardType, gameTime, onBack, englishWords }) => {
   const generateRandomBoard = useCallback(() => {
     const letters = 'abcdefghijklmnopqrstuvwxyz';
     const length = boardType;
+    const cumulativeWeights = [];
+    let sum = 0;
+    for (const freq of FREQ) {
+      sum += freq;
+      cumulativeWeights.push(sum);
+    }
+    const random = () => {
+      const r = Math.random() * cumulativeWeights[cumulativeWeights.length - 1];
+      return cumulativeWeights.findIndex(w => r <= w);
+    };
     let board = '';
     for (let i = 0; i < length; i++) {
-      board += letters[Math.floor(Math.random() * letters.length)];
+      board += letters[random()];
     }
     setBoardLetters(board);
     setSelectedTiles([]);
@@ -65,6 +102,72 @@ const Play = ({ boardType, gameTime, onBack, englishWords }) => {
     generateRandomBoard();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    englishWordsRef.current = englishWords;
+  }, [englishWords]);
+
+  const findAllValidWords = useCallback((letters) => {
+    const validWords = new Set();
+
+    let board;
+    const lettersArr = letters.split('').map((char, i) => new Letter(char, i));
+    
+    if (letters.length === 16) {
+      board = new BoardClass(lettersArr);
+    } else if (letters.length === 25) {
+      board = new BoarderClass(lettersArr);
+    } else if (letters.length === 20) {
+      board = new DonutClass(lettersArr);
+    } else if (letters.length === 21) {
+      board = new XClass(lettersArr);
+    } else {
+      return [];
+    }
+
+    const findValidFrom = (board, word, letter, length, positions) => {
+      if (englishWordsRef.current.has(word) && !validWords.has(word)) {
+        validWords.add(word.toUpperCase());
+      }
+
+      if (length >= MAX_LENGTH) {
+        return;
+      }
+
+      positions.push(letter.pos);
+
+      for (const dir of DIRECTIONS) {
+        const copyBoard = board.copyBoard();
+        const neighborLetter = copyBoard.visitDirection(letter.pos, dir);
+        if (neighborLetter !== -1) {
+          findValidFrom(copyBoard, word + neighborLetter.char, neighborLetter, length + 1, [...positions]);
+        }
+      }
+    };
+
+    board.lb.forEach(letter => {
+      letter.markVisited();
+      findValidFrom(board, letter.char, letter, 1, [letter.pos]);
+      letter.visited = false;
+    });
+
+    return Array.from(validWords);
+  }, []);
+
+  const calculateAllPossibleWords = useCallback(() => {
+    const allWords = findAllValidWords(boardLetters);
+    const wordsWithScores = allWords.map(word => ({
+      word,
+      score: calculateScore(word.length)
+    })).sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      return a.word.localeCompare(b.word);
+    });
+    
+    const total = wordsWithScores.reduce((sum, w) => sum + w.score, 0);
+    setAllPossibleWords(wordsWithScores);
+    setTotalPossibleScore(total);
+  }, [boardLetters, findAllValidWords]);
 
   const handleTileClick = (index) => {
     if (gameOver || !isRunning) return;
@@ -335,24 +438,6 @@ const Play = ({ boardType, gameTime, onBack, englishWords }) => {
           </div>
         </div>
       </div>
-
-      {gameOver && (
-        <div className="game-over-overlay">
-          <div className="game-over-modal">
-            <h2>Time's Up!</h2>
-            <div className="final-score">
-              <span className="score-label">Final Score</span>
-              <span className="score-value">{score}</span>
-            </div>
-            <div className="words-found">
-              <span>{foundWords.length} words found</span>
-            </div>
-            <button className="play-again-button" onClick={handlePlayAgain}>
-              <IoRefresh /> Play Again
-            </button>
-          </div>
-        </div>
-      )}
     </section>
   );
 };
