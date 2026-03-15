@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Play from "../Play/Play";
+import Results from "../Results/Results";
 import Board from "../Boards/Board";
 import Boarder from "../Boards/Boarder";
 import Donut from "../Boards/Donut";
@@ -10,6 +11,7 @@ const Setup = ({ englishWords, wordStarts }) => {
   const [selectedBoard, setSelectedBoard] = useState(0);
   const [gameTime, setGameTime] = useState(30);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [gameResult, setGameResult] = useState(null);
 
   const boardOptions = [
     { 
@@ -67,7 +69,30 @@ const Setup = ({ englishWords, wordStarts }) => {
     setIsPlaying(false);
   };
 
+  const handleGameEnd = (result) => {
+    setGameResult(result);
+    setIsPlaying(false);
+  };
+
+  const handlePlayAgain = () => {
+    setGameResult(null);
+    setIsPlaying(true);
+  };
+
   const activeBoard = boardOptions[selectedBoard];
+
+  if (gameResult) {
+    return (
+      <Results
+        score={gameResult.score}
+        foundWords={gameResult.foundWords}
+        allPossibleWords={gameResult.allPossibleWords}
+        totalPossibleScore={gameResult.totalPossibleScore}
+        onPlayAgain={handlePlayAgain}
+        onBack={() => setGameResult(null)}
+      />
+    );
+  }
 
   if (isPlaying) {
     return (
@@ -75,6 +100,7 @@ const Setup = ({ englishWords, wordStarts }) => {
         boardType={activeBoard.size}
         gameTime={gameTime}
         onBack={handleBackToSetup}
+        onGameEnd={handleGameEnd}
         englishWords={englishWords}
         wordStarts={wordStarts}
       />

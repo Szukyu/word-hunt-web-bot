@@ -185,6 +185,19 @@
   pointer-events: none;
 }
 
+.list-item.found {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.list-item.found .item-word {
+  color: #22c55e;
+}
+
+.list-item.found .item-meta {
+  color: #22c55e;
+}
+
 .list-gradient {
   position: absolute;
   left: 0;
