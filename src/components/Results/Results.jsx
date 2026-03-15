@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import List from '../List/List';
 import { IoArrowBack, IoRefresh } from 'react-icons/io5';
 import './Results.css';
@@ -18,18 +17,11 @@ const Results = ({
     found: foundSet.has(item.word)
   }));
 
-  const sortedByScore = [...allWordsWithStatus].sort((a, b) => {
-    if (b.score !== a.score) return b.score - a.score;
-    return a.word.localeCompare(b.word);
-  });
-
   const sortedByFound = [...allWordsWithStatus].sort((a, b) => {
     if (a.found !== b.found) return b.found ? 1 : -1;
     if (b.score !== a.score) return b.score - a.score;
     return a.word.localeCompare(b.word);
   });
-
-  const [sortMode, setSortMode] = useState('found');
 
   return (
     <section className="results-area">
@@ -70,24 +62,10 @@ const Results = ({
         <div className="results-list-section">
           <div className="results-list-header">
             <h2>All Possible Words</h2>
-            <div className="sort-toggle">
-              <button 
-                className={`sort-btn ${sortMode === 'found' ? 'active' : ''}`}
-                onClick={() => setSortMode('found')}
-              >
-                Found First
-              </button>
-              <button 
-                className={`sort-btn ${sortMode === 'score' ? 'active' : ''}`}
-                onClick={() => setSortMode('score')}
-              >
-                By Score
-              </button>
-            </div>
           </div>
           <div className="results-list">
             <List
-              items={sortMode === 'found' ? sortedByFound : sortedByScore}
+              items={sortedByFound}
               onItemHover={() => {}}
               showGradients={true}
               enableArrowNavigation={false}
