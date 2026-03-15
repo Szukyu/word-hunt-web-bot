@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { FREQ } from '../../data/freq';
+import { POINTS } from '../../data/points';
 import Board from '../Boards/Board';
 import Boarder from '../Boards/Boarder';
 import Donut from '../Boards/Donut';
@@ -228,13 +229,8 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
   }, [currentWord, foundWords, selectedTiles, englishWords]);
 
   const calculateScore = (length) => {
-    if (length === 3) return 1;
-    if (length === 4) return 2;
-    if (length === 5) return 3;
-    if (length === 6) return 5;
-    if (length === 7) return 8;
-    if (length >= 8) return 11;
-    return 0;
+    if (length < 3 || length > 10) return 0;
+    return POINTS[length - 3];
   };
 
   const handleClear = useCallback(() => {
