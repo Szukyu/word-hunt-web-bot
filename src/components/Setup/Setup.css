@@ -5,8 +5,6 @@
   gap: 24px;
   max-width: 1000px;
   margin: 0 auto;
-  max-height: calc(100vh - 100px);
-  overflow: hidden;
 }
 
 .setup-header {
@@ -20,25 +18,23 @@
   margin: 4px 0 0 0;
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text);
 }
 
 .start-button {
   padding: 10px 20px;
-  border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
-  color: #030615;
+  border-radius: 8px;
+  background: var(--highlight);
+  color: var(--bg);
   font-weight: 600;
   border: none;
   cursor: pointer;
-  transition: all 0.3s ease;
   white-space: nowrap;
   font-size: 0.9rem;
 }
 
 .start-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(90, 216, 255, 0.3);
+  opacity: 0.9;
 }
 
 .setup-content {
@@ -56,10 +52,7 @@
 }
 
 .preview-card {
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-card);
-  background: var(--bg-panel);
-  box-shadow: var(--shadow-soft);
+  border-radius: 12px;
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -78,13 +71,14 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--text-muted);
+  color: var(--subalt);
 }
 
 .preview-header h2 {
   margin: 2px 0 0 0;
   font-size: 1.2rem;
   font-weight: 600;
+  color: var(--text);
 }
 
 .preview-meta {
@@ -93,13 +87,12 @@
   gap: 2px;
   text-align: right;
   font-size: 0.8rem;
-  color: var(--text-secondary);
+  color: var(--sub);
 }
 
 .board-preview {
-  border-radius: 16px;
-  border: 1px solid var(--border-strong);
-  background: var(--surface-glass-heavy);
+  border-radius: 12px;
+  border: 1px solid var(--unhighlight);
   padding: 16px;
   display: flex;
   justify-content: center;
@@ -121,10 +114,7 @@
 }
 
 .control-group {
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-card);
-  background: var(--bg-panel);
-  box-shadow: var(--shadow-soft);
+  border-radius: 12px;
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -136,6 +126,7 @@
   margin: 0;
   font-size: 1.1rem;
   font-weight: 600;
+  color: var(--text);
 }
 
 .board-options {
@@ -145,36 +136,38 @@
 }
 
 .board-option {
-  border-radius: var(--radius-md);
-  border: 1px solid var(--pill-border);
-  background: var(--pill-background);
+  border-radius: 8px;
+  border: 1px solid var(--unhighlight);
+  background: var(--main);
   padding: 12px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: all 0.2s ease;
   cursor: pointer;
 }
 
 .board-option:hover {
-  border-color: var(--border-strong);
-  background: var(--surface-glass-light);
+  border-color: var(--subalt);
 }
 
 .board-option.active {
-  border-color: var(--accent);
-  background: var(--surface-accent);
+  border-color: var(--highlight);
+  background: var(--highlight);
+}
+
+.board-option.active .option-name {
+  color: var(--bg);
 }
 
 .option-name {
   font-weight: 600;
   font-size: 0.9rem;
-  color: var(--text-primary);
+  color: var(--text);
 }
 
 .option-meta {
   font-size: 0.8rem;
-  color: var(--text-muted);
+  color: var(--subalt);
 }
 
 .timer-controls {
@@ -187,11 +180,10 @@
   font-size: 1.2rem;
   font-weight: 700;
   text-align: center;
-  color: var(--accent);
+  color: var(--highlight);
   padding: 12px;
-  background: var(--surface-accent);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  border: 1px solid var(--unhighlight);
 }
 
 .timer-presets {
@@ -202,25 +194,23 @@
 
 .timer-preset {
   padding: 8px 12px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--pill-border);
-  background: var(--pill-background);
-  color: var(--text-secondary);
+  border-radius: 8px;
+  background: var(--main);
+  border: 1px solid var(--unhighlight);
+  color: var(--text);
   font-size: 0.85rem;
-  transition: all 0.2s ease;
   cursor: pointer;
   text-align: center;
 }
 
 .timer-preset:hover {
-  border-color: var(--border-strong);
-  background: var(--surface-glass-light);
+  border-color: var(--subalt);
 }
 
 .timer-preset.active {
-  border-color: var(--accent);
-  background: var(--surface-accent);
-  color: var(--accent);
+  border-color: var(--highlight);
+  background: var(--highlight);
+  color: var(--bg);
 }
 
 .eyebrow {
@@ -228,7 +218,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--accent);
+  color: var(--highlight);
 }
 
 @media (max-width: 968px) {

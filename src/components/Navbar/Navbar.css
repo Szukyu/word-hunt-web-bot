@@ -5,9 +5,8 @@
   width: 100%;
   padding: 18px 32px;
   z-index: 100;
-  backdrop-filter: blur(24px);
-  background: var(--surface-nav);
-  border-bottom: 1px solid var(--border-soft);
+  background: var(--bg);
+  border-bottom: 1px solid var(--unhighlight);
 }
 
 .nav-content {
@@ -33,11 +32,11 @@
   font-size: 1.4rem;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: var(--brand);
+  color: var(--text);
 }
 
 .nav-title:hover .brand-title {
-  color: var(--accent);
+  color: var(--highlight);
 }
 
 .nav-actions {
@@ -51,29 +50,21 @@
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--pill-border);
-  background: var(--pill-background);
-  color: var(--text-primary);
+  border-radius: 8px;
+  border: 1px solid var(--unhighlight);
+  background: var(--main);
+  color: var(--text);
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
 }
 
 .theme-toggle:hover {
-  border-color: var(--border-strong);
-  background: var(--surface-glass-light);
-  transform: translateY(-1px);
+  border-color: var(--subalt);
 }
 
 .theme-icon {
   font-size: 1.1rem;
-  transition: transform 0.3s ease;
-}
-
-.theme-toggle:hover .theme-icon {
-  transform: scale(1.1);
 }
 
 .nav-link {
@@ -81,42 +72,17 @@
   align-items: center;
   gap: 8px;
   padding: 8px 20px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--pill-border);
-  background: var(--surface-accent);
-  color: var(--text-primary);
+  border-radius: 8px;
+  border: 1px solid var(--highlight);
+  background: var(--highlight);
+  color: var(--bg);
   font-weight: 600;
   font-size: 0.9rem;
-  transition: all 0.3s ease;
   text-decoration: none;
-  position: relative;
-  overflow: hidden;
-}
-
-.nav-link::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
-  border-radius: var(--radius-md);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: -1;
-}
-
-.nav-link:hover::before {
-  opacity: 1;
 }
 
 .nav-link:hover {
-  color: #030615;
-  transform: translateY(-1px);
-  border-color: transparent;
-  text-decoration: none;
-  background: transparent;
+  opacity: 0.9;
 }
 
 .nav-link-icon {

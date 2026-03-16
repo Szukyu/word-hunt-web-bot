@@ -11,15 +11,15 @@
   justify-content: space-between;
   margin-bottom: 1.5rem;
   padding: 1rem;
-  background: var(--surface-glass-light);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-soft);
+  background: var(--main);
+  border-radius: 8px;
+  border: 1px solid var(--unhighlight);
 }
 
 .results-header h1 {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text);
 }
 
 .results-content {
@@ -40,42 +40,42 @@
   align-items: center;
   gap: 0.5rem;
   padding: 1.25rem;
-  background: var(--surface-glass-light);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-soft);
+  background: var(--main);
+  border-radius: 8px;
+  border: 1px solid var(--unhighlight);
 }
 
 .stat-card.primary {
-  background: var(--surface-accent);
-  border-color: var(--accent);
+  background: var(--highlight);
+  border-color: var(--highlight);
 }
 
 .stat-label {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--text-secondary);
+  color: var(--sub);
 }
 
 .stat-card.primary .stat-label {
-  color: var(--text-primary);
+  color: var(--bg);
 }
 
 .stat-value {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--highlight);
 }
 
 .stat-card.primary .stat-value {
-  color: var(--text-primary);
+  color: var(--bg);
   font-size: 2rem;
 }
 
 .results-list-section {
-  background: var(--surface-glass-light);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-soft);
+  background: var(--main);
+  border-radius: 8px;
+  border: 1px solid var(--unhighlight);
   overflow: hidden;
 }
 
@@ -84,13 +84,13 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem;
-  border-bottom: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--unhighlight);
 }
 
 .results-list-header h2 {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--text);
 }
 
 .sort-toggle {
@@ -102,22 +102,21 @@
   padding: 0.5rem 0.75rem;
   font-size: 0.75rem;
   font-weight: 600;
-  background: var(--surface-glass-mid);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-sm);
-  color: var(--text-secondary);
+  background: var(--bg);
+  border: 1px solid var(--unhighlight);
+  border-radius: 4px;
+  color: var(--sub);
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .sort-btn:hover {
-  background: var(--surface-glass-heavy);
+  border-color: var(--subalt);
 }
 
 .sort-btn.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #080A18;
+  background: var(--highlight);
+  border-color: var(--highlight);
+  color: var(--bg);
 }
 
 .results-list {

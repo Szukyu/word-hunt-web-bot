@@ -24,9 +24,7 @@
 .option-header h1 {
   font-size: 2.5rem;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--text);
   margin: 0;
 }
 
@@ -39,26 +37,20 @@
 }
 
 .option-card {
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-card);
-  background: var(--surface-glass-heavy);
+  border-radius: 12px;
+  border: 1px solid var(--unhighlight);
+  background: var(--main);
   padding: 28px;
   text-align: left;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  color: var(--text-primary);
-  box-shadow: var(--shadow-soft);
-  position: relative;
+  color: var(--text);
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(20px);
 }
 
 .option-card:hover {
-  transform: translateY(-6px);
-  border-color: var(--border-strong);
-  box-shadow: var(--shadow-medium);
+  border-color: var(--subalt);
 }
 
 .option-card-header {
@@ -70,24 +62,21 @@
 .option-card-icon {
   width: 56px;
   height: 56px;
-  border-radius: 16px;
-  background: var(--surface-glass-light);
+  border-radius: 12px;
+  background: var(--bg);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.8rem;
-  color: var(--accent);
-  box-shadow: var(--shadow-soft);
+  color: var(--highlight);
 }
 
 .option-card.play .option-card-icon {
-  background: linear-gradient(135deg, rgba(90, 216, 255, 0.2), rgba(140, 111, 255, 0.2));
   color: var(--success);
 }
 
 .option-card.cheat .option-card-icon {
-  background: linear-gradient(135deg, rgba(140, 111, 255, 0.2), rgba(255, 143, 177, 0.2));
-  color: var(--accent-strong);
+  color: var(--highlight);
 }
 
 .option-card-content {
@@ -102,7 +91,7 @@
 
 .option-card p {
   margin: 0 0 16px 0;
-  color: var(--text-secondary);
+  color: var(--sub);
   line-height: 1.5;
   font-size: 0.95rem;
 }
@@ -117,7 +106,7 @@
 }
 
 .option-features li {
-  color: var(--text-muted);
+  color: var(--subalt);
   font-size: 0.9rem;
   display: flex;
   align-items: center;
@@ -136,7 +125,7 @@
   justify-content: space-between;
   align-items: center;
   padding-top: 8px;
-  border-top: 1px solid var(--border-soft);
+  border-top: 1px solid var(--unhighlight);
 }
 
 .option-card-cta {
@@ -144,23 +133,21 @@
   font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--highlight);
 }
 
 .option-state-card {
-  border-radius: var(--radius-lg);
+  border-radius: 12px;
   padding: 40px;
-  background: var(--surface-glass-mid);
-  border: 1px solid var(--border-card);
+  background: var(--main);
+  border: 1px solid var(--unhighlight);
   text-align: center;
-  box-shadow: var(--shadow-soft);
   display: flex;
   flex-direction: column;
   gap: 16px;
   align-items: center;
   max-width: 400px;
   margin: 100px auto;
-  backdrop-filter: blur(20px);
 }
 
 .option-loading-content {
@@ -188,16 +175,15 @@
 .progress-bar {
   width: 100%;
   height: 4px;
-  background: var(--border-soft);
+  background: var(--unhighlight);
   border-radius: 2px;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+  background: var(--highlight);
   border-radius: 2px;
-  animation: progress 2s ease-in-out infinite;
 }
 
 .option-state-card.error {
@@ -206,32 +192,30 @@
 
 .retry-button {
   padding: 10px 24px;
-  background: var(--accent);
-  color: white;
+  background: var(--highlight);
+  color: var(--bg);
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
   margin-top: 8px;
 }
 
 .retry-button:hover {
-  background: var(--accent-strong);
-  transform: translateY(-1px);
+  opacity: 0.9;
 }
 
 .option-spinner {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 3px solid var(--border-soft);
-  border-top-color: var(--accent);
+  border: 3px solid var(--unhighlight);
+  border-top-color: var(--highlight);
   animation: spin 1s linear infinite;
 }
 
 .state-subtext {
-  color: var(--text-secondary);
+  color: var(--sub);
   font-size: 0.95rem;
 }
 
@@ -245,10 +229,9 @@
 }
 
 .option-active-panel {
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-card);
-  background: var(--bg-panel);
-  box-shadow: var(--shadow-soft);
+  border-radius: 12px;
+  border: 1px solid var(--unhighlight);
+  background: var(--main);
   overflow: hidden;
   min-height: 600px;
 }
@@ -256,21 +239,6 @@
 @keyframes spin {
   to {
     transform: rotate(360deg);
-  }
-}
-
-@keyframes progress {
-  0% {
-    width: 0%;
-    transform: translateX(0);
-  }
-  50% {
-    width: 100%;
-    transform: translateX(0);
-  }
-  100% {
-    width: 100%;
-    transform: translateX(100%);
   }
 }
 
