@@ -3,14 +3,12 @@
   justify-content: center;
   align-items: center;
   min-height: 80px;
-  backdrop-filter: blur(10px);
   font-size: 1rem;
   font-weight: 600;
   letter-spacing: 0.1rem;
-  color: var(--text-primary);
-  background: var(--surface-glass-light);
-  border: 1px solid var(--border-soft);
-  transition: all 0.3s ease;
+  color: var(--text);
+  background: var(--main);
+  border: 1px solid var(--unhighlight);
   min-width: 300px;
   text-align: center;
 }
@@ -38,13 +36,12 @@
   justify-content: center;
   position: relative;
   border-radius: 0.5rem;
-  border: 2px solid var(--border-soft);
-  transition: all 0.15s ease-out;
+  border: 2px solid var(--unhighlight);
   user-select: none;
   cursor: default;
   font-weight: 600;
   background-color: transparent;
-  color: var(--text-secondary);
+  color: var(--sub);
   width: 2rem;
   height: 2rem;
   font-size: 0.875rem;
@@ -57,11 +54,9 @@
 }
 
 .keymap-key.flashing {
-  background-color: var(--surface-accent);
-  color: var(--text-primary);
-  border-color: var(--border-strong);
-  box-shadow: 0 0 12px rgba(13, 185, 215, 0.4);
-  transform: scale(1.02);
+  background-color: var(--highlight);
+  color: var(--bg);
+  border-color: var(--highlight);
 }
 
 .keymap-key .bump {
@@ -69,17 +64,17 @@
   bottom: 0.125rem;
   width: 0.5rem;
   height: 0.125rem;
-  background-color: var(--text-muted);
+  background-color: var(--subalt);
   border-radius: 0.125rem;
 }
 
 .keymap-key.flashing .bump {
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: var(--bg);
 }
 
 .keymap-instruction {
   margin-top: 1rem;
   text-align: center;
-  color: var(--text-muted);
+  color: var(--subalt);
   font-size: 0.875rem;
 }

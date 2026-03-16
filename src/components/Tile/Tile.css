@@ -1,44 +1,27 @@
 .tile {
   width: 64px;
   height: 64px;
-  border-radius: var(--radius-md);
-  background: var(--surface-glass-mid);
-  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  background: var(--main);
+  border: 2px solid var(--unhighlight);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.3rem;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: var(--text-primary);
+  color: var(--text);
   text-transform: uppercase;
-  position: relative;
-  transition: all 0.2s ease;
-  backdrop-filter: blur(10px);
 }
 
 .tile:hover {
-  background: var(--surface-glass-heavy);
-  border-color: var(--border-strong);
+  border-color: var(--subalt);
 }
 
-.tile.part {
-  background: var(--surface-accent);
-  border-color: var(--accent);
-  color: var(--text-primary);
-  box-shadow: 0 4px 16px rgba(90, 216, 255, 0.2);
-}
-
-.tile.part::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border-radius: var(--radius-md);
-  background: linear-gradient(135deg, rgba(90, 216, 255, 0.1), transparent);
-  pointer-events: none;
+.tile.highlight {
+  background: var(--highlight);
+  border-color: var(--highlight);
+  color: var(--bg);
 }
 
 @media (max-width: 768px) {
