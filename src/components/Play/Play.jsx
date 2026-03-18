@@ -112,15 +112,26 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
     const validWords = new Set();
 
     let board;
-    const lettersArr = letters.split('').map((char, i) => new Letter(char, i));
+    let lettersArr;
     
     if (letters.length === 16) {
+      lettersArr = letters.split('').map((char, i) => new Letter(char, i));
       board = new BoardClass(lettersArr);
     } else if (letters.length === 25) {
+      lettersArr = letters.split('').map((char, i) => new Letter(char, i));
       board = new BoarderClass(lettersArr);
     } else if (letters.length === 20) {
+      const donutPositions = [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23];
+      lettersArr = Array(25).fill(null).map((_, i) => {
+        const letterIndex = donutPositions.indexOf(i);
+        if (letterIndex !== -1) {
+          return new Letter(letters[letterIndex], i);
+        }
+        return null;
+      });
       board = new DonutClass(lettersArr);
     } else if (letters.length === 21) {
+      lettersArr = letters.split('').map((char, i) => new Letter(char, i));
       board = new XClass(lettersArr);
     } else {
       return [];
@@ -147,6 +158,7 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
     };
 
     board.lb.forEach(letter => {
+      if (!letter) return;
       letter.markVisited();
       findValidFrom(board, letter.char, letter, 1, [letter.pos]);
       letter.visited = false;
@@ -170,6 +182,38 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
     setTotalPossibleScore(total);
   }, [boardLetters, findAllValidWords]);
 
+  const isAdjacent = (lastTile, newTile) => {
+    const letters = boardLetters.length;
+    let lettersArr;
+    
+    if (letters === 16) {
+      lettersArr = letters.split('').map((char, i) => new Letter(char, i));
+      const board = new BoardClass(lettersArr);
+      return DIRECTIONS.some(dir => board.visitDirection(lastTile, dir)?.pos === newTile);
+    } else if (letters === 25) {
+      lettersArr = letters.split('').map((char, i) => new Letter(char, i));
+      const board = new BoarderClass(lettersArr);
+      return DIRECTIONS.some(dir => board.visitDirection(lastTile, dir)?.pos === newTile);
+    } else if (letters === 20) {
+      const donutPositions = [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23];
+      lettersArr = Array(25).fill(null).map((_, i) => {
+        const letterIndex = donutPositions.indexOf(i);
+        if (letterIndex !== -1) {
+          return new Letter(letters[letterIndex], i);
+        }
+        return null;
+      });
+      const board = new DonutClass(lettersArr);
+      return DIRECTIONS.some(dir => board.visitDirection(lastTile, dir)?.pos === newTile);
+    } else if (letters === 21) {
+      lettersArr = letters.split('').map((char, i) => new Letter(char, i));
+      const board = new XClass(lettersArr);
+      return DIRECTIONS.some(dir => board.visitDirection(lastTile, dir)?.pos === newTile);
+    }
+    
+    return false;
+  };
+
   const handleTileClick = (index) => {
     if (gameOver || !isRunning) return;
     
@@ -185,11 +229,7 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
 
     if (selectedTiles.length > 0) {
       const lastTile = selectedTiles[selectedTiles.length - 1];
-      const rowDiff = Math.floor(index / Math.sqrt(boardLetters.length)) - Math.floor(lastTile / Math.sqrt(boardLetters.length));
-      const colDiff = index % Math.sqrt(boardLetters.length) - lastTile % Math.sqrt(boardLetters.length);
-      const distance = Math.max(Math.abs(rowDiff), Math.abs(colDiff));
-      
-      if (distance > 1) return;
+      if (!isAdjacent(lastTile, index)) return;
     }
 
     setSelectedTiles(prev => [...prev, index]);
@@ -277,11 +317,7 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
           break;
         } else {
           const lastTile = selectedTiles[selectedTiles.length - 1];
-          const rowDiff = Math.floor(i / Math.sqrt(boardLetters.length)) - Math.floor(lastTile / Math.sqrt(boardLetters.length));
-          const colDiff = i % Math.sqrt(boardLetters.length) - lastTile % Math.sqrt(boardLetters.length);
-          const distance = Math.max(Math.abs(rowDiff), Math.abs(colDiff));
-          
-          if (distance <= 1) {
+          if (isAdjacent(lastTile, i)) {
             foundIndex = i;
             break;
           }
@@ -313,38 +349,55 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
 
   const renderInteractiveBoard = () => {
     if (!boardLetters) return null;
-    
-    const letters = boardLetters.split('').map(l => l.toUpperCase());
-    const size = Math.sqrt(letters.length);
-    
-    const rows = [];
-    for (let i = 0; i < size; i++) {
-      const rowTiles = [];
-      for (let j = 0; j < size; j++) {
-        const index = i * size + j;
-        const isSelected = selectedTiles.includes(index);
-        rowTiles.push(
-          <button
-            key={index}
-            className={`play-tile ${isSelected ? 'selected' : ''}`}
-            onClick={() => handleTileClick(index)}
-            disabled={gameOver || !isRunning}
-          >
-            {letters[index]}
-          </button>
+
+    const BoardComponent = {
+      16: Board,
+      20: Donut,
+      21: X,
+      25: Boarder,
+    }[boardLetters.length];
+
+    if (!BoardComponent) {
+      const letters = boardLetters.split('').map(l => l.toUpperCase());
+      const size = Math.sqrt(letters.length);
+      
+      const rows = [];
+      for (let i = 0; i < size; i++) {
+        const rowTiles = [];
+        for (let j = 0; j < size; j++) {
+          const index = i * size + j;
+          const isSelected = selectedTiles.includes(index);
+          rowTiles.push(
+            <button
+              key={index}
+              className={`play-tile ${isSelected ? 'selected' : ''}`}
+              onClick={() => handleTileClick(index)}
+              disabled={gameOver || !isRunning}
+            >
+              {letters[index]}
+            </button>
+          );
+        }
+        rows.push(
+          <div key={i} className="board-row">
+            {rowTiles}
+          </div>
         );
       }
-      rows.push(
-        <div key={i} className="board-row">
-          {rowTiles}
+      
+      return (
+        <div className="board-container">
+          {rows}
         </div>
       );
     }
-    
+
     return (
-      <div className="board-container">
-        {rows}
-      </div>
+      <BoardComponent 
+        letters={boardLetters} 
+        positions={selectedTiles}
+        onTileClick={handleTileClick}
+      />
     );
   };
 

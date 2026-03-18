@@ -220,7 +220,11 @@ export class Donut {
   copyBoard() {
     const newArr = []
     for (let i = 0; i < this.lb.length; i++) {
-      newArr.push(this.lb[i].copyLetter());
+      if (this.lb[i] !== null) {
+        newArr.push(this.lb[i].copyLetter());
+      } else {
+        newArr.push(null);
+      }
     }
     return new Donut(newArr);
   }
@@ -314,7 +318,7 @@ export class Donut {
     };
 
     const visitedLetter = directionDict[dir](pos);
-    if (visitedLetter === -1 || visitedLetter.visited) {
+    if (visitedLetter === -1 || !visitedLetter || visitedLetter.visited) {
       return -1;
     }
     visitedLetter.markVisited();

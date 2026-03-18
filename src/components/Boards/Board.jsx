@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Tile from "../Tile/Tile.jsx";
 
-const Board = ({ letters = '', positions = [] }) => {
+const Board = ({ letters = '', positions = [], onTileClick }) => {
   const initializeTiles = () => {
     if (letters && letters.length === 16) {
       return letters.split('').map(letter => letter.toUpperCase());
@@ -18,7 +18,7 @@ const Board = ({ letters = '', positions = [] }) => {
   const renderTile = (i) => {
     const isPart = positions.includes(i);
     return (
-      <Tile key={i} value={tiles[i]} part={isPart} />
+      <Tile key={i} value={tiles[i]} part={isPart} onClick={() => onTileClick?.(i)} />
     );
   };
 

@@ -12,6 +12,7 @@
   letter-spacing: 0.08em;
   color: var(--text);
   text-transform: uppercase;
+  cursor: pointer;
 }
 
 .tile:hover {

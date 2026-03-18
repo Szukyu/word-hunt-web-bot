@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Tile from "../Tile/Tile.jsx";
 import InvisibleTile from "../InvisibleTile/InvisibleTile.jsx";
 
-const X = ({ letters = '', positions = [] }) => {
+const X = ({ letters = '', positions = [], onTileClick }) => {
   const initializeTiles = () => {
     if (letters && letters.length === 21) {
       return letters.split('').map(letter => letter.toUpperCase());
@@ -19,7 +19,7 @@ const X = ({ letters = '', positions = [] }) => {
   const renderTile = (i) => {
     const isPart = positions.includes(i);
     return (
-      <Tile key={`tile${i}`} value={tiles[i]} part={isPart} />
+      <Tile key={`tile${i}`} value={tiles[i]} part={isPart} onClick={() => onTileClick?.(i)} />
     );
   };
   
