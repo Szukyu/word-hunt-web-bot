@@ -183,30 +183,30 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
   }, [boardLetters, findAllValidWords]);
 
   const isAdjacent = (lastTile, newTile) => {
-    const letters = boardLetters.length;
+    const boardLength = boardLetters.length;
     let lettersArr;
     
-    if (letters === 16) {
-      lettersArr = letters.split('').map((char, i) => new Letter(char, i));
+    if (boardLength === 16) {
+      lettersArr = boardLetters.split('').map((char, i) => new Letter(char, i));
       const board = new BoardClass(lettersArr);
       return DIRECTIONS.some(dir => board.visitDirection(lastTile, dir)?.pos === newTile);
-    } else if (letters === 25) {
-      lettersArr = letters.split('').map((char, i) => new Letter(char, i));
+    } else if (boardLength === 25) {
+      lettersArr = boardLetters.split('').map((char, i) => new Letter(char, i));
       const board = new BoarderClass(lettersArr);
       return DIRECTIONS.some(dir => board.visitDirection(lastTile, dir)?.pos === newTile);
-    } else if (letters === 20) {
+    } else if (boardLength === 20) {
       const donutPositions = [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23];
       lettersArr = Array(25).fill(null).map((_, i) => {
         const letterIndex = donutPositions.indexOf(i);
         if (letterIndex !== -1) {
-          return new Letter(letters[letterIndex], i);
+          return new Letter(boardLetters[letterIndex], i);
         }
         return null;
       });
       const board = new DonutClass(lettersArr);
       return DIRECTIONS.some(dir => board.visitDirection(lastTile, dir)?.pos === newTile);
-    } else if (letters === 21) {
-      lettersArr = letters.split('').map((char, i) => new Letter(char, i));
+    } else if (boardLength === 21) {
+      lettersArr = boardLetters.split('').map((char, i) => new Letter(char, i));
       const board = new XClass(lettersArr);
       return DIRECTIONS.some(dir => board.visitDirection(lastTile, dir)?.pos === newTile);
     }
@@ -308,6 +308,7 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
     
     const letter = key.toUpperCase();
     const boardArray = boardLetters.split('');
+    const newWord = currentWord + letter;
     
     let foundIndex = -1;
     for (let i = 0; i < boardArray.length; i++) {
@@ -329,8 +330,22 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
       setSelectedTiles(prev => [...prev, foundIndex]);
       setCurrentWord(prev => prev + letter);
       setMessage(null);
+    } else if (selectedTiles.length === 1 && currentWord.length === 1) {
+      const firstLetter = currentWord[0];
+      for (let firstTile = 0; firstTile < boardArray.length; firstTile++) {
+        if (boardArray[firstTile].toUpperCase() === firstLetter && firstTile !== selectedTiles[0]) {
+          for (let nextTile = 0; nextTile < boardArray.length; nextTile++) {
+            if (boardArray[nextTile].toUpperCase() === letter && isAdjacent(firstTile, nextTile)) {
+              setSelectedTiles([firstTile, nextTile]);
+              setCurrentWord(newWord);
+              setMessage(null);
+              return;
+            }
+          }
+        }
+      }
     }
-  }, [boardLetters, selectedTiles, gameOver, isRunning, handleSubmit, handleClear]);
+  }, [boardLetters, selectedTiles, currentWord, gameOver, isRunning, handleSubmit, handleClear]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
