@@ -148,6 +148,7 @@
   color: var(--text);
   text-transform: uppercase;
   cursor: pointer;
+  user-select: none;
 }
 
 .play-tile:hover:not(:disabled) {
