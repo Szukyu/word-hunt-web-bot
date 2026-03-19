@@ -13,6 +13,7 @@
   color: var(--text);
   text-transform: uppercase;
   cursor: pointer;
+  user-select: none;
 }
 
 .tile:hover {

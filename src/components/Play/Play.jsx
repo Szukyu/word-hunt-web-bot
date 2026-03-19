@@ -30,6 +30,7 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
   const [isValidating, setIsValidating] = useState(false);
   const [allPossibleWords, setAllPossibleWords] = useState([]);
   const [totalPossibleScore, setTotalPossibleScore] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
   const englishWordsRef = useRef(englishWords);
 
   const boardConfig = BOARD_CONFIG[boardLetters.length];
@@ -237,6 +238,37 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
     setMessage(null);
   };
 
+  const handleTileMouseDown = (index) => {
+    if (gameOver || !isRunning) return;
+    
+    setIsDragging(true);
+    setSelectedTiles([index]);
+    setCurrentWord(boardLetters[index].toUpperCase());
+    setMessage(null);
+  };
+
+  const handleTileMouseEnter = (index) => {
+    if (gameOver || !isRunning || !isDragging) return;
+    
+    if (selectedTiles.includes(index)) {
+      const tileIndex = selectedTiles.indexOf(index);
+      const lastSelectedIndex = selectedTiles[selectedTiles.length - 1];
+      
+      if (tileIndex === lastSelectedIndex - 1) {
+        setSelectedTiles(prev => prev.slice(0, -1));
+        setCurrentWord(prev => prev.slice(0, -1));
+      }
+      return;
+    }
+
+    const lastTile = selectedTiles[selectedTiles.length - 1];
+    if (!isAdjacent(lastTile, index)) return;
+
+    const letter = boardLetters[index].toUpperCase();
+    setSelectedTiles(prev => [...prev, index]);
+    setCurrentWord(prev => prev + letter);
+  };
+
   const handleSubmit = useCallback(() => {
     if (!currentWord || currentWord.length < 3) {
       setMessage({ type: 'error', text: 'Word must be at least 3 letters' });
@@ -267,6 +299,21 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
       setIsValidating(false);
     }, 100);
   }, [currentWord, foundWords, selectedTiles, englishWords]);
+
+  const handleMouseUp = useCallback(() => {
+    if (isDragging && currentWord.length >= 3) {
+      handleSubmit();
+    } else if (isDragging) {
+      setSelectedTiles([]);
+      setCurrentWord('');
+    }
+    setIsDragging(false);
+  }, [isDragging, currentWord, handleSubmit]);
+
+  useEffect(() => {
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => window.removeEventListener('mouseup', handleMouseUp);
+  }, [handleMouseUp]);
 
   const calculateScore = (length) => {
     if (length < 3 || length > 10) return 0;
@@ -387,6 +434,8 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
               key={index}
               className={`play-tile ${isSelected ? 'selected' : ''}`}
               onClick={() => handleTileClick(index)}
+              onMouseDown={() => handleTileMouseDown(index)}
+              onMouseEnter={() => handleTileMouseEnter(index)}
               disabled={gameOver || !isRunning}
             >
               {letters[index]}
@@ -412,6 +461,8 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
         letters={boardLetters} 
         positions={selectedTiles}
         onTileClick={handleTileClick}
+        onTileMouseDown={handleTileMouseDown}
+        onTileMouseEnter={handleTileMouseEnter}
       />
     );
   };
@@ -448,7 +499,7 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
         <div className="play-main">
           <div className="current-word-display">
             <div className={`current-word ${message?.type || ''}`}>
-              {currentWord || 'Type letters to form a word'}
+              {currentWord }
             </div>
             {message && (
               <div className={`message ${message.type}`}>
