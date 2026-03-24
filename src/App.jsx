@@ -2,8 +2,11 @@ import { useState, useEffect } from 'react';
 import './App.css';
 import Navbar from './components/Navbar/Navbar.jsx';
 import Option from './components/Option/Option.jsx';
+import Auth from './components/Auth/Auth.jsx';
+import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 
-function App() {
+const AppContent = () => {
+  const { user, loading, signOut } = useAuth()
   const [resetKey, setResetKey] = useState(0);
   const [theme, setTheme] = useState(() => {
     if (typeof window === 'undefined') return 'dark';
@@ -23,11 +26,29 @@ function App() {
     setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
   };
 
+  if (loading) {
+    return <div className="App">Loading...</div>
+  }
+
   return (
     <div className="App">
-      <Navbar onReset={resetOption} theme={theme} onToggleTheme={toggleTheme} />
-      <Option key={resetKey} />
+      <Navbar 
+        onReset={resetOption} 
+        theme={theme} 
+        onToggleTheme={toggleTheme}
+        user={user}
+        onSignOut={signOut}
+      />
+      {user ? <Option key={resetKey} /> : <Auth />}
     </div>
+  );
+};
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

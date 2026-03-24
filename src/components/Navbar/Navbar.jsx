@@ -1,7 +1,7 @@
-import { IoMoon, IoSunny, IoLogoGithub } from 'react-icons/io5';
+import { IoMoon, IoSunny, IoLogoGithub, IoLogOut } from 'react-icons/io5';
 import './Navbar.css';
 
-const Navbar = ({ onReset, theme = 'dark', onToggleTheme }) => {
+const Navbar = ({ onReset, theme = 'dark', onToggleTheme, user, onSignOut }) => {
   return (
     <nav className="navbar" aria-label="Primary navigation">
       <div className="nav-content">
@@ -27,15 +27,22 @@ const Navbar = ({ onReset, theme = 'dark', onToggleTheme }) => {
               </span>
             </button>
           )}
-          <a
-            href="https://github.com/Szukyu/word-hunt-web-bot"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="nav-link"
-          >
-            <IoLogoGithub className="nav-link-icon" />
-            GitHub
-          </a>
+          {user ? (
+            <button className="nav-link" onClick={onSignOut}>
+              <IoLogOut className="nav-link-icon" />
+              Sign Out
+            </button>
+          ) : (
+            <a
+              href="https://github.com/Szukyu/word-hunt-web-bot"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="nav-link"
+            >
+              <IoLogoGithub className="nav-link-icon" />
+              GitHub
+            </a>
+          )}
         </div>
       </div>
     </nav>
