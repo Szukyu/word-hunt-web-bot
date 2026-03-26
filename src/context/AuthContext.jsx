@@ -1,71 +1,82 @@
-import { createContext, useContext, useEffect, useState } from 'react'
-import { supabase } from '../lib/supabase'
+import { createContext, useContext, useEffect, useState } from 'react';
+import { supabase } from '../lib/supabase';
+import bcrypt from 'bcryptjs';
 
-const AuthContext = createContext({})
+const AuthContext = createContext({});
 
-export const useAuth = () => useContext(AuthContext)
+export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const SALT_ROUNDS = 10;
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('wordhunt_user')
+    const storedUser = localStorage.getItem('wordhunt_user');
     if (storedUser) {
-      setUser(JSON.parse(storedUser))
+      setUser(JSON.parse(storedUser));
     }
-    setLoading(false)
-  }, [])
+    setLoading(false);
+  }, []);
 
   const signUp = async (username, password) => {
     const { data: existing } = await supabase
       .from('users')
       .select('id')
       .eq('username', username)
-      .single()
+      .single();
 
     if (existing) {
-      throw new Error('Username already taken')
+      throw new Error('Username already taken');
     }
+
+    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
     const { data, error } = await supabase
       .from('users')
-      .insert([{ username, password }])
+      .insert([{ username, password: hashedPassword }])
       .select()
-      .single()
+      .single();
 
-    if (error) throw error
+    if (error) throw error;
 
-    const user = { id: data.id, username: data.username }
-    setUser(user)
-    localStorage.setItem('wordhunt_user', JSON.stringify(user))
-    return data
-  }
+    const user = { id: data.id, username: data.username };
+    setUser(user);
+    localStorage.setItem('wordhunt_user', JSON.stringify(user));
+    return data;
+  };
 
   const signIn = async (username, password) => {
-    const { data, error } = await supabase
+    const { data: userData, error } = await supabase
       .from('users')
       .select('*')
       .eq('username', username)
-      .eq('password', password)
-      .single()
+      .single();
 
-    if (error) throw new Error('Invalid username or password')
+    if (error || !userData) {
+      throw new Error('Invalid username or password');
+    }
 
-    const user = { id: data.id, username: data.username }
-    setUser(user)
-    localStorage.setItem('wordhunt_user', JSON.stringify(user))
-    return data
-  }
+    const isPasswordValid = await bcrypt.compare(password, userData.password);
+    if (!isPasswordValid) {
+      throw new Error('Invalid username or password');
+    }
+
+    const user = { id: userData.id, username: userData.username };
+    setUser(user);
+    localStorage.setItem('wordhunt_user', JSON.stringify(user));
+    return userData;
+  };
 
   const signOut = async () => {
-    setUser(null)
-    localStorage.removeItem('wordhunt_user')
-  }
+    setUser(null);
+    localStorage.removeItem('wordhunt_user');
+  };
 
   return (
     <AuthContext.Provider value={{ user, loading, signUp, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
-  )
-}
+  );
+};
