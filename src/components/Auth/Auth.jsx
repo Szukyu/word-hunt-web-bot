@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import './Auth.css'
 
-const Auth = () => {
+const Auth = ({ onClose }) => {
   const { signIn, signUp } = useAuth()
   const [isLogin, setIsLogin] = useState(true)
   const [username, setUsername] = useState('')
@@ -21,6 +21,7 @@ const Auth = () => {
       } else {
         await signUp(username, password)
       }
+      onClose?.()
     } catch (err) {
       setError(err.message)
     } finally {

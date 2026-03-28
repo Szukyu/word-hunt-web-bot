@@ -89,6 +89,22 @@
   font-size: 1.1rem;
 }
 
+.profile-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.profile-icon {
+  font-size: 1.3rem;
+}
+
 @media (max-width: 768px) {
   .navbar {
     padding: 16px 20px;
