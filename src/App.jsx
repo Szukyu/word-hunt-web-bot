@@ -3,11 +3,10 @@ import './App.css';
 import Navbar from './components/Navbar/Navbar.jsx';
 import Option from './components/Option/Option.jsx';
 import Auth from './components/Auth/Auth.jsx';
-import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 
 const AppContent = () => {
-  const { user, loading, signOut } = useAuth()
   const [resetKey, setResetKey] = useState(0);
+  const [showAuth, setShowAuth] = useState(false);
   const [theme, setTheme] = useState(() => {
     if (typeof window === 'undefined') return 'dark';
     return localStorage.getItem('theme') || 'dark';
@@ -26,30 +25,34 @@ const AppContent = () => {
     setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
   };
 
-  if (loading) {
-    return <div className="App">Loading...</div>
-  }
+  const handleLogin = () => {
+    setShowAuth(true);
+  };
+
+  const handleCloseAuth = () => {
+    setShowAuth(false);
+  };
+
+  const handleReset = () => {
+    setShowAuth(false);
+    resetOption();
+  };
 
   return (
     <div className="App">
       <Navbar 
-        onReset={resetOption} 
+        onReset={handleReset} 
         theme={theme} 
         onToggleTheme={toggleTheme}
-        user={user}
-        onSignOut={signOut}
+        onLogin={handleLogin}
       />
-      {user ? <Option key={resetKey} /> : <Auth />}
+      {showAuth ? <Auth onClose={handleCloseAuth} /> : <Option key={resetKey} />}
     </div>
   );
 };
 
 function App() {
-  return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
-  );
+  return <AppContent />;
 }
 
 export default App;
