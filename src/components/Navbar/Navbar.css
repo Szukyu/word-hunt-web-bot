@@ -105,6 +105,28 @@
   font-size: 1.3rem;
 }
 
+.signout-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--unhighlight);
+  background: transparent;
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.signout-button:hover {
+  border-color: var(--subalt);
+}
+
+.signout-icon {
+  font-size: 1.1rem;
+}
+
 @media (max-width: 768px) {
   .navbar {
     padding: 16px 20px;
