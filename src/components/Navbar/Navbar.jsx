@@ -1,7 +1,14 @@
-import { IoMoon, IoSunny, IoLogOut, IoPersonOutline } from 'react-icons/io5';
+import { IoMoon, IoSunny, IoPersonOutline, IoLogOutOutline } from 'react-icons/io5';
 import './Navbar.css';
 
-const Navbar = ({ onReset, theme = 'dark', onToggleTheme, user, onSignOut, onLogin }) => {
+const Navbar = ({ onReset, theme = 'dark', onToggleTheme, onLogin, user, onSignOut, onViewStats }) => {
+  const handleProfileClick = () => {
+    if (user) {
+      onViewStats?.();
+    } else {
+      onLogin();
+    }
+  };
   return (
     <nav className="navbar" aria-label="Primary navigation">
       <div className="nav-content">
@@ -27,14 +34,13 @@ const Navbar = ({ onReset, theme = 'dark', onToggleTheme, user, onSignOut, onLog
               </span>
             </button>
           )}
-          {user ? (
-            <button className="nav-link" onClick={onSignOut}>
-              <IoLogOut className="nav-link-icon" />
-              Sign Out
-            </button>
-          ) : (
-            <button className="profile-button" onClick={onLogin} aria-label="Login">
-              <IoPersonOutline className="profile-icon" />
+          <button className="profile-button" onClick={handleProfileClick} aria-label="Profile">
+            <IoPersonOutline className="profile-icon" />
+          </button>
+          {user && (
+            <button className="signout-button" onClick={onSignOut} aria-label="Sign out">
+              <IoLogOutOutline className="signout-icon" />
+              <span className="signout-text">Sign Out</span>
             </button>
           )}
         </div>
