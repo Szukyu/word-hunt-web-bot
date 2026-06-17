@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { FREQ } from '../../data/freq';
 import { POINTS } from '../../data/points';
 import Board from '../Boards/Board';
 import Boarder from '../Boards/Boarder';
@@ -8,7 +7,8 @@ import X from '../Boards/X';
 import List from '../List/List';
 import { IoTimeOutline, IoCheckmarkCircle, IoArrowBack, IoRefresh, IoClose } from 'react-icons/io5';
 import useTimer from '../../hooks/timer';
-import { Letter, MAX_LENGTH, DIRECTIONS, Board as BoardClass, Boarder as BoarderClass, Donut as DonutClass, X as XClass } from '../../utils/Board.jsx';
+import { useBoard } from '../../hooks/board';
+import { useKeyboardInput } from '../../hooks/keyboardInput';
 import './Play.css';
 
 const BOARD_CONFIG = {
@@ -20,7 +20,6 @@ const BOARD_CONFIG = {
 
 const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
   const { secondsLeft, isRunning, start, pause } = useTimer();
-  const [boardLetters, setBoardLetters] = useState('');
   const [selectedTiles, setSelectedTiles] = useState([]);
   const [foundWords, setFoundWords] = useState([]);
   const [currentWord, setCurrentWord] = useState('');
@@ -31,289 +30,66 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
   const [allPossibleWords, setAllPossibleWords] = useState([]);
   const [totalPossibleScore, setTotalPossibleScore] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+
   const englishWordsRef = useRef(englishWords);
-
-  const boardConfig = BOARD_CONFIG[boardLetters.length];
-  const BoardComponent = boardConfig?.component;
-
-  useEffect(() => {
-    if (boardLetters.length > 0 && !gameOver) {
-      start(gameTime);
-    }
-    return () => pause();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [boardLetters]);
-
-  useEffect(() => {
-    if (secondsLeft === 0 && boardLetters.length > 0 && !gameOver) {
-      setGameOver(true);
-      pause();
-      
-      const allWords = findAllValidWords(boardLetters);
-      const wordsWithScores = allWords.map(word => ({
-        word,
-        score: calculateScore(word.length)
-      })).sort((a, b) => {
-        if (b.score !== a.score) return b.score - a.score;
-        return a.word.localeCompare(b.word);
-      });
-      
-      const total = wordsWithScores.reduce((sum, w) => sum + w.score, 0);
-      setAllPossibleWords(wordsWithScores);
-      setTotalPossibleScore(total);
-      
-      if (onGameEnd) {
-        onGameEnd({
-          score,
-          foundWords,
-          allPossibleWords: wordsWithScores,
-          totalPossibleScore: total
-        });
-      }
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [secondsLeft]);
-
-  const generateRandomBoard = useCallback(() => {
-    const letters = 'abcdefghijklmnopqrstuvwxyz';
-    const length = boardType;
-    const cumulativeWeights = [];
-    let sum = 0;
-    for (const freq of FREQ) {
-      sum += freq;
-      cumulativeWeights.push(sum);
-    }
-    const random = () => {
-      const r = Math.random() * cumulativeWeights[cumulativeWeights.length - 1];
-      return cumulativeWeights.findIndex(w => r <= w);
-    };
-    let board = '';
-    for (let i = 0; i < length; i++) {
-      board += letters[random()];
-    }
-    setBoardLetters(board);
-    setSelectedTiles([]);
-    setCurrentWord('');
-    setFoundWords([]);
-    setScore(0);
-    setGameOver(false);
-    setMessage(null);
-  }, [boardType]);
-
-  useEffect(() => {
-    generateRandomBoard();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+	// Submission Guard
+  const submittingRef = useRef(false);
 
   useEffect(() => {
     englishWordsRef.current = englishWords;
   }, [englishWords]);
 
-  const findAllValidWords = useCallback((letters) => {
-    const validWords = new Set();
+  const { boardLetters, adjacencyMap, generateRandomBoard, getValidWords } = useBoard(boardType, englishWords);
 
-    let board;
-    let lettersArr;
-    
-    if (letters.length === 16) {
-      lettersArr = letters.split('').map((char, i) => new Letter(char, i));
-      board = new BoardClass(lettersArr);
-    } else if (letters.length === 25) {
-      lettersArr = letters.split('').map((char, i) => new Letter(char, i));
-      board = new BoarderClass(lettersArr);
-    } else if (letters.length === 20) {
-      const donutPositions = [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23];
-      lettersArr = Array(25).fill(null).map((_, i) => {
-        const letterIndex = donutPositions.indexOf(i);
-        if (letterIndex !== -1) {
-          return new Letter(letters[letterIndex], i);
-        }
-        return null;
-      });
-      board = new DonutClass(lettersArr);
-    } else if (letters.length === 21) {
-      lettersArr = letters.split('').map((char, i) => new Letter(char, i));
-      board = new XClass(lettersArr);
-    } else {
-      return [];
-    }
-
-    const findValidFrom = (board, word, letter, length, positions) => {
-      if (englishWordsRef.current.has(word) && !validWords.has(word)) {
-        validWords.add(word.toUpperCase());
-      }
-
-      if (length >= MAX_LENGTH) {
-        return;
-      }
-
-      positions.push(letter.pos);
-
-      for (const dir of DIRECTIONS) {
-        const copyBoard = board.copyBoard();
-        const neighborLetter = copyBoard.visitDirection(letter.pos, dir);
-        if (neighborLetter !== -1) {
-          findValidFrom(copyBoard, word + neighborLetter.char, neighborLetter, length + 1, [...positions]);
-        }
-      }
-    };
-
-    board.lb.forEach(letter => {
-      if (!letter) return;
-      letter.markVisited();
-      findValidFrom(board, letter.char, letter, 1, [letter.pos]);
-      letter.visited = false;
-    });
-
-    return Array.from(validWords);
+  // Generate Board on Mount
+  useEffect(() => {
+    generateRandomBoard();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const calculateAllPossibleWords = useCallback(() => {
-    const allWords = findAllValidWords(boardLetters);
-    const wordsWithScores = allWords.map(word => ({
-      word,
-      score: calculateScore(word.length)
-    })).sort((a, b) => {
-      if (b.score !== a.score) return b.score - a.score;
-      return a.word.localeCompare(b.word);
-    });
-    
-    const total = wordsWithScores.reduce((sum, w) => sum + w.score, 0);
-    setAllPossibleWords(wordsWithScores);
-    setTotalPossibleScore(total);
-  }, [boardLetters, findAllValidWords]);
-
-  const isAdjacent = (lastTile, newTile) => {
-    const boardLength = boardLetters.length;
-    let lettersArr;
-    
-    if (boardLength === 16) {
-      lettersArr = boardLetters.split('').map((char, i) => new Letter(char, i));
-      const board = new BoardClass(lettersArr);
-      return DIRECTIONS.some(dir => board.visitDirection(lastTile, dir)?.pos === newTile);
-    } else if (boardLength === 25) {
-      lettersArr = boardLetters.split('').map((char, i) => new Letter(char, i));
-      const board = new BoarderClass(lettersArr);
-      return DIRECTIONS.some(dir => board.visitDirection(lastTile, dir)?.pos === newTile);
-    } else if (boardLength === 20) {
-      const donutPositions = [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23];
-      lettersArr = Array(25).fill(null).map((_, i) => {
-        const letterIndex = donutPositions.indexOf(i);
-        if (letterIndex !== -1) {
-          return new Letter(boardLetters[letterIndex], i);
-        }
-        return null;
-      });
-      const board = new DonutClass(lettersArr);
-      return DIRECTIONS.some(dir => board.visitDirection(lastTile, dir)?.pos === newTile);
-    } else if (boardLength === 21) {
-      lettersArr = boardLetters.split('').map((char, i) => new Letter(char, i));
-      const board = new XClass(lettersArr);
-      return DIRECTIONS.some(dir => board.visitDirection(lastTile, dir)?.pos === newTile);
-    }
-    
-    return false;
-  };
-
-  const handleTileClick = (index) => {
-    if (gameOver || !isRunning) return;
-    
-    const letter = boardLetters[index].toUpperCase();
-    
-    if (selectedTiles.includes(index)) {
-      if (selectedTiles[selectedTiles.length - 1] === index) {
-        setSelectedTiles(prev => prev.slice(0, -1));
-        setCurrentWord(prev => prev.slice(0, -1));
-      }
-      return;
-    }
-
-    if (selectedTiles.length > 0) {
-      const lastTile = selectedTiles[selectedTiles.length - 1];
-      if (!isAdjacent(lastTile, index)) return;
-    }
-
-    setSelectedTiles(prev => [...prev, index]);
-    setCurrentWord(prev => prev + letter);
-    setMessage(null);
-  };
-
-  const handleTileMouseDown = (index) => {
-    if (gameOver || !isRunning) return;
-    
-    setIsDragging(true);
-    setSelectedTiles([index]);
-    setCurrentWord(boardLetters[index].toUpperCase());
-    setMessage(null);
-  };
-
-  const handleTileMouseEnter = (index) => {
-    if (gameOver || !isRunning || !isDragging) return;
-    
-    if (selectedTiles.includes(index)) {
-      const tileIndex = selectedTiles.indexOf(index);
-      const lastSelectedIndex = selectedTiles[selectedTiles.length - 1];
-      
-      if (tileIndex === lastSelectedIndex - 1) {
-        setSelectedTiles(prev => prev.slice(0, -1));
-        setCurrentWord(prev => prev.slice(0, -1));
-      }
-      return;
-    }
-
-    const lastTile = selectedTiles[selectedTiles.length - 1];
-    if (!isAdjacent(lastTile, index)) return;
-
-    const letter = boardLetters[index].toUpperCase();
-    setSelectedTiles(prev => [...prev, index]);
-    setCurrentWord(prev => prev + letter);
-  };
-
-  const handleSubmit = useCallback(() => {
-    if (!currentWord || currentWord.length < 3) {
-      setMessage({ type: 'error', text: 'Word must be at least 3 letters' });
-      return;
-    }
-
-    if (foundWords.some(w => w.word.toLowerCase() === currentWord.toLowerCase())) {
-      setMessage({ type: 'error', text: 'Word already found' });
-      setSelectedTiles([]);
-      setCurrentWord('');
-      return;
-    }
-
-    setIsValidating(true);
-    
-    setTimeout(() => {
-      const wordLower = currentWord.toLowerCase();
-      if (englishWords.has(wordLower)) {
-        const wordScore = calculateScore(wordLower.length);
-        setFoundWords(prev => [...prev, { word: currentWord.toUpperCase(), pos: [...selectedTiles], score: wordScore }]);
-        setScore(prev => prev + wordScore);
-        setMessage({ type: 'success', text: `+${wordScore} points!` });
-      } else {
-        setMessage({ type: 'error', text: 'Not a valid word' });
-      }
-      setSelectedTiles([]);
-      setCurrentWord('');
-      setIsValidating(false);
-    }, 100);
-  }, [currentWord, foundWords, selectedTiles, englishWords]);
-
-  const handleMouseUp = useCallback(() => {
-    if (isDragging && currentWord.length >= 3) {
-      handleSubmit();
-    } else if (isDragging) {
-      setSelectedTiles([]);
-      setCurrentWord('');
-    }
-    setIsDragging(false);
-  }, [isDragging, currentWord, handleSubmit]);
-
+  // Timer control
   useEffect(() => {
-    window.addEventListener('mouseup', handleMouseUp);
-    return () => window.removeEventListener('mouseup', handleMouseUp);
-  }, [handleMouseUp]);
+    if (boardLetters && !gameOver) {
+      start(gameTime);
+    }
+    return () => pause();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [boardLetters, gameOver]);
+
+	// Game Over
+  useEffect(() => {
+    if (secondsLeft === 0 && boardLetters && !gameOver) {
+      setGameOver(true);
+      pause();
+
+      const allWords = getValidWords();
+      const wordsWithScores = allWords
+        .map(word => ({ word, score: calculateScore(word.length) }))
+        .sort((a, b) => {
+          if (b.score !== a.score) return b.score - a.score;
+          return a.word.localeCompare(b.word);
+        });
+
+      const total = wordsWithScores.reduce((sum, w) => sum + w.score, 0);
+      setAllPossibleWords(wordsWithScores);
+      setTotalPossibleScore(total);
+
+      onGameEnd?.({
+        score,
+        foundWords,
+        allPossibleWords: wordsWithScores,
+        totalPossibleScore: total
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [secondsLeft]);
+
+  // Clear Message on New Word
+  useEffect(() => {
+    if (currentWord.length > 0 && message) {
+      setMessage(null);
+    }
+  }, [currentWord, message]);
 
   const calculateScore = (length) => {
     if (length < 3 || length > 10) return 0;
@@ -326,81 +102,151 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
     setMessage(null);
   }, []);
 
-  const handleKeyDown = useCallback((event) => {
-    if (gameOver || !isRunning) return;
-    
-    const key = event.key.toLowerCase();
-    
-    if (key === 'enter') {
-      event.preventDefault();
-      handleSubmit();
+  const handleSubmit = useCallback(() => {
+    if (submittingRef.current) return; // Guard
+
+    if (!currentWord || currentWord.length === 0) return;
+
+    // Too Short
+    if (currentWord.length < 3) {
+      submittingRef.current = true;
+      setMessage({ type: 'error', text: 'Too Short' });
+      setSelectedTiles([]);
+      setCurrentWord('');
+      setTimeout(() => {
+        setMessage(null);
+        submittingRef.current = false;
+      }, 1200);
       return;
     }
-    
-    if (key === 'backspace') {
-      event.preventDefault();
-      if (selectedTiles.length > 0) {
+
+    // Already Found
+    if (foundWords.some(w => w.word.toLowerCase() === currentWord.toLowerCase())) {
+      submittingRef.current = true;
+      setMessage({ type: 'error', text: 'Already Found' });
+      setSelectedTiles([]);
+      setCurrentWord('');
+      setTimeout(() => {
+        setMessage(null);
+        submittingRef.current = false;
+      }, 1200);
+      return;
+    }
+
+    submittingRef.current = true;
+    setIsValidating(true);
+
+    setTimeout(() => {
+      const wordLower = currentWord.toLowerCase();
+      if (englishWordsRef.current.has(wordLower)) {
+        const wordScore = calculateScore(wordLower.length);
+        setFoundWords(prev => [
+          ...prev,
+          { word: currentWord.toUpperCase(), pos: [...selectedTiles], score: wordScore }
+        ]);
+        setScore(prev => prev + wordScore);
+        setMessage({ type: 'success', text: `+${wordScore} points!` });
+      } else {
+        setMessage({ type: 'error', text: 'Invalid word' });
+      }
+
+      setSelectedTiles([]);
+      setCurrentWord('');
+      setIsValidating(false);
+
+      setTimeout(() => {
+        setMessage(null);
+        submittingRef.current = false;
+      }, 1200);
+    }, 100);
+  }, [currentWord, foundWords, selectedTiles]);
+
+  const handleMouseUp = useCallback(() => {
+    if (isDragging && currentWord.length >= 3) {
+      handleSubmit();
+    } else if (isDragging) {
+      handleClear();
+    }
+    setIsDragging(false);
+  }, [isDragging, currentWord, handleSubmit, handleClear]);
+
+  useEffect(() => {
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => window.removeEventListener('mouseup', handleMouseUp);
+  }, [handleMouseUp]);
+
+  const isAdjacent = (lastTile, newTile) =>
+    adjacencyMap[lastTile]?.includes(newTile) ?? false;
+
+  const handleTileClick = (index) => {
+    if (gameOver || !isRunning) return;
+    const letter = boardLetters[index].toUpperCase();
+
+    if (selectedTiles.includes(index)) {
+      if (selectedTiles[selectedTiles.length - 1] === index) {
         setSelectedTiles(prev => prev.slice(0, -1));
         setCurrentWord(prev => prev.slice(0, -1));
       }
       return;
     }
-    
-    if (key === 'escape') {
-      handleClear();
+    if (selectedTiles.length > 0 && !isAdjacent(selectedTiles[selectedTiles.length - 1], index)) return;
+
+    setSelectedTiles(prev => [...prev, index]);
+    setCurrentWord(prev => prev + letter);
+    setMessage(null);
+  };
+
+  const handleTileMouseDown = (index) => {
+    if (gameOver || !isRunning) return;
+    setIsDragging(true);
+    setSelectedTiles([index]);
+    setCurrentWord(boardLetters[index].toUpperCase());
+    setMessage(null);
+  };
+
+  const handleTileMouseEnter = (index) => {
+    if (gameOver || !isRunning || !isDragging) return;
+
+    if (selectedTiles.includes(index)) {
+      const tileIndex = selectedTiles.indexOf(index);
+      const lastSelectedIndex = selectedTiles[selectedTiles.length - 1];
+      if (tileIndex === lastSelectedIndex - 1) {
+        setSelectedTiles(prev => prev.slice(0, -1));
+        setCurrentWord(prev => prev.slice(0, -1));
+      }
       return;
     }
-    
-    if (!/^[a-z]$/.test(key)) return;
-    
-    const letter = key.toUpperCase();
-    const boardArray = boardLetters.split('');
-    const newWord = currentWord + letter;
-    
-    let foundIndex = -1;
-    for (let i = 0; i < boardArray.length; i++) {
-      if (boardArray[i].toUpperCase() === letter && !selectedTiles.includes(i)) {
-        if (selectedTiles.length === 0) {
-          foundIndex = i;
-          break;
-        } else {
-          const lastTile = selectedTiles[selectedTiles.length - 1];
-          if (isAdjacent(lastTile, i)) {
-            foundIndex = i;
-            break;
-          }
-        }
-      }
-    }
-    
-    if (foundIndex !== -1) {
-      setSelectedTiles(prev => [...prev, foundIndex]);
-      setCurrentWord(prev => prev + letter);
-      setMessage(null);
-    } else if (selectedTiles.length === 1 && currentWord.length === 1) {
-      const firstLetter = currentWord[0];
-      for (let firstTile = 0; firstTile < boardArray.length; firstTile++) {
-        if (boardArray[firstTile].toUpperCase() === firstLetter && firstTile !== selectedTiles[0]) {
-          for (let nextTile = 0; nextTile < boardArray.length; nextTile++) {
-            if (boardArray[nextTile].toUpperCase() === letter && isAdjacent(firstTile, nextTile)) {
-              setSelectedTiles([firstTile, nextTile]);
-              setCurrentWord(newWord);
-              setMessage(null);
-              return;
-            }
-          }
-        }
-      }
-    }
-  }, [boardLetters, selectedTiles, currentWord, gameOver, isRunning, handleSubmit, handleClear]);
 
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleKeyDown]);
+    const lastTile = selectedTiles[selectedTiles.length - 1];
+    if (!isAdjacent(lastTile, index)) return;
+
+    setSelectedTiles(prev => [...prev, index]);
+    setCurrentWord(prev => prev + boardLetters[index].toUpperCase());
+  };
+
+  useKeyboardInput({
+    boardLetters,
+    adjacencyMap,
+    selectedTiles,
+    currentWord,
+    setSelectedTiles,
+    setCurrentWord,
+    setMessage,
+    gameOver,
+    isRunning,
+    onSubmit: handleSubmit,
+    onClear: handleClear,
+    submittingRef
+  });
 
   const handlePlayAgain = () => {
     generateRandomBoard();
+    setSelectedTiles([]);
+    setCurrentWord('');
+    setFoundWords([]);
+    setScore(0);
+    setGameOver(false);
+    setMessage(null);
   };
 
   const formatTime = (sec) => {
@@ -411,18 +257,11 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
 
   const renderInteractiveBoard = () => {
     if (!boardLetters) return null;
-
-    const BoardComponent = {
-      16: Board,
-      20: Donut,
-      21: X,
-      25: Boarder,
-    }[boardLetters.length];
+    const BoardComponent = BOARD_CONFIG[boardLetters.length]?.component;
 
     if (!BoardComponent) {
       const letters = boardLetters.split('').map(l => l.toUpperCase());
       const size = Math.sqrt(letters.length);
-      
       const rows = [];
       for (let i = 0; i < size; i++) {
         const rowTiles = [];
@@ -442,23 +281,14 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
             </button>
           );
         }
-        rows.push(
-          <div key={i} className="board-row">
-            {rowTiles}
-          </div>
-        );
+        rows.push(<div key={i} className="board-row">{rowTiles}</div>);
       }
-      
-      return (
-        <div className="board-container">
-          {rows}
-        </div>
-      );
+      return <div className="board-container">{rows}</div>;
     }
 
     return (
-      <BoardComponent 
-        letters={boardLetters} 
+      <BoardComponent
+        letters={boardLetters}
         positions={selectedTiles}
         onTileClick={handleTileClick}
         onTileMouseDown={handleTileMouseDown}
@@ -499,13 +329,8 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
         <div className="play-main">
           <div className="current-word-display">
             <div className={`current-word ${message?.type || ''}`}>
-              {currentWord }
+              {message ? message.text : currentWord}
             </div>
-            {message && (
-              <div className={`message ${message.type}`}>
-                {message.text}
-              </div>
-            )}
           </div>
 
           <div className="play-board">
@@ -513,15 +338,15 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
           </div>
 
           <div className="play-controls">
-            <button 
-              className="control-button clear" 
+            <button
+              className="control-button clear"
               onClick={handleClear}
               disabled={selectedTiles.length === 0 || gameOver}
             >
               <IoClose /> Clear
             </button>
-            <button 
-              className="control-button submit" 
+            <button
+              className="control-button submit"
               onClick={handleSubmit}
               disabled={currentWord.length < 3 || gameOver || isValidating}
             >
