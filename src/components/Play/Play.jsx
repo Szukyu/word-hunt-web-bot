@@ -7,8 +7,8 @@ import X from '../Boards/X';
 import List from '../List/List';
 import { IoTimeOutline, IoCheckmarkCircle, IoArrowBack, IoRefresh, IoClose } from 'react-icons/io5';
 import useTimer from '../../hooks/timer';
-import { useBoard } from '../../hooks/board.js';
-import { useKeyboardInput } from '../../hooks/keyboardInput.js';
+import { useBoard } from '../../hooks/board';
+import { useKeyboardInput } from '../../hooks/keyboardInput';
 import './Play.css';
 
 const BOARD_CONFIG = {
@@ -32,11 +32,20 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
   const [isDragging, setIsDragging] = useState(false);
 
   const englishWordsRef = useRef(englishWords);
+	// Submission Guard
+  const submittingRef = useRef(false);
+
   useEffect(() => {
     englishWordsRef.current = englishWords;
   }, [englishWords]);
 
   const { boardLetters, adjacencyMap, generateRandomBoard, getValidWords } = useBoard(boardType, englishWords);
+
+  // Generate Board on Mount
+  useEffect(() => {
+    generateRandomBoard();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Timer control
   useEffect(() => {
@@ -75,6 +84,13 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [secondsLeft]);
 
+  // Clear Message on New Word
+  useEffect(() => {
+    if (currentWord.length > 0 && message) {
+      setMessage(null);
+    }
+  }, [currentWord, message]);
+
   const calculateScore = (length) => {
     if (length < 3 || length > 10) return 0;
     return POINTS[length - 3];
@@ -87,16 +103,39 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
   }, []);
 
   const handleSubmit = useCallback(() => {
-    if (!currentWord || currentWord.length < 3) {
-      setMessage({ type: 'error', text: 'Word must be at least 3 letters' });
+    if (submittingRef.current) return; // Guard
+
+    if (!currentWord || currentWord.length === 0) return;
+
+    // Too Short
+    if (currentWord.length < 3) {
+      submittingRef.current = true;
+      setMessage({ type: 'error', text: 'Too Short' });
+      setSelectedTiles([]);
+      setCurrentWord('');
+      setTimeout(() => {
+        setMessage(null);
+        submittingRef.current = false;
+      }, 1200);
       return;
     }
+
+    // Already Found
     if (foundWords.some(w => w.word.toLowerCase() === currentWord.toLowerCase())) {
-      setMessage({ type: 'error', text: 'Word already found' });
-      handleClear();
+      submittingRef.current = true;
+      setMessage({ type: 'error', text: 'Already Found' });
+      setSelectedTiles([]);
+      setCurrentWord('');
+      setTimeout(() => {
+        setMessage(null);
+        submittingRef.current = false;
+      }, 1200);
       return;
     }
+
+    submittingRef.current = true;
     setIsValidating(true);
+
     setTimeout(() => {
       const wordLower = currentWord.toLowerCase();
       if (englishWordsRef.current.has(wordLower)) {
@@ -108,12 +147,19 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
         setScore(prev => prev + wordScore);
         setMessage({ type: 'success', text: `+${wordScore} points!` });
       } else {
-        setMessage({ type: 'error', text: 'Not a valid word' });
+        setMessage({ type: 'error', text: 'Invalid word' });
       }
-      handleClear();
+
+      setSelectedTiles([]);
+      setCurrentWord('');
       setIsValidating(false);
+
+      setTimeout(() => {
+        setMessage(null);
+        submittingRef.current = false;
+      }, 1200);
     }, 100);
-  }, [currentWord, foundWords, selectedTiles, handleClear]);
+  }, [currentWord, foundWords, selectedTiles]);
 
   const handleMouseUp = useCallback(() => {
     if (isDragging && currentWord.length >= 3) {
@@ -189,7 +235,8 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
     gameOver,
     isRunning,
     onSubmit: handleSubmit,
-    onClear: handleClear
+    onClear: handleClear,
+    submittingRef
   });
 
   const handlePlayAgain = () => {
@@ -282,13 +329,8 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
         <div className="play-main">
           <div className="current-word-display">
             <div className={`current-word ${message?.type || ''}`}>
-              {currentWord}
+              {message ? message.text : currentWord}
             </div>
-            {message && (
-              <div className={`message ${message.type}`}>
-                {message.text}
-              </div>
-            )}
           </div>
 
           <div className="play-board">
