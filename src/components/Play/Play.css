@@ -1,7 +1,3 @@
-/* ===========================
-   PLAY AREA
-   =========================== */
-
 .play-area {
   width: 100%;
   max-width: 1200px;
@@ -9,7 +5,6 @@
   padding: 1.5rem;
 }
 
-/* ----- HEADER ----- */
 .play-header {
   display: flex;
   align-items: center;
@@ -61,7 +56,6 @@
   color: var(--danger);
 }
 
-/* ----- CONTENT LAYOUT ----- */
 .play-content {
   display: grid;
   grid-template-columns: 1fr 300px;
@@ -75,7 +69,6 @@
   gap: 1.25rem;
 }
 
-/* ----- CURRENT WORD DISPLAY ----- */
 .current-word-display {
   width: 100%;
   max-width: 500px;
@@ -95,7 +88,6 @@
   word-break: break-all;
 }
 
-/* Message styling (overrides normal word display) */
 .current-word.success {
   color: var(--success);
 }
@@ -104,7 +96,6 @@
   color: var(--danger);
 }
 
-/* ----- BOARD ----- */
 .play-board {
   padding: 0.5rem;
   background: var(--main);
@@ -158,7 +149,6 @@
   cursor: not-allowed;
 }
 
-/* ----- CONTROLS ----- */
 .play-controls {
   display: flex;
   gap: 0.75rem;
@@ -203,7 +193,6 @@
   cursor: not-allowed;
 }
 
-/* ----- SIDEBAR (FOUND WORDS) ----- */
 .play-sidebar {
   display: flex;
   flex-direction: column;
@@ -261,7 +250,6 @@
   font-size: 0.8rem;
 }
 
-/* ----- RESPONSIVE ----- */
 @media (max-width: 900px) {
   .play-content {
     grid-template-columns: 1fr;
