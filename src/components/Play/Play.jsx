@@ -118,6 +118,8 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
   };
 
   const handleClear = useCallback(() => {
+    selectedTilesRef.current = [];
+    currentWordRef.current = '';
     setSelectedTiles([]);
     setCurrentWord('');
     setMessage(null);
@@ -132,6 +134,8 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
 
     if (word.length < 3) {
       setMessage({ type: 'error', text: 'Too Short' });
+      selectedTilesRef.current = [];
+      currentWordRef.current = '';
       setSelectedTiles([]);
       setCurrentWord('');
       setTimeout(() => setMessage(null), 1200);
@@ -140,6 +144,8 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
 
     if (foundWordsRef.current.some(w => w.word.toLowerCase() === word.toLowerCase())) {
       setMessage({ type: 'error', text: 'Already Found' });
+      selectedTilesRef.current = [];
+      currentWordRef.current = '';
       setSelectedTiles([]);
       setCurrentWord('');
       setTimeout(() => setMessage(null), 1200);
@@ -163,6 +169,8 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
         setMessage({ type: 'error', text: 'Invalid word' });
       }
 
+      selectedTilesRef.current = [];
+      currentWordRef.current = '';
       setSelectedTiles([]);
       setCurrentWord('');
       setIsValidating(false);
@@ -172,131 +180,187 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
     }, 100);
   }, []);
 
-  const handleMouseUp = useCallback(() => {
-    if (isDragging && currentWord.length >= 3) {
-      handleSubmit();
-    } else if (isDragging) {
-      handleClear();
-    }
-    setIsDragging(false);
-  }, [isDragging, currentWord, handleSubmit, handleClear]);
+  // Unified adjacency check via ref (avoids stale closure)
+  const isAdjacent = useCallback(
+    (lastTile, newTile) => adjacencyMapRef.current[lastTile]?.includes(newTile) ?? false,
+    []
+  );
 
-  useEffect(() => {
-    window.addEventListener('mouseup', handleMouseUp);
-    return () => window.removeEventListener('mouseup', handleMouseUp);
-  }, [handleMouseUp]);
+  const handleTileClick = useCallback((index) => {
+    if (gameOverRef.current || !isRunningRef.current) return;
+    const letters = boardLettersRef.current;
+    if (!letters) return;
+    const letter = letters[index]?.toUpperCase();
+    if (!letter) return;
+    const currentSelected = selectedTilesRef.current;
 
-  const isAdjacent = (lastTile, newTile) =>
-    adjacencyMap[lastTile]?.includes(newTile) ?? false;
-
-  const handleTileClick = (index) => {
-    if (gameOver || !isRunning) return;
-    const letter = boardLetters[index].toUpperCase();
-
-    if (selectedTiles.includes(index)) {
-      if (selectedTiles[selectedTiles.length - 1] === index) {
-        setSelectedTiles(prev => prev.slice(0, -1));
-        setCurrentWord(prev => prev.slice(0, -1));
+    if (currentSelected.includes(index)) {
+      if (currentSelected[currentSelected.length - 1] === index) {
+        const nextTiles = currentSelected.slice(0, -1);
+        const nextWord = currentWordRef.current.slice(0, -1);
+        selectedTilesRef.current = nextTiles;
+        currentWordRef.current = nextWord;
+        setSelectedTiles(nextTiles);
+        setCurrentWord(nextWord);
       }
       return;
     }
-    if (selectedTiles.length > 0 && !isAdjacent(selectedTiles[selectedTiles.length - 1], index)) return;
-
-    setSelectedTiles(prev => [...prev, index]);
-    setCurrentWord(prev => prev + letter);
+    if (currentSelected.length > 0 && !isAdjacent(currentSelected[currentSelected.length - 1], index)) return;
+    const nextTiles = [...currentSelected, index];
+    const nextWord = currentWordRef.current + letter;
+    selectedTilesRef.current = nextTiles;
+    currentWordRef.current = nextWord;
+    setSelectedTiles(nextTiles);
+    setCurrentWord(nextWord);
     setMessage(null);
-  };
-
-  const handleTileMouseDown = (index, e) => {
-    if (e) e.preventDefault();
-    if (gameOver || !isRunning) return;
-    setIsDragging(true);
-    setSelectedTiles([index]);
-    setCurrentWord(boardLetters[index].toUpperCase());
-    setMessage(null);
-  };
-
-  const handleTileMouseEnter = (index) => {
-    if (gameOver || !isRunning || !isDragging) return;
-
-    if (selectedTiles.includes(index)) {
-      const tileIndex = selectedTiles.indexOf(index);
-      if (tileIndex !== selectedTiles.length - 1) {
-        setSelectedTiles(prev => prev.slice(0, tileIndex + 1));
-        setCurrentWord(prev => prev.slice(0, tileIndex + 1));
-      }
-      return;
-    }
-
-    const lastTile = selectedTiles[selectedTiles.length - 1];
-    if (!isAdjacent(lastTile, index)) return;
-
-    setSelectedTiles(prev => [...prev, index]);
-    setCurrentWord(prev => prev + boardLetters[index].toUpperCase());
-  };
-
-  const handleTileTouchStart = (index, e) => {
-    e.preventDefault();
-    if (gameOver || !isRunning) return;
-    setIsDragging(true);
-    setSelectedTiles([index]);
-    setCurrentWord(boardLetters[index].toUpperCase());
-    setMessage(null);
-  };
+  }, [isAdjacent]);
 
   const processTileMove = useCallback((tileIndex) => {
     const currentSelected = selectedTilesRef.current;
     const currentWordStr = currentWordRef.current;
     const adjMap = adjacencyMapRef.current;
     const letters = boardLettersRef.current;
+    if (!letters || tileIndex < 0 || tileIndex >= letters.length) return;
 
     if (currentSelected.includes(tileIndex)) {
       const idx = currentSelected.indexOf(tileIndex);
       if (idx !== currentSelected.length - 1) {
-        setSelectedTiles(currentSelected.slice(0, idx + 1));
-        setCurrentWord(currentWordStr.slice(0, idx + 1));
+        const nextTiles = currentSelected.slice(0, idx + 1);
+        const nextWord = currentWordStr.slice(0, idx + 1);
+        selectedTilesRef.current = nextTiles;
+        currentWordRef.current = nextWord;
+        setSelectedTiles(nextTiles);
+        setCurrentWord(nextWord);
       }
       return;
     }
 
     const lastTile = currentSelected[currentSelected.length - 1];
-    if (!adjMap[lastTile]?.includes(tileIndex)) return;
+    // Allow start if no tile selected (should not happen via move but handle)
+    if (currentSelected.length > 0 && !adjMap[lastTile]?.includes(tileIndex)) return;
 
-    setSelectedTiles([...currentSelected, tileIndex]);
-    setCurrentWord(currentWordStr + letters[tileIndex].toUpperCase());
+    const nextTiles = [...currentSelected, tileIndex];
+    const nextWord = currentWordStr + letters[tileIndex].toUpperCase();
+    selectedTilesRef.current = nextTiles;
+    currentWordRef.current = nextWord;
+    setSelectedTiles(nextTiles);
+    setCurrentWord(nextWord);
   }, []);
+
+  // Unified drag start - uses refs + pointer capture + immediate ref sync
+  const startDrag = useCallback((index, e) => {
+    if (e) {
+      // prevent text selection / native drag
+      e.preventDefault?.();
+      try { e.currentTarget?.setPointerCapture?.(e.pointerId); } catch (_e) { void _e; }
+    }
+    if (gameOverRef.current || !isRunningRef.current) return;
+    const letters = boardLettersRef.current;
+    if (!letters || index < 0 || index >= letters.length) return;
+    const letter = letters[index].toUpperCase();
+    const nextTiles = [index];
+    const nextWord = letter;
+    // Sync refs immediately so subsequent pointermove sees correct state before React re-render
+    isDraggingRef.current = true;
+    selectedTilesRef.current = nextTiles;
+    currentWordRef.current = nextWord;
+    setIsDragging(true);
+    setSelectedTiles(nextTiles);
+    setCurrentWord(nextWord);
+    setMessage(null);
+  }, []);
+
+  const handleTileMouseDown = useCallback((index, e) => startDrag(index, e), [startDrag]);
+  const handleTilePointerDown = useCallback((index, e) => startDrag(index, e), [startDrag]);
+  const handleTileTouchStart = useCallback((index, e) => startDrag(index, e), [startDrag]);
+
+  // MouseEnter is fallback; delegate to ref-driven processTileMove for stale-safety
+  const handleTileMouseEnter = useCallback((index) => {
+    if (!isDraggingRef.current || gameOverRef.current || !isRunningRef.current) return;
+    processTileMove(index);
+  }, [processTileMove]);
+
+  // Global move helper - uses elementFromPoint so gaps and fast drags don't miss tiles
+  const handleGlobalMove = useCallback((clientX, clientY) => {
+    if (!isDraggingRef.current || gameOverRef.current || !isRunningRef.current) return;
+    const element = document.elementFromPoint(clientX, clientY);
+    if (!element) return;
+    const tileEl = element.closest('[data-index]');
+    if (!tileEl) return;
+    const idx = parseInt(tileEl.dataset.index, 10);
+    if (Number.isNaN(idx)) return;
+    processTileMove(idx);
+  }, [processTileMove]);
+
+  const handleMouseMove = useCallback((e) => {
+    if (!isDraggingRef.current) return;
+    // If no buttons pressed, treat as drag end (pointer left window)
+    if (e.buttons === 0) return;
+    handleGlobalMove(e.clientX, e.clientY);
+  }, [handleGlobalMove]);
+
+  const handlePointerMove = useCallback((e) => {
+    if (!isDraggingRef.current) return;
+    handleGlobalMove(e.clientX, e.clientY);
+  }, [handleGlobalMove]);
 
   const handleTouchMove = useCallback((e) => {
     if (!isDraggingRef.current || gameOverRef.current || !isRunningRef.current) return;
     e.preventDefault();
     const touch = e.touches[0];
-    const element = document.elementFromPoint(touch.clientX, touch.clientY);
-    if (!element) return;
-    const tileEl = element.closest('[data-index]');
-    if (!tileEl) return;
-    const index = parseInt(tileEl.dataset.index, 10);
-    if (isNaN(index)) return;
-    processTileMove(index);
-  }, [processTileMove]);
+    if (!touch) return;
+    handleGlobalMove(touch.clientX, touch.clientY);
+  }, [handleGlobalMove]);
 
-  const handleTouchEnd = useCallback((e) => {
-    e.preventDefault();
-    if (isDraggingRef.current && currentWordRef.current.length >= 3) {
+  const handleDragEnd = useCallback((e) => {
+    if (e) e.preventDefault?.();
+    if (!isDraggingRef.current) return;
+    // Capture state via refs before clearing
+    isDraggingRef.current = false;
+    setIsDragging(false);
+    if (currentWordRef.current.length >= 3) {
       handleSubmit();
-    } else if (isDraggingRef.current) {
+    } else {
       handleClear();
     }
-    setIsDragging(false);
   }, [handleSubmit, handleClear]);
+
+  const handleMouseUp = useCallback((e) => handleDragEnd(e), [handleDragEnd]);
+  const handleTouchEnd = useCallback((e) => handleDragEnd(e), [handleDragEnd]);
+  const handlePointerUp = useCallback((e) => handleDragEnd(e), [handleDragEnd]);
+
+  // Global listeners: mouse / pointer / touch move + end
+  useEffect(() => {
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('pointermove', handlePointerMove, { passive: false });
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('pointermove', handlePointerMove);
+    };
+  }, [handleMouseMove, handlePointerMove]);
 
   useEffect(() => {
     window.addEventListener('touchmove', handleTouchMove, { passive: false });
     window.addEventListener('touchend', handleTouchEnd, { passive: false });
+    // also handle touchcancel as end
+    window.addEventListener('touchcancel', handleTouchEnd, { passive: false });
     return () => {
       window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('touchend', handleTouchEnd);
+      window.removeEventListener('touchcancel', handleTouchEnd);
     };
   }, [handleTouchMove, handleTouchEnd]);
+
+  useEffect(() => {
+    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerUp);
+    return () => {
+      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerUp);
+    };
+  }, [handleMouseUp, handlePointerUp]);
 
   useKeyboardInput({
     boardLetters,
@@ -315,12 +379,17 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
 
   const handlePlayAgain = () => {
     generateRandomBoard();
+    selectedTilesRef.current = [];
+    currentWordRef.current = '';
+    isDraggingRef.current = false;
+    gameOverRef.current = false;
     setSelectedTiles([]);
     setCurrentWord('');
     setFoundWords([]);
     setScore(0);
     setGameOver(false);
     setMessage(null);
+    setIsDragging(false);
   };
 
   const formatTime = (sec) => {
@@ -347,16 +416,19 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
               key={index}
               className={`play-tile ${isSelected ? 'selected' : ''}`}
               onClick={() => handleTileClick(index)}
+              onPointerDown={(e) => handleTilePointerDown(index, e)}
               onMouseDown={(e) => {
                 e.preventDefault();
                 handleTileMouseDown(index, e);
               }}
+              onPointerEnter={() => handleTileMouseEnter(index)}
               onMouseEnter={() => handleTileMouseEnter(index)}
               onTouchStart={(e) => handleTileTouchStart(index, e)}
               onDragStart={(e) => e.preventDefault()}
               draggable={false}
               data-index={index}
               disabled={gameOver || !isRunning}
+              style={{ touchAction: 'none' }}
             >
               {letters[index]}
             </button>
@@ -375,6 +447,7 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
         onTileMouseDown={handleTileMouseDown}
         onTileMouseEnter={handleTileMouseEnter}
         onTileTouchStart={handleTileTouchStart}
+        onTilePointerDown={handleTilePointerDown}
       />
     );
   };

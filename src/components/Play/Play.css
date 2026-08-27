@@ -104,6 +104,9 @@
   user-select: none;
   -webkit-user-select: none;
   -webkit-user-drag: none;
+  touch-action: none;
+  -webkit-touch-callout: none;
+  overscroll-behavior: contain;
 }
 
 .board-row {
@@ -113,12 +116,14 @@
   user-select: none;
   -webkit-user-select: none;
   -webkit-user-drag: none;
+  touch-action: none;
 }
 
 .board-container {
   user-select: none;
   -webkit-user-select: none;
   -webkit-user-drag: none;
+  touch-action: none;
 }
 
 .board-row + .board-row {

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Tile from "../Tile/Tile.jsx";
 import InvisibleTile from "../InvisibleTile/InvisibleTile.jsx";
 
-const Donut = ({ letters = '', positions = [], onTileClick, onTileMouseDown, onTileMouseEnter, onTileTouchStart }) => {
+const Donut = ({ letters = '', positions = [], onTileClick, onTileMouseDown, onTileMouseEnter, onTileTouchStart, onTilePointerDown }) => {
   const initializeTiles = () => {
     if (letters && letters.length === 20) {
       return letters.split('').map(letter => letter.toUpperCase());
@@ -24,10 +24,11 @@ const Donut = ({ letters = '', positions = [], onTileClick, onTileMouseDown, onT
         value={tiles[i]}
         part={isPart}
         index={i}
-        onClick={() => onTileClick?.(i)}
-        onMouseDown={() => onTileMouseDown?.(i)}
-        onMouseEnter={() => onTileMouseEnter?.(i)}
-        onTouchStart={(e) => onTileTouchStart?.(i, e)}
+        onClick={onTileClick}
+        onMouseDown={onTileMouseDown}
+        onMouseEnter={onTileMouseEnter}
+        onTouchStart={onTileTouchStart}
+        onPointerDown={onTilePointerDown}
       />
     );
   };

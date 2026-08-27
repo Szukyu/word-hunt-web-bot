@@ -1,16 +1,22 @@
 import './Tile.css'
 
-const Tile = ({ value, part, onClick, onMouseDown, onMouseEnter, onTouchStart, index }) => {
+const Tile = ({ value, part, onClick, onMouseDown, onMouseEnter, onTouchStart, onPointerDown, index }) => {
   return (
     <div
       className={`tile ${part ? 'highlight' : ''}`}
-      onClick={onClick}
+      onClick={() => onClick?.(index)}
       onMouseDown={(e) => {
         e.preventDefault();
-        onMouseDown?.(e);
+        onMouseDown?.(index, e);
       }}
-      onMouseEnter={onMouseEnter}
-      onTouchStart={onTouchStart}
+      onPointerDown={(e) => {
+        try { e.currentTarget.setPointerCapture?.(e.pointerId); } catch (_e) { void _e; }
+        if (onPointerDown) onPointerDown(index, e);
+        else onMouseDown?.(index, e);
+      }}
+      onPointerEnter={() => onMouseEnter?.(index)}
+      onMouseEnter={() => onMouseEnter?.(index)}
+      onTouchStart={(e) => onTouchStart?.(index, e)}
       onDragStart={(e) => e.preventDefault()}
       draggable={false}
       data-index={index}
