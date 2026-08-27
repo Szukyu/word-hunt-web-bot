@@ -131,26 +131,18 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
     if (!word || word.length === 0) return;
 
     if (word.length < 3) {
-      submittingRef.current = true;
       setMessage({ type: 'error', text: 'Too Short' });
       setSelectedTiles([]);
       setCurrentWord('');
-      setTimeout(() => {
-        setMessage(null);
-        submittingRef.current = false;
-      }, 1200);
+      setTimeout(() => setMessage(null), 1200);
       return;
     }
 
     if (foundWordsRef.current.some(w => w.word.toLowerCase() === word.toLowerCase())) {
-      submittingRef.current = true;
       setMessage({ type: 'error', text: 'Already Found' });
       setSelectedTiles([]);
       setCurrentWord('');
-      setTimeout(() => {
-        setMessage(null);
-        submittingRef.current = false;
-      }, 1200);
+      setTimeout(() => setMessage(null), 1200);
       return;
     }
 
@@ -174,11 +166,9 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
       setSelectedTiles([]);
       setCurrentWord('');
       setIsValidating(false);
+      submittingRef.current = false;
 
-      setTimeout(() => {
-        setMessage(null);
-        submittingRef.current = false;
-      }, 1200);
+      setTimeout(() => setMessage(null), 1200);
     }, 100);
   }, []);
 
