@@ -123,8 +123,8 @@ const X = ({ letters = '', positions = [], onTileClick, onTileMouseDown, onTileM
   );
 
   return (
-    <div className="app" style={{ backgroundColor: '#080A18' }}>
-      <div className="board-container">
+    <div className="app" style={{ backgroundColor: '#080A18' }} onDragStart={(e) => e.preventDefault()}>
+      <div className="board-container" onDragStart={(e) => e.preventDefault()}>
         {rows}
       </div>
     </div>

@@ -207,7 +207,8 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
     setMessage(null);
   };
 
-  const handleTileMouseDown = (index) => {
+  const handleTileMouseDown = (index, e) => {
+    if (e) e.preventDefault();
     if (gameOver || !isRunning) return;
     setIsDragging(true);
     setSelectedTiles([index]);
@@ -346,9 +347,14 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
               key={index}
               className={`play-tile ${isSelected ? 'selected' : ''}`}
               onClick={() => handleTileClick(index)}
-              onMouseDown={() => handleTileMouseDown(index)}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                handleTileMouseDown(index, e);
+              }}
               onMouseEnter={() => handleTileMouseEnter(index)}
               onTouchStart={(e) => handleTileTouchStart(index, e)}
+              onDragStart={(e) => e.preventDefault()}
+              draggable={false}
               data-index={index}
               disabled={gameOver || !isRunning}
             >
@@ -409,7 +415,7 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
             </div>
           </div>
 
-          <div className="play-board">
+          <div className="play-board" onDragStart={(e) => e.preventDefault()}>
             {renderInteractiveBoard()}
           </div>
 

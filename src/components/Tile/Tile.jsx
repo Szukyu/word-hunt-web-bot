@@ -5,9 +5,14 @@ const Tile = ({ value, part, onClick, onMouseDown, onMouseEnter, onTouchStart, i
     <div
       className={`tile ${part ? 'highlight' : ''}`}
       onClick={onClick}
-      onMouseDown={onMouseDown}
+      onMouseDown={(e) => {
+        e.preventDefault();
+        onMouseDown?.(e);
+      }}
       onMouseEnter={onMouseEnter}
       onTouchStart={onTouchStart}
+      onDragStart={(e) => e.preventDefault()}
+      draggable={false}
       data-index={index}
     >
       {value}
