@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Tile from "../Tile/Tile.jsx";
 
-const Boarder = ({ letters = '', positions = [], onTileClick, onTileMouseDown, onTileMouseEnter, onTileTouchStart }) => {
+const Boarder = ({ letters = '', positions = [], onTileClick, onTileMouseDown, onTileMouseEnter, onTileTouchStart, onTilePointerDown }) => {
   const initializeTiles = () => {
     if (letters && letters.length === 25) {
       return letters.split('').map(letter => letter.toUpperCase());
@@ -23,10 +23,11 @@ const Boarder = ({ letters = '', positions = [], onTileClick, onTileMouseDown, o
         value={tiles[i]}
         part={isPart}
         index={i}
-        onClick={() => onTileClick?.(i)}
-        onMouseDown={() => onTileMouseDown?.(i)}
-        onMouseEnter={() => onTileMouseEnter?.(i)}
-        onTouchStart={(e) => onTileTouchStart?.(i, e)}
+        onClick={onTileClick}
+        onMouseDown={onTileMouseDown}
+        onMouseEnter={onTileMouseEnter}
+        onTouchStart={onTileTouchStart}
+        onPointerDown={onTilePointerDown}
       />
     );
   };
@@ -46,8 +47,8 @@ const Boarder = ({ letters = '', positions = [], onTileClick, onTileMouseDown, o
   }
 
   return (
-    <div className="app" style={{ backgroundColor: '#080A18' }}>
-      <div className="board-container">
+    <div className="app" style={{ backgroundColor: '#080A18' }} onDragStart={(e) => e.preventDefault()}>
+      <div className="board-container" onDragStart={(e) => e.preventDefault()}>
         {rows}
       </div>
     </div>

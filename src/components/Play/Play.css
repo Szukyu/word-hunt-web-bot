@@ -101,12 +101,29 @@
   background: var(--main);
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  touch-action: none;
+  -webkit-touch-callout: none;
+  overscroll-behavior: contain;
 }
 
 .board-row {
   display: flex;
   gap: 0.4rem;
   justify-content: center;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  touch-action: none;
+}
+
+.board-container {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  touch-action: none;
 }
 
 .board-row + .board-row {
@@ -129,6 +146,10 @@
   text-transform: uppercase;
   cursor: pointer;
   user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+  touch-action: none;
   transition: all 0.12s;
 }
 

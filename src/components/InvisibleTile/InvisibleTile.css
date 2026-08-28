@@ -3,6 +3,8 @@
   height: 64px;
   border-radius: 14px;
   background: transparent;
+  touch-action: none;
+  pointer-events: none;
 }
 
 @media (max-width: 768px) {
