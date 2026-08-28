@@ -1,32 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import './App.css';
 import Navbar from './components/Navbar/Navbar.jsx';
 import Option from './components/Option/Option.jsx';
 import Auth from './components/Auth/Auth.jsx';
 import Stats from './components/Stats/Stats.jsx';
+import ThemePage from './components/ThemePage/ThemePage.jsx';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
+import { ThemeProvider } from './themes/ThemeContext.jsx';
 
 const AppContent = () => {
   const { user, signOut } = useAuth();
   const [resetKey, setResetKey] = useState(0);
   const [showAuth, setShowAuth] = useState(false);
   const [view, setView] = useState('option');
-  const [theme, setTheme] = useState(() => {
-    if (typeof window === 'undefined') return 'dark';
-    return localStorage.getItem('theme') || 'dark';
-  });
-
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    localStorage.setItem('theme', theme);
-  }, [theme]);
 
   const resetOption = () => {
     setResetKey(prev => prev + 1);
-  };
-
-  const toggleTheme = () => {
-    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
   };
 
   const handleLogin = () => {
@@ -54,27 +43,44 @@ const AppContent = () => {
     setView('stats');
   };
 
+  const handleViewThemes = () => {
+    setShowAuth(false);
+    setView('themes');
+  };
+
+  const handleBackToOption = () => {
+    setView('option');
+  };
+
+  const renderView = () => {
+    if (showAuth) return <Auth onClose={handleCloseAuth} />;
+    if (view === 'stats') return <Stats />;
+    if (view === 'themes') return <ThemePage onBack={handleBackToOption} />;
+    return <Option key={resetKey} />;
+  };
+
   return (
     <div className="App">
       <Navbar 
         onReset={handleReset} 
-        theme={theme} 
-        onToggleTheme={toggleTheme}
+        onViewThemes={handleViewThemes}
         onLogin={handleLogin}
         user={user}
         onSignOut={handleSignOut}
         onViewStats={handleViewStats}
       />
-      {showAuth ? <Auth onClose={handleCloseAuth} /> : view === 'stats' ? <Stats /> : <Option key={resetKey} />}
+      {renderView()}
     </div>
   );
 };
 
 function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
