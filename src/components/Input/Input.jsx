@@ -36,7 +36,7 @@ function Input({ englishWords, wordStarts }) {
     const meta = BOARD_META[trimmedLetters.length];
 
     if (!meta) {
-      setInputError('Enter 16, 20, 21, or 25 letters to match a supported board shape.');
+      setInputError('Enter 16, 20, 21 or 25 letters.');
       return;
     }
 
@@ -71,13 +71,8 @@ function Input({ englishWords, wordStarts }) {
     <section className="solver-shell">
       <div className="solver-panel">
         <div className="solver-header">
-          <div className="solver-title">
-            <span className="eyebrow">Solver</span>
-            <h2>Enter your letters to find all words</h2>
-          </div>
-          <p className="solver-description">
-            Type the Board Row-by-Row. Hover over any Word or use Arrow keys to Preview Path.
-          </p>
+          <span className="eyebrow">Solver</span>
+          <h2>Enter letters</h2>
         </div>
 
         <div className="input-group">
@@ -85,6 +80,7 @@ function Input({ englishWords, wordStarts }) {
             <input
               id="board-input"
               type="text"
+              placeholder="abcd..."
               value={inputValue}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
@@ -99,16 +95,16 @@ function Input({ englishWords, wordStarts }) {
               {isSearching ? (
                 <>
                   <div className="button-spinner"></div>
-                  Searching...
+                  ...
                 </>
               ) : (
-                'Solve Board'
+                'Solve'
               )}
             </button>
           </div>
           
           <div className="input-footer">
-            <span className="hint">Supports 16 / 20 / 21 / 25 letters exactly</span>
+            <span className="hint">16 · 20 · 21 · 25</span>
             {(inputError || searchError) && (
               <span className="error">{inputError || searchError}</span>
             )}
@@ -137,9 +133,7 @@ function Input({ englishWords, wordStarts }) {
             
             <div className="words-section">
               <div className="words-header">
-                <div className="words-title">
-                  <span className="eyebrow">Word List</span>
-                </div>
+                <span className="eyebrow">{foundWords.length} words</span>
               </div>
               
               <div className="words-list">
