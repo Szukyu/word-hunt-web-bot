@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { IoAdd, IoTrashOutline, IoPencil } from 'react-icons/io5';
+import { IoAdd, IoTrashOutline, IoPencil, IoTimeOutline, IoCheckmarkCircle, IoArrowBack, IoRefresh, IoClose } from 'react-icons/io5';
 import { useTheme } from '../../themes/ThemeContext.jsx';
 import { CREATOR_KEYS, CREATOR_LABELS, CREATOR_DESCRIPTIONS } from '../../themes/index.js';
 import './ThemePage.css';
@@ -15,8 +15,8 @@ const DEFAULT_SIX = {
 
 // Small preview board - 4x4 with sample letters
 const PREVIEW_LETTERS = ['W','O','R','D','H','U','N','T','G','A','M','E','P','L','A','Y'];
-// highlight a path like W-O-R-D (0-1-2) + N (6) etc
-const PREVIEW_HIGHLIGHT = [0, 1, 2, 6];
+// highlight a contiguous path like W-O-R-D (0-1-2-3) to demo selected tiles
+const PREVIEW_HIGHLIGHT = [0, 1, 2, 3];
 
 const BoardPreview = ({ colors }) => {
   const style = {
@@ -34,22 +34,25 @@ const BoardPreview = ({ colors }) => {
   return (
     <div className="board-preview-wrap" style={style}>
       <div className="board-preview-header">
-        <span className="board-preview-current">WORD</span>
-        <span className="board-preview-score">12 pts</span>
+        <span className="bp-icon-btn" aria-hidden><IoArrowBack /></span>
+        <span className="bp-stats">
+          <span className="bp-stat"><IoTimeOutline className="bp-stat-icon" /> 1:24</span>
+          <span className="bp-stat"><IoCheckmarkCircle className="bp-stat-icon" /> 12 pts</span>
+        </span>
+        <span className="bp-icon-btn" aria-hidden><IoRefresh /></span>
       </div>
-      <div className="board-preview-grid">
-        {PREVIEW_LETTERS.map((letter, idx) => {
-          const isHighlighted = PREVIEW_HIGHLIGHT.includes(idx);
-          return (
-            <div key={idx} className={`preview-tile ${isHighlighted ? 'highlight' : ''}`}>
-              {letter}
-            </div>
-          );
-        })}
-      </div>
-      <div className="board-preview-footer">
-        <span className="board-preview-wordcount">4 words found</span>
-        <span className="board-preview-subtext">preview uses your 6 colors</span>
+      <div className="board-preview-board">
+        <div className="bp-current-word">WORD</div>
+        <div className="bp-grid">
+          {PREVIEW_LETTERS.map((letter, idx) => {
+            const isHighlighted = PREVIEW_HIGHLIGHT.includes(idx);
+            return (
+              <div key={idx} className={`bp-tile ${isHighlighted ? 'highlight' : ''}`}>
+                {letter}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
@@ -160,8 +163,8 @@ const ThemePage = ({ onBack }) => {
       subalt: colors.subalt,
       highlight: colors.highlight,
       unhighlight: colors.subalt || colors.main,
-      danger: '#f7768e',
-      success: '#9ece6a',
+      danger: colors.highlight || '#f7768e',
+      success: colors.highlight || '#9ece6a',
     };
   }, [colors]);
 
@@ -324,7 +327,6 @@ const ThemePage = ({ onBack }) => {
                     {CREATOR_KEYS.map((k) => (
                       <span key={k} className="monkey-dot" style={{ background: theme.colors[k] }} title={`${k}: ${theme.colors[k]}`} />
                     ))}
-                    <span className="monkey-dot border" style={{ background: theme.colors.unhighlight }} title={`unhighlight: ${theme.colors.unhighlight}`} />
                   </span>
                   {isActive ? (
                     <span className="monkey-theme-actions" onClick={(e) => e.stopPropagation()}>
@@ -366,7 +368,6 @@ const ThemePage = ({ onBack }) => {
                       {CREATOR_KEYS.map((k) => (
                         <span key={k} className="monkey-dot" style={{ background: theme.colors[k] }} title={`${k}: ${theme.colors[k]}`} />
                       ))}
-                      <span className="monkey-dot border" style={{ background: theme.colors.unhighlight }} />
                     </span>
                     {isActive && <span className="monkey-active-badge">active</span>}
                   </button>

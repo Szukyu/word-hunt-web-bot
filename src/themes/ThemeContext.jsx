@@ -24,9 +24,31 @@ export const ThemeProvider = ({ children }) => {
       const raw = localStorage.getItem(STORAGE_CUSTOM_THEMES_KEY);
       if (!raw) return {};
       const parsed = JSON.parse(raw);
-      // Validate shape
-      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) return parsed;
-      return {};
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+      // Migration: old 6-color customs defaulted success to green (#9ece6a)
+      // even if palette had no green — caused green on win screen. Migrate
+      // those to highlight so a "no green" theme doesn't get green unless
+      // the user explicitly picked it.
+      let mutated = false;
+      for (const t of Object.values(parsed)) {
+        if (t?.colors && t.colors.success?.toLowerCase() === '#9ece6a' && t.colors.highlight && t.colors.highlight.toLowerCase() !== '#9ece6a') {
+          t.colors.success = t.colors.highlight;
+          mutated = true;
+        }
+        // Ensure newer keys exist for old themes (will be completed on edit)
+        if (t?.colors && !t.colors.danger) {
+          t.colors.danger = '#f7768e';
+          mutated = true;
+        }
+        if (t?.colors && !t.colors.success) {
+          t.colors.success = t.colors.highlight || '#9ece6a';
+          mutated = true;
+        }
+      }
+      if (mutated) {
+        try { localStorage.setItem(STORAGE_CUSTOM_THEMES_KEY, JSON.stringify(parsed)); } catch {}
+      }
+      return parsed;
     } catch {
       return {};
     }

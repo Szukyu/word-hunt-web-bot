@@ -25,7 +25,7 @@
 .stat-card.primary { background: var(--highlight); border-color: var(--highlight); }
 .stat-card.primary .stat-label { color: color-mix(in srgb, var(--bg) 35%, transparent); }
 .stat-card.primary .stat-value { color: var(--bg); }
-.stat-label { font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--subalt); font-weight: 800; }
+.stat-label { font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sub); font-weight: 800; }
 .stat-value { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text); line-height: 1; }
 
 .results-list-section {
@@ -36,7 +36,7 @@
   box-shadow: 0 2px 12px rgba(0,0,0,0.06);
 }
 .results-list-header { padding-bottom: 10px; border-bottom: 1px solid var(--unhighlight); margin-bottom: 8px; }
-.results-list-header h2 { margin: 0; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--subalt); }
+.results-list-header h2 { margin: 0; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sub); }
 .results-list { padding: 0; }
 
 @media (max-width: 700px) { .results-stats { grid-template-columns: repeat(2, 1fr); } }

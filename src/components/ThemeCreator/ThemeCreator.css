@@ -254,22 +254,29 @@
 .theme-color-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 7px;
+  padding: 2px 0;
 }
 
 .theme-color-label {
   font-size: 0.78rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  line-height: 1.45;
+  display: block;
+  padding: 1px 0;
 }
 
 .theme-color-desc {
-  font-size: 0.68rem;
+  font-size: 0.6rem;
   color: var(--subalt);
   font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.5;
+  opacity: 0.9;
+  display: block;
+  padding-bottom: 1px;
 }
 
 .theme-color-input-wrap {
@@ -319,86 +326,59 @@
   text-transform: uppercase;
 }
 
-.theme-preview {
+/* Keep legacy preview vars for fallback but new board replica uses --bg etc via inline previewStyle */
+.theme-preview { display: none; }
+
+.theme-preview-board {
   border: 1px solid var(--unhighlight);
   border-radius: 10px;
   overflow: hidden;
-  background: var(--preview-bg, var(--bg));
+  background: var(--bg);
+  padding: 8px;
 }
 
-.theme-preview-header {
-  padding: 10px 14px;
-  background: var(--preview-main, var(--main));
-  border-bottom: 1px solid var(--preview-unhighlight, var(--unhighlight));
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+/* Minimal accurate replica — mirrors Play.css + Tile.css exactly, scaled */
+.theme-preview-board .board-preview-wrap { width: 100%; display: flex; flex-direction: column; gap: 8px; }
+.theme-preview-board .board-preview-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 8px 10px;
+  background: var(--main);
+  border: 1px solid var(--unhighlight);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
-
-.theme-preview-title {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--preview-text, var(--text));
+.theme-preview-board .bp-icon-btn {
+  width: 24px; height: 24px; border-radius: 8px;
+  border: 1px solid var(--unhighlight);
+  background: var(--bg);
+  color: var(--subalt);
+  display: grid; place-items: center; font-size: 0.75rem; flex-shrink: 0;
 }
-
-.theme-preview-badge {
-  padding: 4px 8px;
-  border-radius: 6px;
-  background: var(--preview-highlight, var(--highlight));
-  color: var(--preview-bg, var(--bg));
-  font-size: 0.7rem;
-  font-weight: 700;
+.theme-preview-board .bp-stats { display: flex; gap: 10px; align-items: center; }
+.theme-preview-board .bp-stat { display: flex; align-items: center; gap: 4px; font-size: 0.58rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--sub); }
+.theme-preview-board .bp-stat-icon { font-size: 0.8rem; flex-shrink: 0; }
+.theme-preview-board .board-preview-board {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 10px;
+  background: var(--main);
+  border: 1px solid var(--unhighlight);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
-
-.theme-preview-body {
-  padding: 14px;
-  background: var(--preview-bg, var(--bg));
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.theme-preview-board .bp-current-word { font-size: 0.9rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text); line-height: 1; min-height: 14px; }
+.theme-preview-board .bp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.theme-preview-board .bp-tile {
+  width: 34px; height: 34px;
+  background: var(--bg);
+  border: 1px solid var(--unhighlight);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.68rem; font-weight: 800; letter-spacing: 0.04em; color: var(--text);
+  text-transform: uppercase;
+  user-select: none;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
 }
-
-.theme-preview-text {
-  color: var(--preview-text, var(--text));
-  font-size: 0.85rem;
-  line-height: 1.5;
-}
-
-.theme-preview-sub {
-  color: var(--preview-sub, var(--sub));
-  font-size: 0.8rem;
-}
-
-.theme-preview-row {
-  display: flex;
-  gap: 8px;
-}
-
-.theme-preview-btn {
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  border: 1px solid var(--preview-highlight, var(--highlight));
-}
-
-.theme-preview-btn.primary {
-  background: var(--preview-highlight, var(--highlight));
-  color: var(--preview-bg, var(--bg));
-}
-
-.theme-preview-btn.secondary {
-  background: transparent;
-  color: var(--preview-text, var(--text));
-  border-color: var(--preview-unhighlight, var(--unhighlight));
-}
-
-.theme-preview-border {
-  height: 8px;
-  background: var(--preview-subalt, var(--subalt));
-  border-radius: 4px;
-  opacity: 0.9;
-}
+.theme-preview-board .bp-tile.highlight { background: var(--highlight); border-color: var(--highlight); color: var(--bg); box-shadow: 0 2px 6px color-mix(in srgb, var(--highlight) 30%, transparent); }
 
 .theme-form-actions {
   display: flex;

@@ -91,7 +91,7 @@
 
 .card-desc {
   margin: 0;
-  color: var(--subalt);
+  color: var(--sub);
   font-size: 0.72rem;
   line-height: 1.6;
   flex: 1;

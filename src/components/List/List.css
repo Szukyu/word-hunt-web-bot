@@ -8,7 +8,7 @@
 .list-container.empty { display: flex; align-items: center; justify-content: center; min-height: 160px; }
 .empty-state { text-align: center; padding: 20px 12px; }
 .empty-state p { margin: 0 0 4px; color: var(--text); font-size: 0.8rem; font-weight: 700; }
-.empty-subtitle { color: var(--subalt); font-size: 0.64rem; letter-spacing: 0.06em; text-transform: uppercase; }
+.empty-subtitle { color: var(--sub); font-size: 0.64rem; letter-spacing: 0.06em; text-transform: uppercase; }
 
 .list-scroll { flex: 1; overflow-y: auto; min-height: 0; scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: var(--unhighlight) transparent; display: flex; flex-direction: column; gap: 4px; padding: 2px; }
 .list-scroll::-webkit-scrollbar { width: 4px; }
