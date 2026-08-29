@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Play from "../Play/Play";
 import Results from "../Results/Results";
 import Board from "../Boards/Board";
 import Boarder from "../Boards/Boarder";
 import Donut from "../Boards/Donut";
 import X from "../Boards/X";
+import { getPreviewMetrics } from "../../utils/boardPreview.js";
 import './Setup.css';
 
 const Setup = ({ englishWords, wordStarts }) => {
@@ -80,6 +81,7 @@ const Setup = ({ englishWords, wordStarts }) => {
   };
 
   const activeBoard = boardOptions[selectedBoard];
+  const previewMetrics = useMemo(() => getPreviewMetrics(activeBoard.size), [activeBoard.size]);
 
   if (gameResult) {
     return (
@@ -132,7 +134,14 @@ const Setup = ({ englishWords, wordStarts }) => {
                 <span>{formatTime(gameTime)}</span>
               </div>
             </div>
-            <div className="board-preview">
+            <div
+              className="board-preview"
+              data-size={activeBoard.size}
+              style={{
+                '--tile-size': `${previewMetrics.tileSize}px`,
+                '--tile-gap': `${previewMetrics.gap}px`,
+              }}
+            >
               {renderBoard(activeBoard)}
             </div>
           </div>
