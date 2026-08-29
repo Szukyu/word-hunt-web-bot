@@ -47,7 +47,7 @@ const Boarder = ({ letters = '', positions = [], onTileClick, onTileMouseDown, o
   }
 
   return (
-    <div className="app" style={{ backgroundColor: 'var(--bg)' }} onDragStart={(e) => e.preventDefault()}>
+    <div className="app" style={{ backgroundColor: 'transparent' }} onDragStart={(e) => e.preventDefault()}>
       <div className="board-container" onDragStart={(e) => e.preventDefault()}>
         {rows}
       </div>

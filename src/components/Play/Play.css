@@ -53,6 +53,7 @@
 .current-word.error { color: var(--danger); }
 
 .play-board { padding: 6px 0; user-select: none; touch-action: none; }
+.play-board .app { background: transparent !important; display: contents; }
 .board-row { display: flex; gap: 6px; justify-content: center; }
 .board-row + .board-row { margin-top: 6px; }
 
