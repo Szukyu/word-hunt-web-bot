@@ -32,16 +32,12 @@ export const buildAdjacencyMap = (letters) => {
     board = new DonutClass(grid);
   } else if (length === 21) {
 		// X
-    const holes = [0, 4, 20, 24];
-    const valid = [];
-    for (let g = 0; g < 25; g++) {
-      if (!holes.includes(g)) valid.push(g);
-    }
-    compactToGrid = (i) => valid[i];
+    const xPositions = [0, 1, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 15, 16, 17, 18, 19, 20, 21, 23, 24];
+    compactToGrid = (i) => xPositions[i];
     gridToCompact = {};
-    valid.forEach((gp, i) => { gridToCompact[gp] = i; });
+    xPositions.forEach((gp, i) => { gridToCompact[gp] = i; });
     const grid = new Array(25).fill(null);
-    valid.forEach((gp, i) => { grid[gp] = new Letter(letters[i], gp); });
+    xPositions.forEach((gp, i) => { grid[gp] = new Letter(letters[i], gp); });
     board = new XClass(grid);
   } else {
 		// Square Board 4x4 and 5x5
@@ -67,7 +63,30 @@ export const buildAdjacencyMap = (letters) => {
     return adj;
   }
 
-	// Neighbor Logic
+	// Donut and X (Logic Fix)
+  if (length === 20 || length === 21) {
+    const validSet = new Set(Object.keys(gridToCompact).map(Number));
+    for (let i = 0; i < length; i++) {
+      const gp = compactToGrid(i);
+      const row = Math.floor(gp / 5);
+      const col = gp % 5;
+      for (let dr = -1; dr <= 1; dr++) {
+        for (let dc = -1; dc <= 1; dc++) {
+          if (dr === 0 && dc === 0) continue;
+          const nr = row + dr;
+          const nc = col + dc;
+          if (nr < 0 || nr >= 5 || nc < 0 || nc >= 5) continue;
+          const ngp = nr * 5 + nc;
+          if (!validSet.has(ngp)) continue;
+          const comp = gridToCompact[ngp];
+          if (comp !== undefined) adj[i].push(comp);
+        }
+      }
+    }
+    return adj;
+  }
+
+	// Neighbor Logic for 16/25 via Board classes
   for (let i = 0; i < length; i++) {
     const gp = compactToGrid(i);
     const freshBoard = board.copyBoard();
@@ -141,7 +160,12 @@ export const findAllValidWords = (letters, dict) => {
     });
     board = new DonutClass(lettersArr);
   } else if (letters.length === 21) {
-    lettersArr = letters.split('').map((ch, i) => new Letter(ch, i));
+    const xPositions = [0, 1, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 15, 16, 17, 18, 19, 20, 21, 23, 24];
+    lettersArr = Array(25).fill(null).map((_, i) => {
+      const idx = xPositions.indexOf(i);
+      if (idx !== -1) return new Letter(letters[idx], i);
+      return null;
+    });
     board = new XClass(lettersArr);
   } else {
     return [];
