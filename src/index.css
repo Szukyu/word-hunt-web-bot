@@ -10,7 +10,8 @@
 }
 
 :root,
-:root[data-theme="dark"] {
+:root[data-theme="dark"],
+:root[data-theme^="custom-"] {
   --bg: #080a18;
   --main: #0f1221;
   --text: #c0caf5;
@@ -20,6 +21,7 @@
   --unhighlight: #1f2335;
   --danger: #f7768e;
   --success: #9ece6a;
+  color-scheme: dark;
 }
 
 :root[data-theme="light"] {
@@ -32,7 +34,13 @@
   --unhighlight: #cfd8e6;
   --danger: #d32f2f;
   --success: #388e3c;
+  color-scheme: light;
 }
+
+/* Custom themes are applied via inline style (ThemeContext applyThemeColors).
+   The [data-theme^="custom-"] fallback above only applies before JS loads;
+   once JS runs, inline --* vars override. The color-scheme inline style
+   set by applyThemeColors then correctly matches bg brightness (dark/light). */
 
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; }

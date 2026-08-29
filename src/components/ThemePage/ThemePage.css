@@ -80,6 +80,9 @@
 .monkey-theme-row { display: flex; align-items: center; gap: 10px; padding: 12px 12px; border: 1px solid var(--unhighlight); background: var(--bg); border-radius: var(--radius-md); color: var(--text); cursor: pointer; width: 100%; text-align: left; }
 .monkey-theme-row:hover { border-color: var(--subalt); }
 .monkey-theme-row.active { border-color: var(--highlight); background: color-mix(in srgb, var(--highlight) 10%, var(--bg)); }
+.monkey-theme-row.custom { padding: 0; overflow: hidden; }
+.monkey-theme-row-main { flex: 1; display: flex; align-items: center; gap: 10px; padding: 12px; background: transparent; border: none; color: var(--text); cursor: pointer; text-align: left; }
+.monkey-theme-row.custom .monkey-theme-actions { padding-right: 12px; display: flex; gap: 6px; align-items: center; }
 .monkey-theme-name { font-weight: 700; font-size: 0.8rem; }
 .monkey-theme-dots { display: flex; gap: 4px; }
 .monkey-dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid var(--unhighlight); }

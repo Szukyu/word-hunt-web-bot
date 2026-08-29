@@ -301,11 +301,23 @@ const ThemePage = ({ onBack }) => {
           ) : (
             defaultThemesList.map((theme) => {
               const isActive = theme.id === activeThemeId;
+              const rowStyle = {
+                '--bg': theme.colors.bg,
+                '--main': theme.colors.main,
+                '--text': theme.colors.text,
+                '--sub': theme.colors.sub,
+                '--subalt': theme.colors.subalt,
+                '--highlight': theme.colors.highlight,
+                '--unhighlight': theme.colors.unhighlight,
+                '--danger': theme.colors.danger,
+                '--success': theme.colors.success,
+              };
               return (
                 <button
                   key={theme.id}
                   className={`monkey-theme-row ${isActive ? 'active' : ''}`}
                   onClick={() => setTheme(theme.id)}
+                  style={rowStyle}
                 >
                   <span className="monkey-theme-name">{theme.name}</span>
                   <span className="monkey-theme-dots">
@@ -335,8 +347,19 @@ const ThemePage = ({ onBack }) => {
           <div className="monkey-theme-list">
             {customThemesList.map((theme) => {
               const isActive = theme.id === activeThemeId;
+              const rowStyle = {
+                '--bg': theme.colors.bg,
+                '--main': theme.colors.main,
+                '--text': theme.colors.text,
+                '--sub': theme.colors.sub,
+                '--subalt': theme.colors.subalt,
+                '--highlight': theme.colors.highlight,
+                '--unhighlight': theme.colors.unhighlight,
+                '--danger': theme.colors.danger,
+                '--success': theme.colors.success,
+              };
               return (
-                <div key={theme.id} className={`monkey-theme-row custom ${isActive ? 'active' : ''}`}>
+                <div key={theme.id} className={`monkey-theme-row custom ${isActive ? 'active' : ''}`} style={rowStyle}>
                   <button className="monkey-theme-row-main" onClick={() => setTheme(theme.id)}>
                     <span className="monkey-theme-name">{theme.name}</span>
                     <span className="monkey-theme-dots">
