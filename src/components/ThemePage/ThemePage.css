@@ -62,8 +62,8 @@
 .monkey-label { font-size: 0.78rem; font-weight: 700; color: var(--text); line-height: 1.45; }
 .monkey-desc { font-size: 0.6rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--subalt); line-height: 1.5; opacity: 0.9; display: block; padding-bottom: 1px; }
 .monkey-color-input-wrap { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border: 1px solid var(--unhighlight); background: var(--bg); border-radius: var(--radius-sm); }
-.monkey-color-picker { width: 24px; height: 24px; border: none; border-radius: 6px; overflow: hidden; }
 .monkey-hex-input { flex: 1; border: none; background: transparent; color: var(--text); font-size: 0.76rem; text-transform: uppercase; outline: none; }
+/* Native <input type="color"> removed — universal ColorPicker handles swatch (see ColorPicker.css) */
 .monkey-actions { display: flex; justify-content: flex-end; gap: 8px; padding-top: 12px; border-top: 1px solid var(--unhighlight); }
 .monkey-btn { padding: 8px 14px; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; border-radius: 999px; border: 1px solid var(--unhighlight); background: var(--bg); color: var(--subalt); }
 .monkey-btn.primary { background: var(--highlight); color: var(--bg); border-color: var(--highlight); }

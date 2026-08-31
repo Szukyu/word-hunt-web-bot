@@ -293,26 +293,7 @@
   border-color: var(--highlight);
 }
 
-.theme-color-picker {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  border: none;
-  padding: 0;
-  background: none;
-  cursor: pointer;
-  flex-shrink: 0;
-  overflow: hidden;
-}
-
-.theme-color-picker::-webkit-color-swatch-wrapper {
-  padding: 0;
-}
-
-.theme-color-picker::-webkit-color-swatch {
-  border: 1px solid var(--unhighlight);
-  border-radius: 6px;
-}
+/* Native <input type="color"> removed — replaced by universal ColorPicker (see ColorPicker.css) */
 
 .theme-color-hex {
   flex: 1;
