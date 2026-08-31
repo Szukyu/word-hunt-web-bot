@@ -140,7 +140,7 @@ export const findPath = (word, adjacencyMap, letters) => {
   return null;
 };
 
-export const findAllValidWords = (letters, dict) => {
+export const findAllValidWords = (letters, dict, wordStarts) => {
   const validWords = new Set();
   let board;
   let lettersArr;
@@ -176,6 +176,10 @@ export const findAllValidWords = (letters, dict) => {
       validWords.add(word.toUpperCase());
     }
     if (len >= MAX_LENGTH) return;
+    // Trie/prefix pruning — skip branches that cannot form any word
+    if (len >= 3 && wordStarts && !wordStarts.has(word)) {
+      return;
+    }
 
     positions.push(letter.pos);
     for (const dir of DIRECTIONS) {

@@ -200,3 +200,126 @@ export async function fetchDailyArchive({ from, to, boardType } = {}) {
   if (error) throw error
   return data
 }
+
+// One Attempt
+
+const LOCAL_PREFIX = 'daily_attempt'
+
+export function dailyAttemptKey(puzzleDate, boardType, userId) {
+  const scope = userId ? `user:${userId}` : 'guest'
+  return `${LOCAL_PREFIX}:${scope}:${puzzleDate}:${boardType}`
+}
+
+export function getLocalDailyAttempt(puzzleDate, boardType, userId) {
+  if (typeof window === 'undefined' || !window.localStorage) return null
+  const keysToTry = userId
+    ? [dailyAttemptKey(puzzleDate, boardType, userId), dailyAttemptKey(puzzleDate, boardType, null), `${LOCAL_PREFIX}:${puzzleDate}:${boardType}`]
+    : [dailyAttemptKey(puzzleDate, boardType, null), `${LOCAL_PREFIX}:${puzzleDate}:${boardType}`]
+  for (const k of keysToTry) {
+    try {
+      const raw = window.localStorage.getItem(k)
+      if (raw) return JSON.parse(raw)
+    } catch (_e) {
+      void _e
+    }
+  }
+  return null
+}
+
+export function hasLocalDailyAttempt(puzzleDate, boardType, userId) {
+  return !!getLocalDailyAttempt(puzzleDate, boardType, userId)
+}
+
+export function saveLocalDailyAttempt(attempt, userId) {
+  if (typeof window === 'undefined' || !window.localStorage) return
+  const { puzzle_date, board_type } = attempt
+  if (!puzzle_date || !board_type) return
+  const key = dailyAttemptKey(puzzle_date, board_type, userId)
+  try {
+    window.localStorage.setItem(key, JSON.stringify({ ...attempt, _saved_at: new Date().toISOString() }))
+  } catch (_e) {
+    void _e
+  }
+  // keep legacy generic guest key in sync for backwards compat when anonymous
+  if (!userId) {
+    try {
+      window.localStorage.setItem(`${LOCAL_PREFIX}:${puzzle_date}:${board_type}`, JSON.stringify({ ...attempt, _saved_at: new Date().toISOString() }))
+    } catch (_e) { void _e }
+  }
+}
+
+export function clearLocalDailyAttempt(puzzleDate, boardType, userId) {
+  if (typeof window === 'undefined' || !window.localStorage) return
+  try {
+    window.localStorage.removeItem(dailyAttemptKey(puzzleDate, boardType, userId))
+  } catch (_e) { void _e }
+}
+
+export async function fetchDailyAttempt(puzzleDate, boardType) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return null
+  const { data, error } = await supabase
+    .from('daily_scores')
+    .select('*')
+    .eq('user_id', user.id)
+    .eq('puzzle_date', puzzleDate)
+    .eq('board_type', boardType)
+    .maybeSingle()
+  if (error) throw error
+  return data
+}
+
+// Extra check: Supabase + Local Fallback
+export async function getDailyAttempt(puzzleDate, boardType, userId) {
+  const local = getLocalDailyAttempt(puzzleDate, boardType, userId)
+  // if we have a userId, try remote first
+  if (userId) {
+    try {
+      const { data, error } = await supabase
+        .from('daily_scores')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('puzzle_date', puzzleDate)
+        .eq('board_type', boardType)
+        .maybeSingle()
+      if (error) throw error
+      if (data) {
+        // normalize shape for local cache (so Daily.jsx can read uniformly)
+        const normalized = {
+          puzzle_date: data.puzzle_date,
+          board_type: data.board_type,
+          score: data.score,
+          words_count: data.words_count,
+          words_found: data.words_found,
+          total_possible_score: data.total_possible_score,
+          total_possible_words: data.total_possible_words,
+          percent_score: data.percent_score,
+          longest_word: data.longest_word,
+          created_at: data.created_at,
+          _remote: true,
+        }
+        saveLocalDailyAttempt(normalized, userId)
+        return normalized
+      }
+    } catch (_e) {
+      void _e
+    }
+    return local
+  }
+  // anonymous: local only
+  // also try to fetch via auth user if userId not passed but session exists
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (user) return getDailyAttempt(puzzleDate, boardType, user.id)
+  } catch (_e) { void _e }
+  return local
+}
+
+export async function hasDailyAttempt(puzzleDate, boardType, userId) {
+  const attempt = await getDailyAttempt(puzzleDate, boardType, userId)
+  return !!attempt
+}

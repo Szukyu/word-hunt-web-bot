@@ -45,6 +45,57 @@
   border-radius: 999px; border: 1px solid var(--highlight);
 }
 .daily-play-button:hover { opacity: 0.9; }
+.daily-play-button:disabled,
+.daily-play-button.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.2);
+}
+
+.daily-completed-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--unhighlight);
+  border-radius: 10px;
+}
+.completed-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--highlight);
+  color: var(--bg);
+  font-weight: 800;
+  font-size: 0.64rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.completed-score { font-weight: 800; font-size: 0.84rem; color: var(--text); }
+.completed-percent { font-size: 0.72rem; color: var(--subalt); font-weight: 700; }
+
+.daily-view-result-button {
+  padding: 9px 14px;
+  background: var(--bg);
+  border: 1px solid var(--highlight);
+  color: var(--text);
+  font-weight: 800;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 999px;
+}
+.daily-view-result-button:hover { background: var(--highlight); color: var(--bg); }
+
+.daily-one-attempt-hint {
+  text-align: center;
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  color: var(--subalt);
+  margin-top: 2px;
+}
 
 .daily-countdown-inline {
   display: flex; align-items: baseline; gap: 8px; justify-content: center;

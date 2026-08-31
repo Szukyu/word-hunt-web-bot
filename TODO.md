@@ -8,7 +8,7 @@
 
 - [x] Daily board generation — deterministic seeded board (same for all users per day, per board type) — `src/lib/daily.js:10`
 - [x] Daily puzzle UI — dedicated route/card on home (`/daily`), countdown to next puzzle (UTC midnight) — `src/components/Daily/Daily.jsx:1` + `src/App.jsx:1` + `src/components/Option/Option.jsx:1`
-- [ ] One attempt per day enforcement (per profile, local + Supabase sync)
+- [x] One attempt per day enforcement (per profile, local + Supabase sync)
 - [ ] Daily streak tracking + freeze / streak repair logic
 - [ ] Daily history & calendar view — past dailies replayable (but not counting toward streak)
 - [ ] Daily share card — spoiler-free result image/text (`Word Hunt 29/08/2026 - 847 pts - 12/38 words`)

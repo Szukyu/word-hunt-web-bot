@@ -1,25 +1,22 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Support both new publishable key name and legacy anon key name
-const url =
-  import.meta.env.VITE_SUPABASE_URL ||
-  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY // guard: mis-config still warns
+// Support both new publishable key name and legacy anon key name.
+// The publishable key (sb_publishable_...) is a valid anon replacement for Supabase JS v2.
+const url = import.meta.env.VITE_SUPABASE_URL
 
 const anonKey =
   import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
   import.meta.env.VITE_SUPABASE_ANON_KEY ||
   import.meta.env.VITE_SUPABASE_KEY
 
-if (!import.meta.env.VITE_SUPABASE_URL) {
-  console.warn('[supabase] Missing VITE_SUPABASE_URL — check your .env')
+if (!url) {
+  console.warn('[supabase] Missing VITE_SUPABASE_URL — check your .env (expected https://<ref>.supabase.co)')
 }
 if (!anonKey) {
   console.warn('[supabase] Missing VITE_SUPABASE_PUBLISHABLE_KEY / VITE_SUPABASE_ANON_KEY — check your .env')
 }
 
-export const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  anonKey,
+export const supabase = createClient(url, anonKey,
   {
     auth: {
       persistSession: true,
