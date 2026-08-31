@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import Navbar from './components/Navbar/Navbar.jsx';
 import Option from './components/Option/Option.jsx';
 import Auth from './components/Auth/Auth.jsx';
 import Stats from './components/Stats/Stats.jsx';
 import ThemePage from './components/ThemePage/ThemePage.jsx';
+import Daily from './components/Daily/Daily.jsx';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { ThemeProvider } from './themes/ThemeContext.jsx';
 
@@ -52,10 +53,28 @@ const AppContent = () => {
     setView('option');
   };
 
+  const handleViewDaily = () => {
+    setShowAuth(false);
+    setView('daily');
+    if (window.location.pathname !== '/daily') window.history.pushState({}, '', '/daily');
+  };
+
+  // Deep-link support: /daily
+  useEffect(() => {
+    if (window.location.pathname === '/daily') setView('daily');
+    const onPop = () => {
+      if (window.location.pathname === '/daily') setView('daily');
+      else if (view === 'daily' && window.location.pathname !== '/daily') setView('option');
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, [view]);
+
   const renderView = () => {
     if (showAuth) return <Auth onClose={handleCloseAuth} />;
     if (view === 'stats') return <Stats />;
     if (view === 'themes') return <ThemePage onBack={handleBackToOption} />;
+    if (view === 'daily') return <Daily />;
     return <Option key={resetKey} />;
   };
 
@@ -68,6 +87,7 @@ const AppContent = () => {
         user={user}
         onSignOut={handleSignOut}
         onViewStats={handleViewStats}
+        onViewDaily={handleViewDaily}
       />
       {renderView()}
     </div>

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { IoClose, IoBrushOutline, IoAdd, IoTrashOutline, IoPencil } from 'react-icons/io5';
+import { IoClose, IoBrushOutline, IoAdd, IoTrashOutline, IoPencil, IoTimeOutline, IoCheckmarkCircle, IoArrowBack, IoRefresh } from 'react-icons/io5';
 import { useTheme } from '../../themes/ThemeContext.jsx';
 import { CREATOR_KEYS, CREATOR_LABELS, CREATOR_DESCRIPTIONS } from '../../themes/index.js';
 import './ThemeCreator.css';
@@ -106,20 +106,21 @@ const ThemeCreator = ({ isOpen, onClose }) => {
     setColors(DEFAULT_SIX);
   };
 
+  const PREVIEW_LETTERS = ['W','O','R','D','H','U','N','T','G','A','M','E','P','L','A','Y'];
+  const PREVIEW_HIGHLIGHT = [0, 1, 2, 3];
+
   const previewStyle = useMemo(() => {
-    const s = {};
-    CREATOR_KEYS.forEach((k) => {
-      s[`--preview-${k}`] = colors[k];
-    });
-    // Derive unhighlight preview as subalt
-    s['--preview-unhighlight'] = colors.subalt || colors.main;
-    s['--preview-bg'] = colors.bg;
-    s['--preview-main'] = colors.main;
-    s['--preview-text'] = colors.text;
-    s['--preview-sub'] = colors.sub;
-    s['--preview-subalt'] = colors.subalt;
-    s['--preview-highlight'] = colors.highlight;
-    return s;
+    return {
+      '--bg': colors.bg,
+      '--main': colors.main,
+      '--text': colors.text,
+      '--sub': colors.sub,
+      '--subalt': colors.subalt,
+      '--highlight': colors.highlight,
+      '--unhighlight': colors.subalt || colors.main,
+      '--danger': colors.highlight || '#f7768e',
+      '--success': colors.highlight || '#9ece6a',
+    };
   }, [colors]);
 
   if (!isOpen) return null;
@@ -168,12 +169,6 @@ const ThemeCreator = ({ isOpen, onClose }) => {
                           title={`${k}: ${theme.colors[k]}`}
                         />
                       ))}
-                      {/* Show derived unhighlight as extra swatch faintly */}
-                      <span
-                        className="theme-swatch"
-                        style={{ background: theme.colors.unhighlight, opacity: 0.95 }}
-                        title={`unhighlight: ${theme.colors.unhighlight}`}
-                      />
                     </div>
                     {!isDefault && (
                       <div className="theme-card-actions" onClick={(e) => e.stopPropagation()}>
@@ -248,21 +243,24 @@ const ThemeCreator = ({ isOpen, onClose }) => {
                   ))}
                 </div>
 
-                {/* Live preview that overwrites entire theme preview */}
-                <div className="theme-preview" style={previewStyle}>
-                  <div className="theme-preview-header">
-                    <span className="theme-preview-title" style={{ color: previewStyle['--preview-text'] }}>Preview</span>
-                    <span className="theme-preview-badge" style={{ background: previewStyle['--preview-highlight'], color: previewStyle['--preview-bg'] }}>Accent</span>
-                  </div>
-                  <div className="theme-preview-body">
-                    <div className="theme-preview-text" style={{ color: previewStyle['--preview-text'] }}>
-                      The quick brown fox jumps over the lazy dog
+                {/* Accurate play-screen replica — mirrors Play.jsx */}
+                <div className="theme-preview-board" style={previewStyle}>
+                  <div className="board-preview-wrap">
+                    <div className="board-preview-header">
+                      <span className="bp-icon-btn" aria-hidden><IoArrowBack /></span>
+                      <span className="bp-stats">
+                        <span className="bp-stat"><IoTimeOutline className="bp-stat-icon" /> 1:24</span>
+                        <span className="bp-stat"><IoCheckmarkCircle className="bp-stat-icon" /> 12 pts</span>
+                      </span>
+                      <span className="bp-icon-btn" aria-hidden><IoRefresh /></span>
                     </div>
-                    <div className="theme-preview-sub" style={{ color: previewStyle['--preview-sub'] }}>Secondary text and UI details</div>
-                    <div className="theme-preview-border" style={{ background: previewStyle['--preview-subalt'] }} />
-                    <div className="theme-preview-row">
-                      <button type="button" className="theme-preview-btn primary" style={{ background: previewStyle['--preview-highlight'], color: previewStyle['--preview-bg'], borderColor: previewStyle['--preview-highlight'] }}>Primary</button>
-                      <button type="button" className="theme-preview-btn secondary" style={{ color: previewStyle['--preview-text'], borderColor: previewStyle['--preview-unhighlight'], background: previewStyle['--preview-main'] }}>Secondary</button>
+                    <div className="board-preview-board">
+                      <div className="bp-current-word">WORD</div>
+                      <div className="bp-grid">
+                        {PREVIEW_LETTERS.map((letter, idx) => (
+                          <div key={idx} className={`bp-tile ${PREVIEW_HIGHLIGHT.includes(idx) ? 'highlight' : ''}`}>{letter}</div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>

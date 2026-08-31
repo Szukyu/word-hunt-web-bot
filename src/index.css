@@ -1,13 +1,17 @@
 :root {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  --font-mono: "Monaspace Neon", "Monaspace Neon Nerd Font", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 10px;
 }
 
 :root,
-:root[data-theme="dark"] {
+:root[data-theme="dark"],
+:root[data-theme^="custom-"] {
   --bg: #080a18;
   --main: #0f1221;
   --text: #c0caf5;
@@ -17,6 +21,7 @@
   --unhighlight: #1f2335;
   --danger: #f7768e;
   --success: #9ece6a;
+  color-scheme: dark;
 }
 
 :root[data-theme="light"] {
@@ -29,70 +34,39 @@
   --unhighlight: #cfd8e6;
   --danger: #d32f2f;
   --success: #388e3c;
+  color-scheme: light;
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
-}
+/* Custom themes are applied via inline style (ThemeContext applyThemeColors).
+   The [data-theme^="custom-"] fallback above only applies before JS loads;
+   once JS runs, inline --* vars override. The color-scheme inline style
+   set by applyThemeColors then correctly matches bg brightness (dark/light). */
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: var(--bg);
+  background: var(--bg);
   color: var(--text);
-  line-height: 1.6;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--font-mono);
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  background-image:
+    radial-gradient(ellipse 820px 520px at 50% -10%, color-mix(in srgb, var(--highlight) 7%, transparent), transparent 68%),
+    radial-gradient(ellipse 600px 400px at 90% 8%, color-mix(in srgb, var(--sub) 5%, transparent), transparent 65%);
+  background-attachment: fixed;
 }
 
-a {
-  color: var(--highlight);
-  text-decoration: none;
-  font-weight: 550;
-}
+a { color: var(--highlight); text-decoration: none; }
+button { font-family: var(--font-mono); border: none; cursor: pointer; }
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--highlight); outline-offset: 2px; }
+input, textarea, select { font-family: var(--font-mono); }
 
-button {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  border: none;
-  cursor: pointer;
-}
-
-button:focus-visible,
-input:focus-visible,
-textarea:focus-visible,
-select:focus-visible {
-  outline: 2px solid var(--highlight);
-  outline-offset: 2px;
-}
-
-input,
-textarea,
-select {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
-
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--unhighlight);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--subalt);
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-::selection {
-  background: var(--highlight);
-  color: var(--bg);
-}
-
-::-moz-selection {
-  background: var(--highlight);
-  color: var(--bg);
-}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--subalt); border-radius: 999px; }
+::selection { background: var(--highlight); color: var(--bg); }
+::-moz-selection { background: var(--highlight); color: var(--bg); }

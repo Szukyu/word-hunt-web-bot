@@ -1,0 +1,57 @@
+.daily-area { max-width: 1040px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 16px; }
+
+.daily-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  background: var(--main);
+  border: 1px solid var(--unhighlight);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.daily-title h1 { margin: 4px 0 0; font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text); line-height: 1; }
+.daily-subtitle { font-size: 0.72rem; color: var(--subalt); margin-top: 4px; display: block; }
+.daily-back {
+  padding: 8px 14px; background: var(--bg); border: 1px solid var(--unhighlight);
+  border-radius: 999px; font-weight: 700; font-size: 0.72rem; color: var(--text); white-space: nowrap;
+}
+
+.daily-content { display: grid; grid-template-columns: 1fr; gap: 16px; max-width: 520px; margin: 0 auto; width: 100%; }
+
+.daily-preview-card {
+  background: var(--main);
+  border: 1px solid var(--unhighlight);
+  border-radius: var(--radius-lg);
+  padding: 14px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.daily-preview-card .board-preview {
+  display: grid; place-items: center; height: 268px; min-height: 268px; overflow: hidden;
+}
+.daily-preview-card .board-preview .board-container { gap: var(--tile-gap, 6px); }
+.daily-preview-card .board-preview .board-row { gap: var(--tile-gap, 6px); }
+.daily-preview-card .board-preview .board-row + .board-row { margin-top: var(--tile-gap, 6px); }
+.daily-preview-card .tile { width: var(--tile-size, 60px); height: var(--tile-size, 60px); font-size: calc(var(--tile-size, 60px) * 0.26); border-radius: 10px; }
+.daily-preview-card .invisibleTile { width: var(--tile-size, 60px); height: var(--tile-size, 60px); }
+
+.daily-play-button {
+  margin-top: 4px; padding: 10px 16px; background: var(--highlight); color: var(--bg);
+  font-weight: 800; font-size: 0.74rem; letter-spacing: 0.08em; text-transform: uppercase;
+  border-radius: 999px; border: 1px solid var(--highlight);
+}
+.daily-play-button:hover { opacity: 0.9; }
+
+.daily-countdown-inline {
+  display: flex; align-items: baseline; gap: 8px; justify-content: center;
+  padding: 8px 0 2px; border-top: 1px solid var(--unhighlight); margin-top: 2px;
+}
+.daily-countdown-inline .preview-label { font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--subalt); font-weight: 700; }
+.daily-countdown-inline .countdown-value { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.03em; color: var(--text); font-variant-numeric: tabular-nums; }
+.daily-countdown-inline .countdown-hint { font-size: 0.62rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--subalt); }
+
+@media (max-width: 860px) { .daily-header { flex-direction: column; align-items: stretch; } }

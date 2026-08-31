@@ -1,19 +1,11 @@
-#root {
-  min-height: 100vh;
-}
-
+#root { min-height: 100vh; }
 .App {
   min-height: 100vh;
-  padding: 110px 32px 48px;
-  max-width: 1300px;
+  padding: 84px 20px 40px;
+  max-width: 1040px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 24px;
 }
-
-@media (max-width: 768px) {
-  .App {
-    padding: 96px 20px 32px;
-  }
-}
+@media (max-width: 768px) { .App { padding: 76px 14px 28px; gap: 18px; } }

@@ -18,7 +18,7 @@ const BOARD_CONFIG = {
   25: { name: '5×5 Grid', component: Boarder },
 };
 
-const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
+const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords, initialLetters = null, disableRegenerate = false }) => {
   const { secondsLeft, isRunning, start, pause } = useTimer();
   const isRunningRef = useRef(isRunning);
   const [selectedTiles, setSelectedTiles] = useState([]);
@@ -54,7 +54,7 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
     englishWordsRef.current = englishWords;
   }, [englishWords]);
 
-  const { boardLetters, adjacencyMap, generateRandomBoard, getValidWords } = useBoard(boardType, englishWords);
+  const { boardLetters, adjacencyMap, generateRandomBoard, getValidWords, setBoard } = useBoard(boardType, englishWords, initialLetters);
 
   const adjacencyMapRef = useRef(adjacencyMap);
   const boardLettersRef = useRef(boardLetters);
@@ -62,11 +62,15 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
   useEffect(() => { adjacencyMapRef.current = adjacencyMap; }, [adjacencyMap]);
   useEffect(() => { boardLettersRef.current = boardLetters; }, [boardLetters]);
 
-  // Generate Board on Mount
+  // Generate / set board on mount
   useEffect(() => {
-    generateRandomBoard();
+    if (initialLetters) {
+      setBoard(initialLetters);
+    } else {
+      generateRandomBoard();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [initialLetters]);
 
   // Timer control
   useEffect(() => {
@@ -378,7 +382,14 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords }) => {
   });
 
   const handlePlayAgain = () => {
-    generateRandomBoard();
+    if (initialLetters && !disableRegenerate) {
+      setBoard(initialLetters);
+    } else if (!initialLetters) {
+      generateRandomBoard();
+    } else {
+      // daily replay — keep same board
+      setBoard(initialLetters);
+    }
     selectedTilesRef.current = [];
     currentWordRef.current = '';
     isDraggingRef.current = false;

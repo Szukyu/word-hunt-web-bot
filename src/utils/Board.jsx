@@ -211,10 +211,11 @@ export class Boarder {
   }
 }
 
-// Donut Board Class
+// Donut Board Class — holes at 0,4,12,20,24 (5x5 grid)
 export class Donut {
   constructor(lettersArr) {
     this.lb = lettersArr;
+    this._valid = new Set([1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23]);
   }
 
   copyBoard() {
@@ -226,84 +227,30 @@ export class Donut {
         newArr.push(null);
       }
     }
-    return new Donut(newArr);
+    const c = new Donut(newArr);
+    c._valid = this._valid;
+    return c;
   }
 
-  peekUpperLeft(pos) {
-    if (pos <= 4 || pos === 8 || pos === 12 || pos === 15) {
-      return -1;
-    } else if (pos === 9 || pos === 16) {
-      return this.lb[pos - 6];
-    } else {
-      return this.lb[pos - 5];
-    }
+  _neighbor(pos, dr, dc) {
+    const r = Math.floor(pos / 5), c = pos % 5;
+    const nr = r + dr, nc = c + dc;
+    if (nr < 0 || nr >= 5 || nc < 0 || nc >= 5) return -1;
+    const ngp = nr * 5 + nc;
+    if (!this._valid.has(ngp)) return -1;
+    const cell = this.lb[ngp];
+    if (!cell) return -1;
+    return cell;
   }
 
-  peekUp(pos) {
-    if (pos <= 3 || pos % 7 === 0) {
-      return -1;
-    } else if (pos === 8 || pos === 9 || pos === 15 || pos === 16) {
-      return this.lb[pos - 5];
-    } else {
-      return this.lb[pos - 4];
-    }
-  }
-
-  peekUpperRight(pos) {
-    if (pos < 3 || pos === 6 || pos === 7 || pos === 11 || pos === 13 || pos === 16) {
-      return -1;
-    } else if (pos === 8 || pos === 9 || pos === 14 || pos === 15) {
-      return this.lb[pos - 4];
-    } else {
-      return this.lb[pos - 3];
-    }
-  }
-
-  peekRight(pos) {
-    if (pos === 2 || pos === 7 || pos === 9 || pos === 11 || pos === 16 || pos === 19) {
-      return -1;
-    } else {
-      return this.lb[pos + 1];
-    }
-  }
-
-  peekLowerRight(pos) {
-    if (pos === 4 || pos === 7 || pos === 11 || pos >= 15) {
-      return -1;
-    } else if (pos === 3 || pos === 10) {
-      return this.lb[pos + 6];
-    } else {
-      return this.lb[pos + 5];
-    }
-  }
-
-  peekDown(pos) {
-    if (pos === 5 || pos === 12 || pos >= 16) {
-      return -1;
-    } else if (pos === 3 || pos === 4 || pos === 10 || pos === 11) {
-      return this.lb[pos + 5];
-    } else {
-      return this.lb[pos + 4];
-    }
-  }
-
-  peekLowerLeft(pos) {
-    if (pos === 3 || pos === 8 || pos === 13 || pos >= 17 || pos % 6 === 0) {
-      return -1;
-    } else if (pos === 4 || pos === 5 || pos === 10 || pos === 11) {
-      return this.lb[pos + 4];
-    } else {
-      return this.lb[pos + 3];
-    }
-  }
-
-  peekLeft(pos) {
-    if (pos === 0 || pos === 3 || pos === 8 || pos === 10 || pos === 12 || pos === 17) {
-      return -1;
-    } else {
-      return this.lb[pos - 1];
-    }
-  }
+  peekUpperLeft(pos) { return this._neighbor(pos, -1, -1); }
+  peekUp(pos) { return this._neighbor(pos, -1, 0); }
+  peekUpperRight(pos) { return this._neighbor(pos, -1, 1); }
+  peekRight(pos) { return this._neighbor(pos, 0, 1); }
+  peekLowerRight(pos) { return this._neighbor(pos, 1, 1); }
+  peekDown(pos) { return this._neighbor(pos, 1, 0); }
+  peekLowerLeft(pos) { return this._neighbor(pos, 1, -1); }
+  peekLeft(pos) { return this._neighbor(pos, 0, -1); }
 
   visitDirection(pos, dir) {
     const directionDict = {
@@ -316,100 +263,53 @@ export class Donut {
       [DOWNLEFT]: this.peekLowerLeft.bind(this),
       [LEFT]: this.peekLeft.bind(this)
     };
-
     const visitedLetter = directionDict[dir](pos);
-    if (visitedLetter === -1 || !visitedLetter || visitedLetter.visited) {
-      return -1;
-    }
+    if (visitedLetter === -1 || !visitedLetter || visitedLetter.visited) return -1;
     visitedLetter.markVisited();
     return visitedLetter;
   }
 }
 
-// X Board Class
+// X Board Class — holes at 2,10,14,22 (matches Boards/X.jsx)
 export class X {
   constructor(lettersArr) {
     this.lb = lettersArr;
+    this._valid = new Set([0, 1, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 15, 16, 17, 18, 19, 20, 21, 23, 24]);
   }
 
   copyBoard() {
     const newArr = []
     for (let i = 0; i < this.lb.length; i++) {
-      newArr.push(this.lb[i].copyLetter());
+      if (this.lb[i] !== null) {
+        newArr.push(this.lb[i].copyLetter());
+      } else {
+        newArr.push(null);
+      }
     }
-    return new X(newArr);
+    const c = new X(newArr);
+    c._valid = this._valid;
+    return c;
   }
 
-  peekUpperLeft(pos) {
-    if (pos <= 4 || pos == 7 || pos == 12 || pos == 13 || pos == 17) {
-      return -1;
-    } else if (pos == 8 || pos == 18) {
-      return this.lb[pos - 6];
-    } else {
-      return this.lb[pos - 5];
-    }
+  _neighbor(pos, dr, dc) {
+    const r = Math.floor(pos / 5), c = pos % 5;
+    const nr = r + dr, nc = c + dc;
+    if (nr < 0 || nr >= 5 || nc < 0 || nc >= 5) return -1;
+    const ngp = nr * 5 + nc;
+    if (!this._valid.has(ngp)) return -1;
+    const cell = this.lb[ngp];
+    if (!cell) return -1;
+    return cell;
   }
 
-  peekUp(pos) {
-    if (pos <= 3 || pos === 6 || pos === 12 || pos === 16) {
-      return -1;
-    } else if (pos === 7 || pos === 8 || pos === 17 || pos === 18) {
-      return this.lb[pos - 5];
-    } else {
-      return this.lb[pos - 4];
-    }
-  }
-
-  peekUpperRight(pos) {
-    if (pos <= 3 || pos === 5 || pos === 8 || pos === 15 || pos === 16 || pos === 20) {
-      return -1;
-    } else if (pos === 6 || pos === 7 || pos === 17 || pos === 18) {
-      return this.lb[pos - 4];
-    } else {
-      return this.lb[pos - 3];
-    }
-  }
-
-  peekRight(pos) {
-    if (pos === 1 || pos === 3 || pos === 8 || pos === 11 || pos === 16 || pos === 18 || pos === 20) {
-      return -1;
-    }
-    return this.lb[pos + 1];
-  }
-
-  peekLowerRight(pos) {
-    if (pos === 3 || pos === 7 || pos === 8 || pos === 13 || pos >= 16) {
-      return -1;
-    } else if (pos === 2 || pos === 12) {
-      return this.lb[pos + 6];
-    }
-    return this.lb[pos + 5];
-  }
-
-  peekDown(pos) {
-    if (pos === 4 || pos === 8 || pos === 14 || pos >= 17) {
-      return -1;
-    } else if (pos === 2 || pos === 12 || pos === 3 || pos === 13) {
-      return this.lb[pos + 5];
-    }
-    return this.lb[pos + 4];
-  }
-
-  peekLowerLeft(pos) {
-    if (pos >= 17 || pos === 15 || pos === 5 || pos === 12 || pos === 4 || pos === 0) {
-      return -1;
-    } else if (pos === 2 || pos === 3 || pos === 13 || pos === 14) {
-      return this.lb[pos + 4];
-    }
-    return this.lb[pos + 3];
-  }
-
-  peekLeft(pos) {
-    if (pos === 0 || pos === 2 || pos === 4 || pos === 9 || pos === 12 || pos === 17 || pos === 19) {
-      return -1;
-    }
-    return this.lb[pos - 1];
-  }
+  peekUpperLeft(pos) { return this._neighbor(pos, -1, -1); }
+  peekUp(pos) { return this._neighbor(pos, -1, 0); }
+  peekUpperRight(pos) { return this._neighbor(pos, -1, 1); }
+  peekRight(pos) { return this._neighbor(pos, 0, 1); }
+  peekLowerRight(pos) { return this._neighbor(pos, 1, 1); }
+  peekDown(pos) { return this._neighbor(pos, 1, 0); }
+  peekLowerLeft(pos) { return this._neighbor(pos, 1, -1); }
+  peekLeft(pos) { return this._neighbor(pos, 0, -1); }
 
   visitDirection(pos, dir) {
     const directionDict = {
@@ -422,11 +322,8 @@ export class X {
       [DOWNLEFT]: this.peekLowerLeft.bind(this),
       [LEFT]: this.peekLeft.bind(this)
     };
-
     const visitedLetter = directionDict[dir](pos);
-    if (visitedLetter === -1 || visitedLetter.visited) {
-      return -1;
-    }
+    if (visitedLetter === -1 || !visitedLetter || visitedLetter.visited) return -1;
     visitedLetter.markVisited();
     return visitedLetter;
   }
