@@ -2,13 +2,17 @@ import { useState, useCallback, useMemo } from 'react';
 import { FREQ } from '../data/freq';
 import { buildAdjacencyMap, findAllValidWords } from './utils.js'
 
-export const useBoard = (boardType, englishWords) => {
-  const [boardLetters, setBoardLetters] = useState('');
+export const useBoard = (boardType, englishWords, initialLetters = null) => {
+  const [boardLetters, setBoardLetters] = useState(initialLetters || '');
 
   const adjacencyMap = useMemo(() => {
     if (!boardLetters) return {};
     return buildAdjacencyMap(boardLetters);
   }, [boardLetters]);
+
+  const setBoard = useCallback((letters) => {
+    setBoardLetters(letters.toLowerCase());
+  }, []);
 
   const generateRandomBoard = useCallback(() => {
     const letters = 'abcdefghijklmnopqrstuvwxyz';
@@ -34,5 +38,5 @@ export const useBoard = (boardType, englishWords) => {
     return findAllValidWords(boardLetters, englishWords);
   }, [boardLetters, englishWords]);
 
-  return { boardLetters, adjacencyMap, generateRandomBoard, getValidWords };
+  return { boardLetters, adjacencyMap, generateRandomBoard, getValidWords, setBoard, setBoardLetters };
 };

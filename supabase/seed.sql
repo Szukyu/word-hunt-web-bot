@@ -1,7 +1,7 @@
 -- Seed: system themes + example daily puzzle for today
 -- Run with: supabase db reset  or  supabase seed
 
--- System themes (is_system = true, is_public = true)
+-- Themes
 insert into public.themes (slug, name, colors, is_system, is_public)
 values
   ('midnight', 'Midnight', '{"bg":"#0a0e1a","tile":"#1a2332","tileText":"#e2e8f0","accent":"#3b82f6","board":"#1e293b"}', true, true),

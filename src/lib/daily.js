@@ -1,8 +1,4 @@
-/**
- * Daily puzzle helpers
- * - Deterministic seeded board generation (same for all users per day, per board_type)
- * - Supabase fetch/persist for daily_puzzles + daily_scores + streaks
- */
+// Daily Board Helper
 import { supabase } from './supabase'
 import { FREQ } from '../data/freq'
 
@@ -16,16 +12,68 @@ export function mulberry32(seed) {
   }
 }
 
-// Hash a date string + boardType into a 32-bit seed
-export function dateToSeed(dateStr, boardType) {
+export const DAILY_BOARD_TYPES = [16, 20, 21, 25]
+export const DAILY_BOARD_META = {
+  16: { name: '4×4 Grid', size: 16 },
+  20: { name: 'Donut Ring', size: 20 },
+  21: { name: 'X Shape', size: 21 },
+  25: { name: '5×5 Grid', size: 25 },
+}
+
+// Hash a date string (+ optional boardType) into a 32-bit seed
+export function dateToSeed(dateStr, boardType = '') {
   // dateStr: YYYY-MM-DD (UTC)
   let h = 2166136261
-  const s = `${dateStr}:${boardType}`
+  const s = boardType === '' ? `${dateStr}` : `${dateStr}:${boardType}`
   for (let i = 0; i < s.length; i++) {
     h ^= s.charCodeAt(i)
     h = Math.imul(h, 16777619)
   }
   return h >>> 0
+}
+
+// Deterministically choose one of the 4 base board types
+export function chooseDailyBoardType(dateStr) {
+  const seed = dateToSeed(dateStr, 'choose')
+  const rand = mulberry32(seed)
+  const idx = Math.floor(rand() * DAILY_BOARD_TYPES.length)
+  return DAILY_BOARD_TYPES[idx]
+}
+
+// Daily board creation: pick type + randomly populate (deterministic per date)
+export function createDailyBoard(dateStr = todayUTC()) {
+  const boardType = chooseDailyBoardType(dateStr)
+  const boardLetters = generateSeededBoard(dateStr, boardType)
+  return {
+    puzzle_date: dateStr,
+    board_type: boardType,
+    board_letters: boardLetters,
+    board_name: DAILY_BOARD_META[boardType].name,
+  }
+}
+
+// Non-deterministic helper (for previews/testing): random board type + random letters
+export function createRandomDailyBoard() {
+  const boardType = DAILY_BOARD_TYPES[Math.floor(Math.random() * DAILY_BOARD_TYPES.length)]
+  const letters = 'abcdefghijklmnopqrstuvwxyz'
+  const cumulative = []
+  let sum = 0
+  for (const f of FREQ) {
+    sum += f
+    cumulative.push(sum)
+  }
+  const total = cumulative[cumulative.length - 1]
+  let board = ''
+  for (let i = 0; i < boardType; i++) {
+    const r = Math.random() * total
+    const idx = cumulative.findIndex((w) => r <= w)
+    board += letters[idx]
+  }
+  return {
+    board_type: boardType,
+    board_letters: board,
+    board_name: DAILY_BOARD_META[boardType].name,
+  }
 }
 
 export function generateSeededBoard(dateStr, boardType) {

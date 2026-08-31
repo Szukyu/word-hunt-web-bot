@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Input from '../Input/Input';
 import Setup from '../Setup/Setup';
+import Daily from '../Daily/Daily';
 import useLoad from '../../hooks/load';
 import './Option.css';
 
@@ -10,15 +11,22 @@ function Option() {
 
   const modeOptions = [
     {
-      id: 'play',
+      id: 'daily',
       num: '01',
+      title: 'Daily',
+      desc: 'One board · 90s · streak',
+      cta: 'Open',
+    },
+    {
+      id: 'play',
+      num: '02',
       title: 'Practice',
       desc: '4 boards · 10—120s',
       cta: 'Open',
     },
     {
       id: 'cheat',
-      num: '02',
+      num: '03',
       title: 'Solver',
       desc: '16 / 20 / 21 / 25 · path',
       cta: 'Open',
@@ -69,6 +77,7 @@ function Option() {
   return (
     <section className="option-active">
       <div className="option-active-panel">
+        {activeComponent === 'daily' && <Daily />}
         {activeComponent === 'play' && <Setup englishWords={englishWords} wordStarts={wordStarts} />}
         {activeComponent === 'cheat' && <Input englishWords={englishWords} wordStarts={wordStarts} />}
       </div>
