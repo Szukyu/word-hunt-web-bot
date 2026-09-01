@@ -323,3 +323,99 @@ export async function hasDailyAttempt(puzzleDate, boardType, userId) {
   const attempt = await getDailyAttempt(puzzleDate, boardType, userId)
   return !!attempt
 }
+
+// --- Daily history & calendar helpers (view-only, no replay) ---
+
+export function getAllLocalDailyAttempts(userId = null) {
+  if (typeof window === 'undefined' || !window.localStorage) return []
+  const out = []
+  const seen = new Set()
+  for (let i = 0; i < window.localStorage.length; i++) {
+    const key = window.localStorage.key(i)
+    if (!key || !key.startsWith(LOCAL_PREFIX)) continue
+    // Filter by scope: when userId is known, only include that user's keys;
+    // when guest (null), include guest + legacy keys.
+    if (userId) {
+      if (!key.includes(`user:${userId}`)) continue
+    } else {
+      // guest: include guest or legacy (no user: prefix)
+      if (key.includes('user:')) continue
+    }
+    try {
+      const raw = window.localStorage.getItem(key)
+      if (!raw) continue
+      const data = JSON.parse(raw)
+      if (!data.puzzle_date || !data.board_type) continue
+      const dedupKey = `${data.puzzle_date}:${data.board_type}`
+      if (seen.has(dedupKey)) continue
+      seen.add(dedupKey)
+      out.push(data)
+    } catch (_e) { void _e }
+  }
+  // Also scan legacy keys for guest explicitly (already covered but ensure dedup)
+  if (!userId) {
+    for (let i = 0; i < window.localStorage.length; i++) {
+      const key = window.localStorage.key(i)
+      if (!key || !key.startsWith(`${LOCAL_PREFIX}:`)) continue
+      if (key.includes('user:') || key.includes(':guest:')) continue
+      // legacy: daily_attempt:YYYY-MM-DD:boardType
+      const parts = key.split(':')
+      if (parts.length !== 3) continue
+      const dedupKey = `${parts[1]}:${parts[2]}`
+      if (seen.has(dedupKey)) continue
+      try {
+        const raw = window.localStorage.getItem(key)
+        if (!raw) continue
+        const data = JSON.parse(raw)
+        if (!data.puzzle_date || !data.board_type) continue
+        seen.add(dedupKey)
+        out.push(data)
+      } catch (_e) { void _e }
+    }
+  }
+  out.sort((a, b) => (b.puzzle_date || '').localeCompare(a.puzzle_date || ''))
+  return out
+}
+
+// number of distinct local keys collected (for debugging)
+export function countLocalDailyAttempts(userId = null) {
+  return getAllLocalDailyAttempts(userId).length
+}
+
+// Build a Map puzzle_date -> attempt (deduped, latest _saved_at wins if duplicates across scopes)
+export function buildLocalHistoryMap(userId = null) {
+  const list = getAllLocalDailyAttempts(userId)
+  const map = new Map()
+  for (const a of list) {
+    const k = a.puzzle_date
+    if (!map.has(k)) map.set(k, a)
+    else {
+      const existing = map.get(k)
+      const tA = a._saved_at || a.created_at || ''
+      const tB = existing._saved_at || existing.created_at || ''
+      if (tA > tB) map.set(k, a)
+    }
+  }
+  return map
+}
+
+// Merge remote history (from Supabase) + local fallback, dedup by puzzle_date:board_type
+export function mergeDailyHistory(remoteList = [], localList = []) {
+  const map = new Map()
+  for (const r of remoteList) {
+    const k = `${r.puzzle_date}:${r.board_type}`
+    map.set(k, { ...r, _source: 'remote' })
+  }
+  for (const l of localList) {
+    const k = `${l.puzzle_date}:${l.board_type}`
+    if (!map.has(k)) map.set(k, { ...l, _source: 'local' })
+  }
+  const merged = Array.from(map.values())
+  merged.sort((a, b) => (b.puzzle_date || '').localeCompare(a.puzzle_date || ''))
+  return merged
+}
+
+// Helper: enumerate whether a dateStr is in the future relative to todayUTC
+export function isFutureDate(dateStr) {
+  return dateStr > todayUTC()
+}

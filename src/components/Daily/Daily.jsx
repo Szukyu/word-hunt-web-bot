@@ -14,9 +14,14 @@ import {
   saveLocalDailyAttempt,
   getDailyAttempt,
   submitDailyScore,
+  fetchUserDailyHistory,
+  getAllLocalDailyAttempts,
+  mergeDailyHistory,
 } from '../../lib/daily'
 import { getPreviewMetrics } from '../../utils/boardPreview'
 import { useAuth } from '../../context/AuthContext'
+import DailyCalendar from './DailyCalendar'
+import DailyHistory from './DailyHistory'
 import './Daily.css'
 
 const DAILY_TIME = 90
@@ -47,6 +52,11 @@ const Daily = () => {
   const [checkingAttempt, setCheckingAttempt] = useState(true)
   const [viewAttemptResult, setViewAttemptResult] = useState(false)
 
+  // Daily history & calendar (view-only; past not replayable)
+  const [historyList, setHistoryList] = useState([])
+  const [historyLoading, setHistoryLoading] = useState(false)
+  const [calendarSelected, setCalendarSelected] = useState(null)
+
   useEffect(() => {
     const id = setInterval(() => setCountdown(daysUntilNextUTC()), 1000)
     return () => clearInterval(id)
@@ -56,6 +66,34 @@ const Daily = () => {
   useEffect(() => {
     if (attempt && isPlaying) setIsPlaying(false)
   }, [attempt, isPlaying])
+
+  // Load daily history (remote + local merge) — powers calendar & history list (view-only)
+  useEffect(() => {
+    let cancelled = false
+    async function loadHistory() {
+      setHistoryLoading(true)
+      try {
+        let remote = []
+        if (user?.id) {
+          try {
+            remote = await fetchUserDailyHistory(user.id, 100)
+          } catch (e) {
+            void e
+            remote = []
+          }
+        }
+        const local = getAllLocalDailyAttempts(user?.id || null)
+        const merged = mergeDailyHistory(remote, local)
+        if (!cancelled) setHistoryList(merged)
+      } catch {
+        if (!cancelled) setHistoryList(getAllLocalDailyAttempts(user?.id || null))
+      } finally {
+        if (!cancelled) setHistoryLoading(false)
+      }
+    }
+    loadHistory()
+    return () => { cancelled = true }
+  }, [user?.id, attempt, gameResult])
 
   // One-attempt enforcement: per profile local + Supabase sync
   useEffect(() => {
@@ -217,6 +255,13 @@ const Daily = () => {
   if (attempt) {
     const wordsCount = attempt.words_count ?? attempt.words_found?.length ?? attempt.wordsFound?.length ?? 0
     const hasFullResult = !!(attempt.allPossibleWords || attempt.all_possible_words)
+    const handleHistorySelect = (dateStr) => {
+      setCalendarSelected(dateStr)
+      // scroll to calendar card for context
+      setTimeout(() => {
+        document.getElementById('daily-calendar-anchor')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 50)
+    }
     return (
       <section className="daily-area">
         <div className="daily-header">
@@ -270,8 +315,21 @@ const Daily = () => {
             <span className="daily-one-attempt-hint">One attempt per day per profile. Come back tomorrow.</span>
           </div>
         </div>
+
+        <div className="daily-extra" id="daily-calendar-anchor">
+          <DailyCalendar history={historyList} selectedDate={calendarSelected} onSelectDate={setCalendarSelected} />
+          <DailyHistory history={historyList} onSelectDate={handleHistorySelect} />
+          {historyLoading && <div className="daily-history-loading mono-hint">loading history…</div>}
+        </div>
       </section>
     )
+  }
+
+  const handleHistorySelectFallback = (dateStr) => {
+    setCalendarSelected(dateStr)
+    setTimeout(() => {
+      document.getElementById('daily-calendar-anchor')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 50)
   }
 
   return (
@@ -315,6 +373,12 @@ const Daily = () => {
             Play Daily
           </button>
         </div>
+      </div>
+
+      <div className="daily-extra" id="daily-calendar-anchor">
+        <DailyCalendar history={historyList} selectedDate={calendarSelected} onSelectDate={setCalendarSelected} />
+        <DailyHistory history={historyList} onSelectDate={handleHistorySelectFallback} />
+        {historyLoading && <div className="daily-history-loading mono-hint">loading history…</div>}
       </div>
     </section>
   )

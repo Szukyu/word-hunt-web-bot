@@ -1,6 +1,6 @@
 # TODO
 
-> Last updated: 2026-08-29
+> Last updated: 2026-09-01
 
 ---
 
@@ -10,7 +10,8 @@
 - [x] Daily puzzle UI — dedicated route/card on home (`/daily`), countdown to next puzzle (UTC midnight) — `src/components/Daily/Daily.jsx:1` + `src/App.jsx:1` + `src/components/Option/Option.jsx:1`
 - [x] One attempt per day enforcement (per profile, local + Supabase sync)
 - [ ] Daily streak tracking + freeze / streak repair logic
-- [ ] Daily history & calendar view — past dailies replayable (but not counting toward streak)
+- [x] Daily history & calendar view — calendar + history list (view-only, past not replayable) — `src/components/Daily/DailyCalendar.jsx:1` + `src/components/Daily/DailyHistory.jsx:1` + `src/lib/daily.js:204` — past replay deferred (no replay button; view-only detail + board preview)
+- [ ] Daily history — past dailies replayable (deferred, not counting toward streak)
 - [ ] Daily share card — spoiler-free result image/text (`Word Hunt 29/08/2026 - 847 pts - 12/38 words`)
 - [ ] Daily leaderboard (global + friends) for each day's board
 - [ ] Daily archive and stats — average, best day, % of max score found

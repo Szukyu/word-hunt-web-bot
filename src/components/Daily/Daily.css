@@ -20,6 +20,63 @@
 
 .daily-content { display: grid; grid-template-columns: 1fr; gap: 16px; max-width: 520px; margin: 0 auto; width: 100%; }
 
+.daily-extra {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.daily-history-loading {
+  text-align: center;
+  padding: 6px 0;
+}
+
+.eyebrow {
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--subalt);
+  font-weight: 700;
+}
+
+.preview-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--subalt);
+  font-weight: 700;
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.preview-header h2 {
+  margin: 4px 0 0;
+  font-size: 0.98rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  line-height: 1;
+}
+
+.preview-meta {
+  display: flex;
+  gap: 8px;
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--subalt);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .daily-preview-card {
   background: var(--main);
   border: 1px solid var(--unhighlight);
