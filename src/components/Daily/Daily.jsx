@@ -21,7 +21,6 @@ import {
 import { getPreviewMetrics } from '../../utils/boardPreview'
 import { useAuth } from '../../context/AuthContext'
 import DailyCalendar from './DailyCalendar'
-import DailyHistory from './DailyHistory'
 import './Daily.css'
 
 const DAILY_TIME = 90
@@ -52,10 +51,11 @@ const Daily = () => {
   const [checkingAttempt, setCheckingAttempt] = useState(true)
   const [viewAttemptResult, setViewAttemptResult] = useState(false)
 
-  // Daily history & calendar (view-only; past not replayable)
+  // Daily history & calendar (view-only; past not replayable) — shown in modal via button
   const [historyList, setHistoryList] = useState([])
   const [historyLoading, setHistoryLoading] = useState(false)
   const [calendarSelected, setCalendarSelected] = useState(null)
+  const [showArchive, setShowArchive] = useState(false)
 
   useEffect(() => {
     const id = setInterval(() => setCountdown(daysUntilNextUTC()), 1000)
@@ -94,6 +94,19 @@ const Daily = () => {
     loadHistory()
     return () => { cancelled = true }
   }, [user?.id, attempt, gameResult])
+
+  // Modal UX: lock scroll + Esc to close
+  useEffect(() => {
+    if (!showArchive) return
+    const onKey = (e) => { if (e.key === 'Escape') setShowArchive(false) }
+    window.addEventListener('keydown', onKey)
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prevOverflow
+    }
+  }, [showArchive])
 
   // One-attempt enforcement: per profile local + Supabase sync
   useEffect(() => {
@@ -255,13 +268,6 @@ const Daily = () => {
   if (attempt) {
     const wordsCount = attempt.words_count ?? attempt.words_found?.length ?? attempt.wordsFound?.length ?? 0
     const hasFullResult = !!(attempt.allPossibleWords || attempt.all_possible_words)
-    const handleHistorySelect = (dateStr) => {
-      setCalendarSelected(dateStr)
-      // scroll to calendar card for context
-      setTimeout(() => {
-        document.getElementById('daily-calendar-anchor')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }, 50)
-    }
     return (
       <section className="daily-area">
         <div className="daily-header">
@@ -316,20 +322,33 @@ const Daily = () => {
           </div>
         </div>
 
-        <div className="daily-extra" id="daily-calendar-anchor">
-          <DailyCalendar history={historyList} selectedDate={calendarSelected} onSelectDate={setCalendarSelected} />
-          <DailyHistory history={historyList} onSelectDate={handleHistorySelect} />
-          {historyLoading && <div className="daily-history-loading mono-hint">loading history…</div>}
+        <div className="daily-archive-trigger">
+          <button className="daily-archive-button" onClick={() => setShowArchive(true)}>
+            Past Boards
+          </button>
+          <span className="daily-archive-hint">{historyList.length ? `${historyList.length} in archive · view-only` : 'No history yet · view-only'}</span>
         </div>
+
+        {showArchive && (
+          <div className="daily-archive-overlay" role="dialog" aria-modal="true" aria-label="Past daily boards" onClick={() => setShowArchive(false)}>
+            <div className="daily-archive-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="daily-archive-modal-header">
+                <div>
+                  <span className="eyebrow">Archive</span>
+                  <h2>Past Boards</h2>
+                  <span className="cal-subtitle">View-only · past dailies are not replayable</span>
+                </div>
+                <button className="daily-archive-close" onClick={() => setShowArchive(false)} aria-label="Close archive">✕</button>
+              </div>
+              <div className="daily-archive-modal-body">
+                <DailyCalendar history={historyList} selectedDate={calendarSelected} onSelectDate={setCalendarSelected} />
+                {historyLoading && <div className="daily-history-loading mono-hint">loading history…</div>}
+              </div>
+            </div>
+          </div>
+        )}
       </section>
     )
-  }
-
-  const handleHistorySelectFallback = (dateStr) => {
-    setCalendarSelected(dateStr)
-    setTimeout(() => {
-      document.getElementById('daily-calendar-anchor')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }, 50)
   }
 
   return (
@@ -375,11 +394,31 @@ const Daily = () => {
         </div>
       </div>
 
-      <div className="daily-extra" id="daily-calendar-anchor">
-        <DailyCalendar history={historyList} selectedDate={calendarSelected} onSelectDate={setCalendarSelected} />
-        <DailyHistory history={historyList} onSelectDate={handleHistorySelectFallback} />
-        {historyLoading && <div className="daily-history-loading mono-hint">loading history…</div>}
+      <div className="daily-archive-trigger">
+        <button className="daily-archive-button" onClick={() => setShowArchive(true)}>
+          Past Boards
+        </button>
+        <span className="daily-archive-hint">{historyList.length ? `${historyList.length} in archive · view-only` : 'No history yet · view-only'}</span>
       </div>
+
+      {showArchive && (
+        <div className="daily-archive-overlay" role="dialog" aria-modal="true" aria-label="Past daily boards" onClick={() => setShowArchive(false)}>
+          <div className="daily-archive-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="daily-archive-modal-header">
+              <div>
+                <span className="eyebrow">Archive</span>
+                <h2>Past Boards</h2>
+                <span className="cal-subtitle">View-only · past dailies are not replayable</span>
+              </div>
+              <button className="daily-archive-close" onClick={() => setShowArchive(false)} aria-label="Close archive">✕</button>
+            </div>
+            <div className="daily-archive-modal-body">
+              <DailyCalendar history={historyList} selectedDate={calendarSelected} onSelectDate={setCalendarSelected} />
+              {historyLoading && <div className="daily-history-loading mono-hint">loading history…</div>}
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   )
 }
