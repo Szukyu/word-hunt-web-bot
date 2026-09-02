@@ -1,0 +1,188 @@
+.cp-wrapper {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.cp-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--unhighlight);
+  padding: 0;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
+  transition: transform 0.12s, border-color 0.12s, box-shadow 0.12s;
+  background-clip: padding-box;
+}
+
+.cp-swatch:hover {
+  border-color: var(--subalt);
+  transform: scale(1.03);
+}
+
+.cp-swatch:focus-visible {
+  outline: none;
+  border-color: var(--highlight);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--highlight) 30%, transparent);
+}
+
+.cp-swatch-inner {
+  display: none;
+}
+
+.cp-popover {
+  position: fixed;
+  z-index: 320;
+  width: 220px;
+  background: var(--main);
+  border: 1px solid var(--unhighlight);
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.16);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: cp-in 0.14s ease;
+}
+
+@keyframes cp-in {
+  from { opacity: 0; transform: translateY(4px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.cp-sv {
+  position: relative;
+  width: 100%;
+  height: 132px;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: crosshair;
+  border: 1px solid rgba(0,0,0,0.12);
+  touch-action: none;
+  user-select: none;
+}
+
+.cp-sv-white {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, #fff 0%, rgba(255,255,255,0) 100%);
+  pointer-events: none;
+}
+
+.cp-sv-black {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, #000 0%, rgba(0,0,0,0) 100%);
+  pointer-events: none;
+}
+
+.cp-cursor {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.35), 0 1px 6px rgba(0,0,0,0.3);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.cp-hue-wrap {
+  padding: 2px 0;
+}
+
+.cp-hue {
+  position: relative;
+  height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(to right,
+    #f00 0%,
+    #ff0 17%,
+    #0f0 33%,
+    #0ff 50%,
+    #00f 67%,
+    #f0f 83%,
+    #f00 100%);
+  cursor: pointer;
+  border: 1px solid rgba(0,0,0,0.14);
+  touch-action: none;
+  user-select: none;
+}
+
+.cp-hue:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--highlight) 35%, transparent);
+}
+
+.cp-hue-thumb {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.28), 0 1px 4px rgba(0,0,0,0.28);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.cp-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 1px 0;
+}
+
+.cp-preview {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 1px solid var(--unhighlight);
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.06);
+}
+
+.cp-hex {
+  flex: 1;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cp-eyedropper {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  border: 1px solid var(--unhighlight);
+  background: var(--bg);
+  color: var(--subalt);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.cp-eyedropper:hover {
+  border-color: var(--subalt);
+  color: var(--text);
+}
+
+/* Smaller variant for dense layouts — auto via wrapper context if needed */
+.monkey-color-input-wrap .cp-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+}

@@ -1,30 +1,45 @@
 .auth-container { display: flex; justify-content: center; padding: 40px 16px; }
 .auth-card {
   width: 100%;
-  max-width: 380px;
+  max-width: 360px;
   background: var(--main);
   border: 1px solid var(--unhighlight);
   border-radius: var(--radius-lg);
   padding: 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.08);
 }
-.auth-title { margin: 0; font-size: 1rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text); }
-.auth-form { display: flex; flex-direction: column; gap: 12px; }
+.auth-form { display: flex; flex-direction: column; gap: 10px; }
 .auth-input {
   padding: 10px 12px;
   border: 1px solid var(--unhighlight);
   background: var(--bg);
   border-radius: var(--radius-sm);
   color: var(--text);
-  font-size: 0.84rem;
+  font-size: 0.9rem;
 }
 .auth-input:focus { outline: none; border-color: var(--highlight); }
 .auth-input::placeholder { color: var(--subalt); font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase; }
-.auth-button { padding: 10px; background: var(--highlight); color: var(--bg); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 999px; border: 1px solid var(--highlight); }
+.auth-button {
+  padding: 10px;
+  background: var(--highlight);
+  color: var(--bg);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  border: 1px solid var(--highlight);
+}
 .auth-button:hover { opacity: 0.9; }
-.auth-toggle { text-align: center; color: var(--subalt); font-size: 0.76rem; }
-.auth-toggle button { background: none; border: none; color: var(--highlight); font-weight: 800; cursor: pointer; }
-.auth-error { color: var(--danger); font-size: 0.74rem; border-left: 2px solid var(--danger); padding-left: 8px; }
+.auth-button:disabled { opacity: 0.6; }
+.auth-switch {
+  background: none;
+  border: none;
+  color: var(--subalt);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 4px;
+  text-align: center;
+}
+.auth-switch:hover { color: var(--highlight); }
+.auth-error { color: var(--danger); font-size: 0.74rem; border-left: 2px solid var(--danger); padding-left: 8px; margin: 0; }

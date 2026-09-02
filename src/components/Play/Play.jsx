@@ -18,9 +18,10 @@ const BOARD_CONFIG = {
   25: { name: '5×5 Grid', component: Boarder },
 };
 
-const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords, initialLetters = null, disableRegenerate = false }) => {
+const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords, wordStarts, initialLetters = null, disableRegenerate = false }) => {
   const { secondsLeft, isRunning, start, pause } = useTimer();
   const isRunningRef = useRef(isRunning);
+  const hasStartedRef = useRef(false);
   const [selectedTiles, setSelectedTiles] = useState([]);
   const [foundWords, setFoundWords] = useState([]);
   const [currentWord, setCurrentWord] = useState('');
@@ -54,7 +55,7 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords, initialLet
     englishWordsRef.current = englishWords;
   }, [englishWords]);
 
-  const { boardLetters, adjacencyMap, generateRandomBoard, getValidWords, setBoard } = useBoard(boardType, englishWords, initialLetters);
+  const { boardLetters, adjacencyMap, generateRandomBoard, getValidWords, setBoard } = useBoard(boardType, englishWords, wordStarts, initialLetters);
 
   const adjacencyMapRef = useRef(adjacencyMap);
   const boardLettersRef = useRef(boardLetters);
@@ -81,30 +82,38 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords, initialLet
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [boardLetters, gameOver]);
 
-	// Game Over
+  // Track that timer has actually started (isRunning became true) to avoid immediate gameOver on mount
   useEffect(() => {
-    if (secondsLeft === 0 && boardLetters && !gameOver) {
+    if (isRunning) hasStartedRef.current = true;
+  }, [isRunning]);
+
+	// Game Over — only after timer has actually started, and run solver off main thread tick
+  useEffect(() => {
+    if (secondsLeft === 0 && boardLetters && !gameOver && hasStartedRef.current) {
       setGameOver(true);
       pause();
+      // Defer heavy solver to next tick so UI can paint "Game Over" without blocking
+      const t = setTimeout(() => {
+        const allWords = getValidWords();
+        const wordsWithScores = allWords
+          .map(word => ({ word, score: calculateScore(word.length) }))
+          .sort((a, b) => {
+            if (b.score !== a.score) return b.score - a.score;
+            return a.word.localeCompare(b.word);
+          });
 
-      const allWords = getValidWords();
-      const wordsWithScores = allWords
-        .map(word => ({ word, score: calculateScore(word.length) }))
-        .sort((a, b) => {
-          if (b.score !== a.score) return b.score - a.score;
-          return a.word.localeCompare(b.word);
+        const total = wordsWithScores.reduce((sum, w) => sum + w.score, 0);
+        setAllPossibleWords(wordsWithScores);
+        setTotalPossibleScore(total);
+
+        onGameEnd?.({
+          score,
+          foundWords,
+          allPossibleWords: wordsWithScores,
+          totalPossibleScore: total
         });
-
-      const total = wordsWithScores.reduce((sum, w) => sum + w.score, 0);
-      setAllPossibleWords(wordsWithScores);
-      setTotalPossibleScore(total);
-
-      onGameEnd?.({
-        score,
-        foundWords,
-        allPossibleWords: wordsWithScores,
-        totalPossibleScore: total
-      });
+      }, 50);
+      return () => clearTimeout(t);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [secondsLeft]);
@@ -394,6 +403,7 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords, initialLet
     currentWordRef.current = '';
     isDraggingRef.current = false;
     gameOverRef.current = false;
+    hasStartedRef.current = false;
     setSelectedTiles([]);
     setCurrentWord('');
     setFoundWords([]);
@@ -401,6 +411,8 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords, initialLet
     setGameOver(false);
     setMessage(null);
     setIsDragging(false);
+    setAllPossibleWords([]);
+    setTotalPossibleScore(0);
   };
 
   const formatTime = (sec) => {

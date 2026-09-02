@@ -1,8 +1,36 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
+// eslint-disable-next-line react-refresh/only-export-components -- helpers are co-located for username-as-email auth
 const AuthContext = createContext({});
 export const useAuth = () => useContext(AuthContext);
+
+const INTERNAL_DOMAIN = 'wordhunt.internal'
+
+// Username is the only credential — no real emails are collected.
+// We synthesize a virtual email for Supabase Auth: <username>@wordhunt.internal
+export function normalizeUsername(input) {
+  return String(input ?? '').trim().toLowerCase()
+}
+
+export function validateUsername(input) {
+  const u = normalizeUsername(input)
+  if (u.length < 3 || u.length > 20) {
+    throw new Error('Username must be 3-20 characters')
+  }
+  if (!/^[a-z0-9_]+$/.test(u)) {
+    throw new Error('Username can only use letters, numbers, and underscores (no spaces or @)')
+  }
+  if (u.includes('@')) {
+    throw new Error('Do not use an email — just a username')
+  }
+  return u
+}
+
+export function toVirtualEmail(username) {
+  const u = validateUsername(username)
+  return `${u}@${INTERNAL_DOMAIN}`
+}
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -23,12 +51,13 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const signUp = async (username, password) => {
-    const virtualEmail = `${username.toLowerCase()}@wordhunt.internal`;
+    const normalized = validateUsername(username)
+    const virtualEmail = `${normalized}@${INTERNAL_DOMAIN}`;
 
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: virtualEmail,
       password: password,
-      options: { data: { username } },
+      options: { data: { username: normalized } },
     });
 
     if (authError) throw authError;
@@ -39,7 +68,7 @@ export const AuthProvider = ({ children }) => {
     if (authData.user?.id) {
       const { error: profileError } = await supabase
         .from('profiles')
-        .upsert([{ id: authData.user.id, username }], { onConflict: 'id' });
+        .upsert([{ id: authData.user.id, username: normalized }], { onConflict: 'id' });
 
       // non-fatal: trigger may have already created it
       if (profileError && profileError.code !== '23505') {
@@ -51,7 +80,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   const signIn = async (username, password) => {
-    const virtualEmail = `${username.toLowerCase()}@wordhunt.internal`;
+    const normalized = validateUsername(username)
+    const virtualEmail = `${normalized}@${INTERNAL_DOMAIN}`;
     
     const { data, error } = await supabase.auth.signInWithPassword({
       email: virtualEmail,

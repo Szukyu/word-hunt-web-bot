@@ -20,6 +20,63 @@
 
 .daily-content { display: grid; grid-template-columns: 1fr; gap: 16px; max-width: 520px; margin: 0 auto; width: 100%; }
 
+.daily-extra {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.daily-history-loading {
+  text-align: center;
+  padding: 6px 0;
+}
+
+.eyebrow {
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--subalt);
+  font-weight: 700;
+}
+
+.preview-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--subalt);
+  font-weight: 700;
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.preview-header h2 {
+  margin: 4px 0 0;
+  font-size: 0.98rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  line-height: 1;
+}
+
+.preview-meta {
+  display: flex;
+  gap: 8px;
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--subalt);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .daily-preview-card {
   background: var(--main);
   border: 1px solid var(--unhighlight);
@@ -45,6 +102,57 @@
   border-radius: 999px; border: 1px solid var(--highlight);
 }
 .daily-play-button:hover { opacity: 0.9; }
+.daily-play-button:disabled,
+.daily-play-button.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.2);
+}
+
+.daily-completed-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--unhighlight);
+  border-radius: 10px;
+}
+.completed-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--highlight);
+  color: var(--bg);
+  font-weight: 800;
+  font-size: 0.64rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.completed-score { font-weight: 800; font-size: 0.84rem; color: var(--text); }
+.completed-percent { font-size: 0.72rem; color: var(--subalt); font-weight: 700; }
+
+.daily-view-result-button {
+  padding: 9px 14px;
+  background: var(--bg);
+  border: 1px solid var(--highlight);
+  color: var(--text);
+  font-weight: 800;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 999px;
+}
+.daily-view-result-button:hover { background: var(--highlight); color: var(--bg); }
+
+.daily-one-attempt-hint {
+  text-align: center;
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  color: var(--subalt);
+  margin-top: 2px;
+}
 
 .daily-countdown-inline {
   display: flex; align-items: baseline; gap: 8px; justify-content: center;

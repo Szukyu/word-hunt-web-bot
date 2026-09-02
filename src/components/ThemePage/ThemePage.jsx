@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { IoAdd, IoTrashOutline, IoPencil, IoTimeOutline, IoCheckmarkCircle, IoArrowBack, IoRefresh, IoClose } from 'react-icons/io5';
 import { useTheme } from '../../themes/ThemeContext.jsx';
 import { CREATOR_KEYS, CREATOR_LABELS, CREATOR_DESCRIPTIONS } from '../../themes/index.js';
+import ColorPicker from '../ColorPicker/ColorPicker.jsx';
 import './ThemePage.css';
 
 const DEFAULT_SIX = {
@@ -229,12 +230,11 @@ const ThemePage = ({ onBack }) => {
                       <span className="monkey-desc">{CREATOR_DESCRIPTIONS[key]}</span>
                     </div>
                     <div className="monkey-color-input-wrap">
-                      <input
-                        type="color"
-                        className="monkey-color-picker"
-                        value={/^#([0-9a-fA-F]{6})$/.test(colors[key]) ? colors[key] : '#000000'}
-                        onChange={(e) => handleColorChange(key, e.target.value)}
-                        aria-label={`${CREATOR_LABELS[key]} picker`}
+                      <ColorPicker
+                        value={colors[key]}
+                        onChange={(v) => handleColorChange(key, v)}
+                        label={CREATOR_LABELS[key]}
+                        id={`theme-page-${key}`}
                       />
                       <input
                         type="text"
@@ -265,12 +265,11 @@ const ThemePage = ({ onBack }) => {
                       <span className="monkey-desc">{CREATOR_DESCRIPTIONS[key]}</span>
                     </div>
                     <div className="monkey-color-input-wrap">
-                      <input
-                        type="color"
-                        className="monkey-color-picker"
-                        value={/^#([0-9a-fA-F]{6})$/.test(colors[key]) ? colors[key] : '#000000'}
-                        onChange={(e) => handleColorChange(key, e.target.value)}
-                        aria-label={`${CREATOR_LABELS[key]} picker`}
+                      <ColorPicker
+                        value={colors[key]}
+                        onChange={(v) => handleColorChange(key, v)}
+                        label={CREATOR_LABELS[key]}
+                        id={`theme-page-${key}-r`}
                       />
                       <input
                         type="text"

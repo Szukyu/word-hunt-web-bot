@@ -2,7 +2,16 @@ import { useState, useCallback, useMemo } from 'react';
 import { FREQ } from '../data/freq';
 import { buildAdjacencyMap, findAllValidWords } from './utils.js'
 
-export const useBoard = (boardType, englishWords, initialLetters = null) => {
+export const useBoard = (boardType, englishWords, wordStartsOrInitial, initialLettersOrNull = null) => {
+  // Back-compat: old 3-arg signature was (boardType, englishWords, initialLetters)
+  let wordStarts, initialLetters
+  if (typeof wordStartsOrInitial === 'string' || wordStartsOrInitial === null) {
+    wordStarts = null
+    initialLetters = wordStartsOrInitial
+  } else {
+    wordStarts = wordStartsOrInitial
+    initialLetters = initialLettersOrNull
+  }
   const [boardLetters, setBoardLetters] = useState(initialLetters || '');
 
   const adjacencyMap = useMemo(() => {
@@ -35,8 +44,8 @@ export const useBoard = (boardType, englishWords, initialLetters = null) => {
 
   const getValidWords = useCallback(() => {
     if (!boardLetters) return [];
-    return findAllValidWords(boardLetters, englishWords);
-  }, [boardLetters, englishWords]);
+    return findAllValidWords(boardLetters, englishWords, wordStarts);
+  }, [boardLetters, englishWords, wordStarts]);
 
   return { boardLetters, adjacencyMap, generateRandomBoard, getValidWords, setBoard, setBoardLetters };
 };

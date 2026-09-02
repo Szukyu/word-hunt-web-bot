@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { IoClose, IoBrushOutline, IoAdd, IoTrashOutline, IoPencil, IoTimeOutline, IoCheckmarkCircle, IoArrowBack, IoRefresh } from 'react-icons/io5';
 import { useTheme } from '../../themes/ThemeContext.jsx';
 import { CREATOR_KEYS, CREATOR_LABELS, CREATOR_DESCRIPTIONS } from '../../themes/index.js';
+import ColorPicker from '../ColorPicker/ColorPicker.jsx';
 import './ThemeCreator.css';
 
 const DEFAULT_SIX = {
@@ -222,12 +223,11 @@ const ThemeCreator = ({ isOpen, onClose }) => {
                       </div>
                       <span className="theme-color-desc">{CREATOR_DESCRIPTIONS[key]}</span>
                       <div className="theme-color-input-wrap">
-                        <input
-                          type="color"
-                          className="theme-color-picker"
-                          value={/^#([0-9a-fA-F]{6})$/.test(colors[key]) ? colors[key] : '#000000'}
-                          onChange={(e) => handleColorChange(key, e.target.value)}
-                          aria-label={`${CREATOR_LABELS[key]} color picker`}
+                        <ColorPicker
+                          value={colors[key]}
+                          onChange={(v) => handleColorChange(key, v)}
+                          label={CREATOR_LABELS[key]}
+                          id={`theme-${key}`}
                         />
                         <input
                           type="text"
