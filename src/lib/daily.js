@@ -170,13 +170,95 @@ export async function submitDailyScore({ puzzleDate, boardType, score, wordsFoun
 export async function fetchDailyLeaderboard(puzzleDate, boardType, limit = 50) {
   const { data, error } = await supabase
     .from('daily_scores')
-    .select('score, words_count, percent_score, created_at, profiles!inner(username)')
+    .select('user_id, score, words_count, percent_score, longest_word, created_at, profiles!inner(username, display_name)')
     .eq('puzzle_date', puzzleDate)
     .eq('board_type', boardType)
     .order('score', { ascending: false })
+    .order('created_at', { ascending: true })
     .limit(limit)
   if (error) throw error
-  return data
+  return (data || []).map((row, idx) => ({
+    ...row,
+    username: row.profiles?.username ?? row.profiles?.display_name ?? 'unknown',
+    display_name: row.profiles?.display_name ?? null,
+    rank: idx + 1,
+  }))
+}
+
+export async function fetchFriendsDailyLeaderboard(puzzleDate, boardType, userIds, limit = 50) {
+  if (!userIds || userIds.length === 0) return []
+  const { data, error } = await supabase
+    .from('daily_scores')
+    .select('user_id, score, words_count, percent_score, longest_word, created_at, profiles!inner(username, display_name)')
+    .eq('puzzle_date', puzzleDate)
+    .eq('board_type', boardType)
+    .in('user_id', userIds)
+    .order('score', { ascending: false })
+    .order('created_at', { ascending: true })
+    .limit(limit)
+  if (error) throw error
+  return (data || []).map((row, idx) => ({
+    ...row,
+    username: row.profiles?.username ?? row.profiles?.display_name ?? 'unknown',
+    display_name: row.profiles?.display_name ?? null,
+    rank: idx + 1,
+  }))
+}
+
+export async function fetchMyDailyRank(puzzleDate, boardType, myScore = null, scopeUserIds = null) {
+  // Returns 1-based rank for current user. If scopeUserIds provided, rank within that scope (friends).
+  // If myScore is null, fetches the current user's score first.
+  let score = myScore
+  if (score == null) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) return null
+    const { data, error } = await supabase
+      .from('daily_scores')
+      .select('score')
+      .eq('user_id', user.id)
+      .eq('puzzle_date', puzzleDate)
+      .eq('board_type', boardType)
+      .maybeSingle()
+    if (error) throw error
+    if (!data) return null
+    score = data.score
+  }
+  // Count how many have strictly greater score (and same filter)
+  let q = supabase
+    .from('daily_scores')
+    .select('id', { count: 'exact', head: true })
+    .eq('puzzle_date', puzzleDate)
+    .eq('board_type', boardType)
+    .gt('score', score)
+  if (scopeUserIds && scopeUserIds.length > 0) {
+    q = q.in('user_id', scopeUserIds)
+  }
+  const { count, error } = await q
+  if (error) throw error
+  return (count ?? 0) + 1
+}
+
+export async function fetchMyDailyEntry(puzzleDate, boardType) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return null
+  const { data, error } = await supabase
+    .from('daily_scores')
+    .select('user_id, score, words_count, percent_score, longest_word, created_at, profiles!inner(username, display_name)')
+    .eq('user_id', user.id)
+    .eq('puzzle_date', puzzleDate)
+    .eq('board_type', boardType)
+    .maybeSingle()
+  if (error) throw error
+  if (!data) return null
+  return {
+    ...data,
+    username: data.profiles?.username ?? data.profiles?.display_name ?? 'you',
+    display_name: data.profiles?.display_name ?? null,
+  }
 }
 
 export async function fetchUserDailyHistory(userId, limit = 30) {

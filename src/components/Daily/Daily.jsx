@@ -21,6 +21,7 @@ import {
 import { getPreviewMetrics } from '../../utils/boardPreview'
 import { useAuth } from '../../context/AuthContext'
 import DailyCalendar from './DailyCalendar'
+import DailyLeaderboard from './DailyLeaderboard'
 import './Daily.css'
 
 const DAILY_TIME = 90
@@ -56,6 +57,7 @@ const Daily = () => {
   const [historyLoading, setHistoryLoading] = useState(false)
   const [calendarSelected, setCalendarSelected] = useState(null)
   const [showArchive, setShowArchive] = useState(false)
+  const [showLeaderboard, setShowLeaderboard] = useState(false)
 
   useEffect(() => {
     const id = setInterval(() => setCountdown(daysUntilNextUTC()), 1000)
@@ -97,8 +99,13 @@ const Daily = () => {
 
   // Modal UX: lock scroll + Esc to close
   useEffect(() => {
-    if (!showArchive) return
-    const onKey = (e) => { if (e.key === 'Escape') setShowArchive(false) }
+    if (!showArchive && !showLeaderboard) return
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        setShowArchive(false)
+        setShowLeaderboard(false)
+      }
+    }
     window.addEventListener('keydown', onKey)
     const prevOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
@@ -106,7 +113,7 @@ const Daily = () => {
       window.removeEventListener('keydown', onKey)
       document.body.style.overflow = prevOverflow
     }
-  }, [showArchive])
+  }, [showArchive, showLeaderboard])
 
   // One-attempt enforcement: per profile local + Supabase sync
   useEffect(() => {
@@ -323,11 +330,26 @@ const Daily = () => {
         </div>
 
         <div className="daily-archive-trigger">
-          <button className="daily-archive-button" onClick={() => setShowArchive(true)}>
-            Past Boards
-          </button>
-          <span className="daily-archive-hint">{historyList.length ? `${historyList.length} in archive · view-only` : 'No history yet · view-only'}</span>
+          <button className="daily-archive-button" onClick={() => setShowLeaderboard(true)}>Leaderboard</button>
+          <button className="daily-archive-button" onClick={() => setShowArchive(true)}>Past Boards</button>
         </div>
+
+        {showLeaderboard && (
+          <div className="daily-archive-overlay" role="dialog" aria-modal="true" aria-label="Leaderboard" onClick={() => setShowLeaderboard(false)}>
+            <div className="daily-archive-modal daily-lb-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="daily-archive-modal-header">
+                <div>
+                  <span className="eyebrow">Daily</span>
+                  <h2>Leaderboard</h2>
+                </div>
+                <button className="daily-archive-close" onClick={() => setShowLeaderboard(false)} aria-label="Close leaderboard">✕</button>
+              </div>
+              <div className="daily-archive-modal-body">
+                <DailyLeaderboard puzzleDate={daily.puzzle_date} boardType={daily.board_type} />
+              </div>
+            </div>
+          </div>
+        )}
 
         {showArchive && (
           <div className="daily-archive-overlay" role="dialog" aria-modal="true" aria-label="Past daily boards" onClick={() => setShowArchive(false)}>
@@ -395,11 +417,26 @@ const Daily = () => {
       </div>
 
       <div className="daily-archive-trigger">
-        <button className="daily-archive-button" onClick={() => setShowArchive(true)}>
-          Past Boards
-        </button>
-        <span className="daily-archive-hint">{historyList.length ? `${historyList.length} in archive · view-only` : 'No history yet · view-only'}</span>
+        <button className="daily-archive-button" onClick={() => setShowLeaderboard(true)}>Leaderboard</button>
+        <button className="daily-archive-button" onClick={() => setShowArchive(true)}>Past Boards</button>
       </div>
+
+      {showLeaderboard && (
+        <div className="daily-archive-overlay" role="dialog" aria-modal="true" aria-label="Leaderboard" onClick={() => setShowLeaderboard(false)}>
+          <div className="daily-archive-modal daily-lb-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="daily-archive-modal-header">
+              <div>
+                <span className="eyebrow">Daily</span>
+                <h2>Leaderboard</h2>
+              </div>
+              <button className="daily-archive-close" onClick={() => setShowLeaderboard(false)} aria-label="Close leaderboard">✕</button>
+            </div>
+            <div className="daily-archive-modal-body">
+              <DailyLeaderboard puzzleDate={daily.puzzle_date} boardType={daily.board_type} />
+            </div>
+          </div>
+        </div>
+      )}
 
       {showArchive && (
         <div className="daily-archive-overlay" role="dialog" aria-modal="true" aria-label="Past daily boards" onClick={() => setShowArchive(false)}>

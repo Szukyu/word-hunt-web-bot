@@ -145,6 +145,11 @@
   background: var(--bg);
 }
 
+.daily-lb-modal {
+  width: min(440px, 100%);
+  max-height: min(80vh, 640px);
+}
+
 @media (max-width: 640px) {
   .daily-archive-overlay { padding: 10px; align-items: end; }
   .daily-archive-modal { max-height: 92vh; border-radius: 18px 18px var(--radius-lg) var(--radius-lg); }
