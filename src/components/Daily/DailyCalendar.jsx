@@ -198,67 +198,52 @@ const DailyCalendar = ({ history = [], selectedDate, onSelectDate }) => {
         </div>
       </div>
 
-      {/* Selected day detail — view-only */}
-      <div className="cal-detail">
-        {selected && selected > todayStr ? (
+      {/* Selected day detail — only for completed past dailies (view-only) */}
+      {selected && selected > todayStr ? (
+        <div className="cal-detail">
           <div className="cal-detail-empty">Future puzzle — not yet available.</div>
-        ) : selectedBoard ? (
-          <>
-            <div className="cal-detail-head">
-              <div>
-                <span className="preview-label">Selected</span>
-                <h3>{formatDateUTC(selected)} — {selectedBoard.board_name}</h3>
-                <span className="cal-detail-meta">{selectedBoard.board_letters.length} letters · {selectedAttempt ? 'Completed' : selected === todayStr ? 'Today' : 'Not played'} · view-only</span>
-              </div>
-              <span className={`cal-status-badge ${selectedAttempt ? 'done' : selected === todayStr ? 'today' : 'missed'}`}>
-                {selectedAttempt ? 'Completed' : selected === todayStr ? 'Today' : 'Missed'}
-              </span>
+        </div>
+      ) : selectedAttempt && selectedBoard ? (
+        <div className="cal-detail">
+          <div className="cal-detail-head">
+            <div>
+              <span className="preview-label">Selected</span>
+              <h3>{formatDateUTC(selected)} — {selectedBoard.board_name}</h3>
+              <span className="cal-detail-meta">{selectedBoard.board_letters.length} letters · Completed · view-only</span>
             </div>
+            <span className="cal-status-badge done">Completed</span>
+          </div>
 
-            <div className="cal-detail-body">
-              <div className="cal-detail-board">
-                {renderMiniBoard()}
-              </div>
-              <div className="cal-detail-stats">
-                {selectedAttempt ? (
-                  <>
-                    <div className="cal-stat-row">
-                      <span className="cal-stat-label">Score</span>
-                      <span className="cal-stat-value">{selectedAttempt.score} pts</span>
-                    </div>
-                    <div className="cal-stat-row">
-                      <span className="cal-stat-label">Words</span>
-                      <span className="cal-stat-value">{selectedAttempt.words_count ?? selectedAttempt.words_found?.length ?? 0}{selectedAttempt.total_possible_words ? ` / ${selectedAttempt.total_possible_words}` : ''}</span>
-                    </div>
-                    {selectedAttempt.percent_score != null && (
-                      <div className="cal-stat-row">
-                        <span className="cal-stat-label">Accuracy</span>
-                        <span className="cal-stat-value">{Math.round(selectedAttempt.percent_score)}% of max</span>
-                      </div>
-                    )}
-                    {selectedAttempt.longest_word && (
-                      <div className="cal-stat-row">
-                        <span className="cal-stat-label">Longest</span>
-                        <span className="cal-stat-value longest">{String(selectedAttempt.longest_word).toUpperCase()}</span>
-                      </div>
-                    )}
-                    <div className="cal-detail-hint">Past dailies are view-only and do not affect streak. Replay will be enabled in a future update.</div>
-                  </>
-                ) : (
-                  <>
-                    <div className="cal-detail-empty muted">
-                      {selected === todayStr ? 'You haven’t played today yet. Play the Daily above.' : 'No attempt recorded for this day.'}
-                    </div>
-                    <div className="cal-detail-hint">This board is shown for reference only — past puzzles cannot be replayed yet.</div>
-                  </>
-                )}
-              </div>
+          <div className="cal-detail-body">
+            <div className="cal-detail-board">
+              {renderMiniBoard()}
             </div>
-          </>
-        ) : (
-          <div className="cal-detail-empty">Select a day to view details.</div>
-        )}
-      </div>
+            <div className="cal-detail-stats">
+              <div className="cal-stat-row">
+                <span className="cal-stat-label">Score</span>
+                <span className="cal-stat-value">{selectedAttempt.score} pts</span>
+              </div>
+              <div className="cal-stat-row">
+                <span className="cal-stat-label">Words</span>
+                <span className="cal-stat-value">{selectedAttempt.words_count ?? selectedAttempt.words_found?.length ?? 0}{selectedAttempt.total_possible_words ? ` / ${selectedAttempt.total_possible_words}` : ''}</span>
+              </div>
+              {selectedAttempt.percent_score != null && (
+                <div className="cal-stat-row">
+                  <span className="cal-stat-label">Accuracy</span>
+                  <span className="cal-stat-value">{Math.round(selectedAttempt.percent_score)}% of max</span>
+                </div>
+              )}
+              {selectedAttempt.longest_word && (
+                <div className="cal-stat-row">
+                  <span className="cal-stat-label">Longest</span>
+                  <span className="cal-stat-value longest">{String(selectedAttempt.longest_word).toUpperCase()}</span>
+                </div>
+              )}
+              <div className="cal-detail-hint">Past dailies are view-only and do not affect streak. Replay will be enabled in a future update.</div>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </section>
   )
 }
