@@ -132,6 +132,8 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 .lb-you-badge {
   padding: 2px 6px;
