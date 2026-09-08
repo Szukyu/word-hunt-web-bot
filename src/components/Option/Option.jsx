@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Input from '../Input/Input';
 import Setup from '../Setup/Setup';
 import Daily from '../Daily/Daily';
+import Leaderboard from '../Leaderboard/Leaderboard';
 import useLoad from '../../hooks/load';
 import './Option.css';
 
@@ -29,6 +30,13 @@ function Option() {
       num: '03',
       title: 'Solver',
       desc: '16 / 20 / 21 / 25 · path',
+      cta: 'Open',
+    },
+    {
+      id: 'leaderboard',
+      num: '04',
+      title: 'Leaderboard',
+      desc: 'Global · weekly · friends',
       cta: 'Open',
     },
   ];
@@ -80,6 +88,7 @@ function Option() {
         {activeComponent === 'daily' && <Daily />}
         {activeComponent === 'play' && <Setup englishWords={englishWords} wordStarts={wordStarts} />}
         {activeComponent === 'cheat' && <Input englishWords={englishWords} wordStarts={wordStarts} />}
+        {activeComponent === 'leaderboard' && <Leaderboard onBack={() => setActiveComponent(null)} />}
       </div>
     </section>
   );

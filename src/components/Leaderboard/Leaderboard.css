@@ -1,0 +1,43 @@
+.gb-area { max-width: 560px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 14px; }
+.gb-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 18px; background: var(--main); border: 1px solid var(--unhighlight); border-radius: var(--radius-lg); }
+.gb-header h1 { margin: 4px 0 0; font-size: 1.05rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text); line-height: 1; }
+.gb-back { width: 36px; height: 36px; display: grid; place-items: center; background: var(--bg); border: 1px solid var(--unhighlight); border-radius: 50%; color: var(--text); }
+.gb-back:hover { border-color: var(--highlight); color: var(--highlight); }
+
+.gb-controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.gb-tabs { display: flex; gap: 6px; padding: 4px; background: var(--main); border: 1px solid var(--unhighlight); border-radius: 999px; width: fit-content; }
+.gb-tab { padding: 6px 12px; border-radius: 999px; font-weight: 800; font-size: 0.66rem; letter-spacing: 0.06em; text-transform: uppercase; background: transparent; color: var(--subalt); border: 1px solid transparent; }
+.gb-tab.active { background: var(--highlight); color: var(--bg); border-color: var(--highlight); }
+
+.gb-board-filter { display: flex; gap: 6px; flex-wrap: wrap; }
+.gb-board-pill { padding: 6px 10px; border-radius: 999px; background: var(--main); border: 1px solid var(--unhighlight); color: var(--subalt); font-weight: 700; font-size: 0.66rem; }
+.gb-board-pill.active { border-color: var(--highlight); color: var(--text); background: color-mix(in srgb, var(--highlight) 10%, var(--main)); }
+
+.gb-add-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; background: var(--main); border: 1px solid var(--unhighlight); border-radius: 12px; padding: 8px; }
+.gb-add-input { flex: 1; min-width: 120px; padding: 8px 10px; background: var(--bg); border: 1px solid var(--unhighlight); border-radius: 8px; color: var(--text); font-size: 0.78rem; }
+.gb-add-btn { padding: 8px 12px; background: var(--highlight); color: var(--bg); border: 1px solid var(--highlight); border-radius: 8px; font-weight: 800; font-size: 0.72rem; }
+.gb-add-btn:disabled { opacity: 0.5; }
+.gb-add-msg { font-size: 0.68rem; font-weight: 700; }
+.gb-add-msg.ok { color: var(--success); }
+.gb-add-msg.err { color: var(--danger); }
+
+.gb-state { display: grid; place-items: center; gap: 8px; padding: 20px 12px; background: var(--main); border: 1px solid var(--unhighlight); border-radius: 12px; text-align: center; }
+.gb-state p { margin: 0; font-weight: 700; font-size: 0.84rem; color: var(--text); }
+.gb-spinner { width: 16px; height: 16px; border: 2px solid var(--unhighlight); border-top-color: var(--highlight); border-radius: 50%; animation: lbSpin 0.7s linear infinite; }
+
+.gb-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; max-height: 58vh; overflow-y: auto; }
+.gb-row { display: grid; grid-template-columns: 40px 1fr auto auto; gap: 8px; align-items: center; padding: 9px 12px; background: var(--main); border: 1px solid var(--unhighlight); border-radius: 10px; }
+.gb-row.is-me { border-color: var(--highlight); background: color-mix(in srgb, var(--highlight) 10%, var(--bg)); }
+.gb-rank { display: grid; place-items: center; }
+.gb-rank-badge { font-size: 1rem; }
+.gb-rank-num { font-weight: 800; font-size: 0.72rem; color: var(--subalt); font-variant-numeric: tabular-nums; }
+.gb-user { display: flex; gap: 6px; align-items: center; min-width: 0; overflow: hidden; }
+.gb-username { font-weight: 800; font-size: 0.82rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gb-you-badge { padding: 2px 6px; border-radius: 999px; background: var(--highlight); color: var(--bg); font-weight: 800; font-size: 0.55rem; text-transform: uppercase; }
+.gb-meta { font-size: 0.62rem; color: var(--subalt); font-weight: 700; }
+.gb-score { font-weight: 800; font-size: 0.82rem; color: var(--text); font-variant-numeric: tabular-nums; }
+
+.gb-my-rank { display: flex; justify-content: space-between; padding: 8px 12px; background: color-mix(in srgb, var(--highlight) 10%, var(--bg)); border: 1px solid var(--highlight); border-radius: 10px; font-weight: 800; font-size: 0.76rem; color: var(--text); }
+
+.mono-hint { font-size: 0.70rem; color: var(--subalt); }
+.retry-button { padding: 6px 12px; background: var(--highlight); color: var(--bg); font-weight: 800; font-size: 0.68rem; border-radius: 999px; border: 1px solid var(--highlight); }
