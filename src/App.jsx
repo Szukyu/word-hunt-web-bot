@@ -9,6 +9,7 @@ import Daily from './components/Daily/Daily.jsx';
 import Leaderboard from './components/Leaderboard/Leaderboard.jsx';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { ThemeProvider } from './themes/ThemeContext.jsx';
+import { ensureTodaysDailyPuzzles } from './lib/daily.js';
 
 const AppContent = () => {
   const { user, signOut } = useAuth();
@@ -65,6 +66,11 @@ const AppContent = () => {
     setView('leaderboard');
     if (window.location.pathname !== '/leaderboard') window.history.pushState({}, '', '/leaderboard');
   };
+
+  // Ensure today's daily puzzle exists even if user never opens Daily view (first app load creates it)
+  useEffect(() => {
+    ensureTodaysDailyPuzzles().catch(() => {})
+  }, [])
 
   // Deep-link support: /daily, /leaderboard
   useEffect(() => {

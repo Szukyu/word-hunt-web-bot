@@ -1,0 +1,75 @@
+name: daily-publish
+
+on:
+  schedule:
+    # Run daily at 00:05 UTC — ensures daily_puzzles exist even if nobody opens the app
+    - cron: '5 0 * * *'
+  workflow_dispatch:
+    inputs:
+      date:
+        description: 'Optional date YYYY-MM-DD to publish (default: today UTC)'
+        required: false
+        type: string
+      backfill:
+        description: 'Backfill last N days (e.g. 7)'
+        required: false
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish today's daily puzzle via edge function
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL || 'https://ssnqvqpovljjarewxgta.supabase.co' }}
+          # Use publishable key (public) or anon key — edge function uses service_role internally, no secret needed
+          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY || secrets.SUPABASE_ANON_KEY || 'sb_publishable_mRwhl7o_3lkM_YuwNmPoRQ_c-QFDGHA' }}
+          INPUT_DATE: ${{ inputs.date }}
+          INPUT_BACKFILL: ${{ inputs.backfill }}
+        run: |
+          set -e
+          URL="${SUPABASE_URL}/functions/v1/daily-publish"
+          # Determine query string
+          QS=""
+          if [ -n "$INPUT_BACKFILL" ]; then
+            QS="?backfill=${INPUT_BACKFILL}"
+          elif [ -n "$INPUT_DATE" ]; then
+            QS="?date=${INPUT_DATE}"
+          fi
+          echo "Calling $URL$QS"
+          HTTP_CODE=$(curl -s -o /tmp/resp.json -w "%{http_code}" -X POST \
+            -H "apikey: ${SUPABASE_PUBLISHABLE_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_PUBLISHABLE_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "{\"date\": \"${INPUT_DATE:-}\"}" \
+            "${URL}${QS}" || true)
+          echo "HTTP $HTTP_CODE"
+          cat /tmp/resp.json || true
+          if [ "$HTTP_CODE" -ge 400 ]; then
+            echo "::warning::Edge function call failed with $HTTP_CODE, trying GET fallback"
+            HTTP_CODE2=$(curl -s -o /tmp/resp2.json -w "%{http_code}" \
+              -H "apikey: ${SUPABASE_PUBLISHABLE_KEY}" \
+              -H "Authorization: Bearer ${SUPABASE_PUBLISHABLE_KEY}" \
+              "${URL}${QS}" || true)
+            echo "HTTP $HTTP_CODE2 (GET)"
+            cat /tmp/resp2.json || true
+            if [ "$HTTP_CODE2" -ge 400 ]; then
+              echo "::error::Both POST and GET failed"
+              exit 1
+            fi
+          fi
+          echo "Daily publish succeeded"
+
+      # Optional: verify puzzles exist
+      - name: Verify puzzles exist
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL || 'https://ssnqvqpovljjarewxgta.supabase.co' }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY || secrets.SUPABASE_ANON_KEY || 'sb_publishable_mRwhl7o_3lkM_YuwNmPoRQ_c-QFDGHA' }}
+        run: |
+          TODAY=$(date -u +%F)
+          echo "Checking puzzles for $TODAY"
+          curl -s \
+            -H "apikey: ${SUPABASE_PUBLISHABLE_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_PUBLISHABLE_KEY}" \
+            "${SUPABASE_URL}/rest/v1/daily_puzzles?puzzle_date=eq.${TODAY}&select=puzzle_date,board_type,board_letters" | head -c 2000
+          echo ""

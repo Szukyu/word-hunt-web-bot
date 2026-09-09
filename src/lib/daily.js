@@ -133,6 +133,109 @@ export async function fetchTodaysPuzzles() {
   return data
 }
 
+// --- Client-side ensure: first visitor of the day creates the puzzle (fallback when cron hasn't run) ---
+// Throttled via localStorage so we don't hammer the edge function every render.
+// This is fire-and-forget from Daily.jsx — non-blocking and best-effort.
+const ENSURE_THROTTLE_PREFIX = 'daily_ensure:'
+
+function shouldThrottleEnsure(dateStr) {
+  if (typeof window === 'undefined' || !window.localStorage) return false
+  try {
+    const key = `${ENSURE_THROTTLE_PREFIX}${dateStr}`
+    const last = window.localStorage.getItem(key)
+    // throttle to once per 6h (in case edge function was down, we retry later)
+    if (last && Date.now() - parseInt(last, 10) < 6 * 60 * 60 * 1000) return true
+    window.localStorage.setItem(key, String(Date.now()))
+    return false
+  } catch { return false }
+}
+
+export async function ensureDailyPuzzlesForDate(dateStr) {
+  // Single daily puzzle per day — chosen board type (mirrors createDailyBoard)
+  const chosenType = chooseDailyBoardType(dateStr)
+  // fast-path: check if the chosen puzzle already exists
+  try {
+    const { data, error } = await supabase.from('daily_puzzles').select('board_type').eq('puzzle_date', dateStr).eq('board_type', chosenType).maybeSingle()
+    if (!error && data) return data
+  } catch (_e) { void _e }
+
+  if (shouldThrottleEnsure(dateStr)) return null
+
+  // Try edge function (uses service_role internally, works even for anon users — no RLS)
+  try {
+    const url = import.meta.env.VITE_SUPABASE_URL
+    const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_KEY
+    if (url && anonKey) {
+      const res = await fetch(`${url}/functions/v1/daily-publish`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': anonKey,
+          'Authorization': `Bearer ${anonKey}`,
+        },
+        body: JSON.stringify({ date: dateStr }),
+      })
+      if (res.ok) {
+        const json = await res.json().catch(() => null)
+        return json
+      }
+    }
+  } catch (_e) { void _e }
+
+  // Fallback: direct upsert via authenticated user (RLS policy daily_puzzles_insert_auth requires authenticated role)
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return null
+    const row = {
+      puzzle_date: dateStr,
+      board_type: chosenType,
+      board_letters: generateSeededBoard(dateStr, chosenType),
+    }
+    const { error } = await supabase.from('daily_puzzles').upsert(row, { onConflict: 'puzzle_date,board_type', ignoreDuplicates: false })
+    if (error) throw error
+    return row
+  } catch (_e) { void _e }
+  return null
+}
+
+export async function ensureTodaysDailyPuzzles() {
+  return ensureDailyPuzzlesForDate(todayUTC())
+}
+
+// Backfill last N days (inclusive of today) — useful after downtime or cold start
+export async function ensureRecentDailyPuzzles(days = 7) {
+  const today = todayUTC()
+  const start = new Date(today + 'T00:00:00Z')
+  start.setUTCDate(start.getUTCDate() - (days - 1))
+  const from = start.toISOString().slice(0, 10)
+  // Use edge function backfill if available
+  try {
+    const url = import.meta.env.VITE_SUPABASE_URL
+    const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_KEY
+    if (url && anonKey) {
+      const res = await fetch(`${url}/functions/v1/daily-publish?backfill=${days}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': anonKey,
+          'Authorization': `Bearer ${anonKey}`,
+        },
+      })
+      if (res.ok) return await res.json().catch(() => null)
+      // try GET fallback
+      const res2 = await fetch(`${url}/functions/v1/daily-publish?from=${from}&to=${today}`, {
+        headers: { 'apikey': anonKey, 'Authorization': `Bearer ${anonKey}` },
+      })
+      if (res2.ok) return await res2.json().catch(() => null)
+    }
+  } catch (_e) { void _e }
+  // Fallback: ensure each date individually via direct path (throttled per date)
+  for (let d = new Date(from + 'T00:00:00Z'); d <= new Date(today + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + 1)) {
+    await ensureDailyPuzzlesForDate(d.toISOString().slice(0, 10))
+  }
+  return null
+}
+
 async function ensureDailyPuzzle(puzzleDate, boardType) {
   const boardLetters = generateSeededBoard(puzzleDate, boardType)
   // upsert daily_puzzles so FK on daily_scores never fails (idempotent)
