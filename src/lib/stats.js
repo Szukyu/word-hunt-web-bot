@@ -5,6 +5,21 @@
 import { supabase } from './supabase'
 import { POINTS } from '../data/points'
 
+async function ensureProfileForGame(user) {
+  if (!user?.id) return
+  const { data: existing } = await supabase.from('profiles').select('id').eq('id', user.id).maybeSingle()
+  if (existing) return
+  const raw = user.user_metadata?.username || user.email?.split('@')[0] || 'user'
+  let username = String(raw).toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 20)
+  if (username.length < 3) username = `user_${user.id.slice(0, 6)}`
+  if (!/^[a-z0-9_]+$/.test(username)) username = `user_${user.id.slice(0, 8)}`
+  const { error } = await supabase.from('profiles').upsert({ id: user.id, username }, { onConflict: 'id' })
+  if (error?.code === '23505') {
+    const alt = `${username.slice(0, 12)}_${user.id.slice(0, 4)}`.slice(0, 20)
+    await supabase.from('profiles').upsert({ id: user.id, username: alt }, { onConflict: 'id' })
+  }
+}
+
 // Persist a finished game to Supabase
 export async function saveGame({
   boardType,
@@ -24,6 +39,7 @@ export async function saveGame({
     // Allow guest play: store locally only, caller should handle fallback
     return { localOnly: true }
   }
+  await ensureProfileForGame(user)
 
   const wordsCount = foundWords.length
   const percentScore = totalPossibleScore ? (score / totalPossibleScore) * 100 : null

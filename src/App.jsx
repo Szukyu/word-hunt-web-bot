@@ -6,6 +6,7 @@ import Auth from './components/Auth/Auth.jsx';
 import Stats from './components/Stats/Stats.jsx';
 import ThemePage from './components/ThemePage/ThemePage.jsx';
 import Daily from './components/Daily/Daily.jsx';
+import Leaderboard from './components/Leaderboard/Leaderboard.jsx';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { ThemeProvider } from './themes/ThemeContext.jsx';
 
@@ -59,12 +60,20 @@ const AppContent = () => {
     if (window.location.pathname !== '/daily') window.history.pushState({}, '', '/daily');
   };
 
-  // Deep-link support: /daily
+  const handleViewLeaderboard = () => {
+    setShowAuth(false);
+    setView('leaderboard');
+    if (window.location.pathname !== '/leaderboard') window.history.pushState({}, '', '/leaderboard');
+  };
+
+  // Deep-link support: /daily, /leaderboard
   useEffect(() => {
     if (window.location.pathname === '/daily') setView('daily');
+    if (window.location.pathname === '/leaderboard') setView('leaderboard');
     const onPop = () => {
       if (window.location.pathname === '/daily') setView('daily');
-      else if (view === 'daily' && window.location.pathname !== '/daily') setView('option');
+      else if (window.location.pathname === '/leaderboard') setView('leaderboard');
+      else if ((view === 'daily' || view === 'leaderboard') && !['/daily','/leaderboard'].includes(window.location.pathname)) setView('option');
     };
     window.addEventListener('popstate', onPop);
     return () => window.removeEventListener('popstate', onPop);
@@ -75,6 +84,7 @@ const AppContent = () => {
     if (view === 'stats') return <Stats />;
     if (view === 'themes') return <ThemePage onBack={handleBackToOption} />;
     if (view === 'daily') return <Daily />;
+    if (view === 'leaderboard') return <Leaderboard onBack={handleBackToOption} />;
     return <Option key={resetKey} />;
   };
 
@@ -88,6 +98,7 @@ const AppContent = () => {
         onSignOut={handleSignOut}
         onViewStats={handleViewStats}
         onViewDaily={handleViewDaily}
+        onViewLeaderboard={handleViewLeaderboard}
       />
       {renderView()}
     </div>

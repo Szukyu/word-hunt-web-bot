@@ -110,7 +110,10 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords, wordStarts
           score,
           foundWords,
           allPossibleWords: wordsWithScores,
-          totalPossibleScore: total
+          totalPossibleScore: total,
+          boardLetters,
+          boardType,
+          gameTime,
         });
       }, 50);
       return () => clearTimeout(t);

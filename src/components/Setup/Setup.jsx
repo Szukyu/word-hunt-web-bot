@@ -6,6 +6,7 @@ import Boarder from "../Boards/Boarder";
 import Donut from "../Boards/Donut";
 import X from "../Boards/X";
 import { getPreviewMetrics } from "../../utils/boardPreview.js";
+import { saveGame } from "../../lib/stats.js";
 import './Setup.css';
 
 const Setup = ({ englishWords, wordStarts }) => {
@@ -70,9 +71,26 @@ const Setup = ({ englishWords, wordStarts }) => {
     setIsPlaying(false);
   };
 
-  const handleGameEnd = (result) => {
+  const handleGameEnd = async (result) => {
     setGameResult(result);
     setIsPlaying(false);
+    // Persist to Supabase for global leaderboards (all-time / weekly / per board)
+    try {
+      await saveGame({
+        boardType: result.boardType ?? activeBoard.size,
+        boardLetters: result.boardLetters ?? activeBoard.letters,
+        gameTime,
+        score: result.score,
+        foundWords: result.foundWords,
+        totalPossibleScore: result.totalPossibleScore,
+        totalPossibleWords: result.allPossibleWords?.length ?? 0,
+        isDaily: false,
+        puzzleDate: null,
+      });
+    } catch (e) {
+      // non-fatal: leaderboard may stay empty until retry
+      console.warn('[setup] saveGame failed', e?.message);
+    }
   };
 
   const handlePlayAgain = () => {

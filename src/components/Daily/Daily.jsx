@@ -22,6 +22,7 @@ import { getPreviewMetrics } from '../../utils/boardPreview'
 import { useAuth } from '../../context/AuthContext'
 import DailyCalendar from './DailyCalendar'
 import DailyLeaderboard from './DailyLeaderboard'
+import { saveGame } from '../../lib/stats'
 import './Daily.css'
 
 const DAILY_TIME = 90
@@ -121,13 +122,45 @@ const Daily = () => {
     async function check() {
       setCheckingAttempt(true)
       try {
-        // Try fast local first for immediate UI, then sync with Supabase if authenticated
         const local = getLocalDailyAttempt(daily.puzzle_date, daily.board_type, user?.id)
         if (user?.id) {
           const remote = await getDailyAttempt(daily.puzzle_date, daily.board_type, user.id)
           if (!cancelled) setAttempt(remote || local || null)
+          // Auto-sync: if we have a local attempt but no remote, push it (fixes pre-FK-bug stuck users)
+          if (!cancelled && local && !remote) {
+            const longestWord = local.longest_word || (local.words_found?.length ? local.words_found.reduce((a,b)=>a.word.length>=b.word.length?a:b).word : null)
+            try {
+              await submitDailyScore({
+                puzzleDate: local.puzzle_date,
+                boardType: local.board_type,
+                score: local.score,
+                wordsFound: local.words_found || local.wordsFound || [],
+                totalPossibleScore: local.total_possible_score ?? local.totalPossibleScore ?? 0,
+                totalPossibleWords: local.total_possible_words ?? local.totalPossibleWords ?? 0,
+                longestWord,
+              })
+              // also save to games for global leaderboard
+              try {
+                await saveGame({
+                  boardType: local.board_type,
+                  boardLetters: daily.board_letters,
+                  gameTime: 90,
+                  score: local.score,
+                  foundWords: local.words_found || local.wordsFound || [],
+                  totalPossibleScore: local.total_possible_score ?? local.totalPossibleScore ?? 0,
+                  totalPossibleWords: local.total_possible_words ?? local.totalPossibleWords ?? 0,
+                  isDaily: true,
+                  puzzleDate: local.puzzle_date,
+                })
+              } catch { /* ignore games sync */ }
+              // re-fetch remote to update _remote flag
+              const refreshed = await getDailyAttempt(daily.puzzle_date, daily.board_type, user.id)
+              if (!cancelled && refreshed) setAttempt(refreshed)
+            } catch (e) {
+              if (e?.code !== '23505') console.warn('[daily] auto-sync failed', e?.message)
+            }
+          }
         } else {
-          // guest: local only (also checks generic guest keys)
           if (!cancelled) setAttempt(local || null)
         }
       } catch {
@@ -139,7 +172,7 @@ const Daily = () => {
     }
     check()
     return () => { cancelled = true }
-  }, [daily.puzzle_date, daily.board_type, user?.id])
+  }, [daily.puzzle_date, daily.board_type, daily.board_letters, user?.id])
 
   const renderBoard = () => {
     const props = { letters: daily.board_letters, positions: [] }
@@ -199,6 +232,22 @@ const Daily = () => {
         if (e?.message && !e.message.includes('Already submitted')) {
           console.warn('[daily] submitDailyScore failed', e.message)
         }
+      }
+      // Also save to games for global leaderboards (all-time / weekly)
+      try {
+        await saveGame({
+          boardType: result.boardType ?? daily.board_type,
+          boardLetters: result.boardLetters ?? daily.board_letters,
+          gameTime: 90,
+          score: result.score,
+          foundWords: result.foundWords,
+          totalPossibleScore: result.totalPossibleScore,
+          totalPossibleWords: result.allPossibleWords.length,
+          isDaily: true,
+          puzzleDate: daily.puzzle_date,
+        })
+      } catch (e) {
+        console.warn('[daily] saveGame failed', e?.message)
       }
     }
   }

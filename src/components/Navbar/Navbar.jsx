@@ -1,7 +1,7 @@
 import { IoPersonOutline, IoLogOutOutline } from 'react-icons/io5';
 import './Navbar.css';
 
-const Navbar = ({ onReset, onOpenTheme, onViewThemes, onLogin, user, onSignOut, onViewStats, onViewDaily }) => {
+const Navbar = ({ onReset, onOpenTheme, onViewThemes, onLogin, user, onSignOut, onViewStats, onViewDaily, onViewLeaderboard }) => {
   const handleThemeClick = onViewThemes || onOpenTheme;
   const handleProfileClick = () => {
     if (user) onViewStats?.();
@@ -19,6 +19,11 @@ const Navbar = ({ onReset, onOpenTheme, onViewThemes, onLogin, user, onSignOut, 
           {onViewDaily && (
             <button className="nav-pill" type="button" onClick={onViewDaily} aria-label="Daily puzzle">
               Daily
+            </button>
+          )}
+          {onViewLeaderboard && (
+            <button className="nav-pill" type="button" onClick={onViewLeaderboard} aria-label="Leaderboards">
+              Leaderboard
             </button>
           )}
           <button className="nav-pill" type="button" onClick={handleThemeClick} aria-label="Open themes">

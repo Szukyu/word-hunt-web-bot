@@ -133,12 +133,52 @@ export async function fetchTodaysPuzzles() {
   return data
 }
 
+async function ensureDailyPuzzle(puzzleDate, boardType) {
+  const boardLetters = generateSeededBoard(puzzleDate, boardType)
+  // upsert daily_puzzles so FK on daily_scores never fails (idempotent)
+  const { error } = await supabase
+    .from('daily_puzzles')
+    .upsert(
+      { puzzle_date: puzzleDate, board_type: boardType, board_letters: boardLetters },
+      { onConflict: 'puzzle_date,board_type', ignoreDuplicates: false }
+    )
+  if (error && error.code !== '23505') {
+    // non-fatal: if RLS blocks, daily_scores may still fail with FK 23503 -> handled below
+    console.warn('[daily] ensureDailyPuzzle upsert warning', error.message)
+  }
+}
+
+async function ensureProfile(user) {
+  if (!user?.id) return
+  const { data: existing } = await supabase.from('profiles').select('id').eq('id', user.id).maybeSingle()
+  if (existing) return
+  const raw = user.user_metadata?.username || user.email?.split('@')[0] || 'user'
+  let username = String(raw).toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 20)
+  if (username.length < 3) username = `user_${user.id.slice(0, 6)}`
+  if (!/^[a-z0-9_]+$/.test(username)) username = `user_${user.id.slice(0, 8)}`
+  const { error } = await supabase.from('profiles').upsert({ id: user.id, username }, { onConflict: 'id' })
+  if (error) {
+    if (error.code === '23505') {
+      // username taken, retry with suffix
+      const alt = `${username.slice(0, 12)}_${user.id.slice(0, 4)}`.slice(0, 20)
+      await supabase.from('profiles').upsert({ id: user.id, username: alt }, { onConflict: 'id' })
+    } else {
+      console.warn('[daily] ensureProfile warning', error.message)
+    }
+  }
+}
+
 // Enforce one attempt per day per board_type
 export async function submitDailyScore({ puzzleDate, boardType, score, wordsFound, totalPossibleScore, totalPossibleWords, longestWord }) {
   const {
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) throw new Error('Not authenticated')
+
+  // Ensure profile exists (prevents 23503 daily_scores_user_id_fkey)
+  await ensureProfile(user)
+  // Ensure FK target exists (prevents 23503 daily_scores_puzzle_date_board_type_fkey)
+  await ensureDailyPuzzle(puzzleDate, boardType)
 
   const payload = {
     user_id: user.id,
@@ -162,6 +202,7 @@ export async function submitDailyScore({ puzzleDate, boardType, score, wordsFoun
   // unique violation means already submitted
   if (error) {
     if (error.code === '23505') throw new Error('Already submitted today for this board')
+    // FK fallback: if daily_puzzles RLS blocked, try once more after ignoring FK? surface error
     throw error
   }
   return data
@@ -170,7 +211,7 @@ export async function submitDailyScore({ puzzleDate, boardType, score, wordsFoun
 export async function fetchDailyLeaderboard(puzzleDate, boardType, limit = 50) {
   const { data, error } = await supabase
     .from('daily_scores')
-    .select('user_id, score, words_count, percent_score, longest_word, created_at, profiles!inner(username, display_name)')
+    .select('user_id, score, words_count, percent_score, longest_word, created_at, profiles(username, display_name)')
     .eq('puzzle_date', puzzleDate)
     .eq('board_type', boardType)
     .order('score', { ascending: false })
@@ -189,7 +230,7 @@ export async function fetchFriendsDailyLeaderboard(puzzleDate, boardType, userId
   if (!userIds || userIds.length === 0) return []
   const { data, error } = await supabase
     .from('daily_scores')
-    .select('user_id, score, words_count, percent_score, longest_word, created_at, profiles!inner(username, display_name)')
+    .select('user_id, score, words_count, percent_score, longest_word, created_at, profiles(username, display_name)')
     .eq('puzzle_date', puzzleDate)
     .eq('board_type', boardType)
     .in('user_id', userIds)
@@ -247,7 +288,7 @@ export async function fetchMyDailyEntry(puzzleDate, boardType) {
   if (!user) return null
   const { data, error } = await supabase
     .from('daily_scores')
-    .select('user_id, score, words_count, percent_score, longest_word, created_at, profiles!inner(username, display_name)')
+    .select('user_id, score, words_count, percent_score, longest_word, created_at, profiles(username, display_name)')
     .eq('user_id', user.id)
     .eq('puzzle_date', puzzleDate)
     .eq('board_type', boardType)
