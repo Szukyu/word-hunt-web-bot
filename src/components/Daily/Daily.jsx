@@ -17,6 +17,8 @@ import {
   fetchUserDailyHistory,
   getAllLocalDailyAttempts,
   mergeDailyHistory,
+  ensureTodaysDailyPuzzles,
+  ensureRecentDailyPuzzles,
 } from '../../lib/daily'
 import { getPreviewMetrics } from '../../utils/boardPreview'
 import { useAuth } from '../../context/AuthContext'
@@ -63,6 +65,21 @@ const Daily = () => {
   useEffect(() => {
     const id = setInterval(() => setCountdown(daysUntilNextUTC()), 1000)
     return () => clearInterval(id)
+  }, [])
+
+  // Ensure daily puzzles exist in Supabase (first visitor creates them) — fixes "only 2 puzzles because only ran 2 days"
+  // Server cron (pg_cron + GitHub Actions) is primary; this client ensure is fallback + backfills missed days.
+  useEffect(() => {
+    // fire-and-forget, non-blocking
+    ensureTodaysDailyPuzzles().catch(() => {})
+    try {
+      const key = 'daily_backfill:last'
+      const last = window.localStorage.getItem(key)
+      if (!last || Date.now() - parseInt(last, 10) > 24 * 60 * 60 * 1000) {
+        ensureRecentDailyPuzzles(7).catch(() => {})
+        window.localStorage.setItem(key, String(Date.now()))
+      }
+    } catch (_e) { void _e }
   }, [])
 
   // If attempt becomes known while playing (race on initial check), kick out of Play
