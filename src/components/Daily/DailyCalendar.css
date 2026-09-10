@@ -339,6 +339,28 @@
   padding: 8px 10px;
 }
 
+.cal-replay-button {
+  margin-top: 4px;
+  padding: 10px 14px;
+  background: var(--highlight);
+  color: var(--bg);
+  border: 1px solid var(--highlight);
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.70rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
+  width: 100%;
+}
+.cal-replay-button:hover { opacity: 0.9; }
+.cal-replay-button.secondary {
+  background: var(--bg);
+  color: var(--text);
+  border-color: var(--highlight);
+}
+.cal-replay-button.secondary:hover { background: var(--highlight); color: var(--bg); }
+
 @media (max-width: 640px) {
   .cal-detail-body { grid-template-columns: 1fr; }
   .cal-detail-board { min-width: unset; }

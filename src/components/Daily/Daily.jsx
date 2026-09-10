@@ -55,12 +55,14 @@ const Daily = () => {
   const [checkingAttempt, setCheckingAttempt] = useState(true)
   const [viewAttemptResult, setViewAttemptResult] = useState(false)
 
-  // Daily history & calendar (view-only; past not replayable) — shown in modal via button
   const [historyList, setHistoryList] = useState([])
   const [historyLoading, setHistoryLoading] = useState(false)
   const [calendarSelected, setCalendarSelected] = useState(null)
   const [showArchive, setShowArchive] = useState(false)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
+
+  const [replayTarget, setReplayTarget] = useState(null)
+  const [replayResult, setReplayResult] = useState(null)
 
   useEffect(() => {
     const id = setInterval(() => setCountdown(daysUntilNextUTC()), 1000)
@@ -274,6 +276,30 @@ const Daily = () => {
     setIsPlaying(true)
   }
 
+  const handleReplay = (dateStr) => {
+    try {
+      const board = createDailyBoard(dateStr)
+      setReplayTarget(board)
+      setReplayResult(null)
+      setGameResult(null)
+      setViewAttemptResult(false)
+      setIsPlaying(false)
+      setShowArchive(false)
+    } catch (e) {
+      console.warn('[daily] handleReplay failed', e?.message)
+    }
+  }
+
+  const handleReplayEnd = (result) => {
+    const enriched = {
+      ...result,
+      puzzle_date: replayTarget?.puzzle_date ?? result.puzzle_date,
+      board_type: replayTarget?.board_type ?? result.boardType,
+    }
+    setReplayResult(enriched)
+    setReplayTarget(null)
+  }
+
   if (loading || checkingAttempt) {
     return (
       <div className="option-state-card">
@@ -318,6 +344,40 @@ const Daily = () => {
         totalPossibleScore={totalScore}
         onPlayAgain={() => setViewAttemptResult(false)}
         onBack={() => setViewAttemptResult(false)}
+      />
+    )
+  }
+
+  // Past puzzle replay — practice, not counted toward streak/leaderboard
+  if (replayResult) {
+    return (
+      <Results
+        score={replayResult.score}
+        foundWords={replayResult.foundWords}
+        allPossibleWords={replayResult.allPossibleWords}
+        totalPossibleScore={replayResult.totalPossibleScore}
+        onPlayAgain={() => {
+          // replay same puzzle again
+          const board = createDailyBoard(replayResult.puzzle_date)
+          setReplayResult(null)
+          setReplayTarget(board)
+        }}
+        onBack={() => setReplayResult(null)}
+      />
+    )
+  }
+
+  if (replayTarget) {
+    return (
+      <Play
+        boardType={replayTarget.board_type}
+        gameTime={DAILY_TIME}
+        initialLetters={replayTarget.board_letters}
+        disableRegenerate={true}
+        onBack={() => setReplayTarget(null)}
+        onGameEnd={handleReplayEnd}
+        englishWords={englishWords}
+        wordStarts={wordStarts}
       />
     )
   }
@@ -424,12 +484,12 @@ const Daily = () => {
                 <div>
                   <span className="eyebrow">Archive</span>
                   <h2>Past Boards</h2>
-                  <span className="cal-subtitle">View-only · past dailies are not replayable</span>
+                  <span className="cal-subtitle">Replay any past puzzle — practice, no streak</span>
                 </div>
                 <button className="daily-archive-close" onClick={() => setShowArchive(false)} aria-label="Close archive">✕</button>
               </div>
               <div className="daily-archive-modal-body">
-                <DailyCalendar history={historyList} selectedDate={calendarSelected} onSelectDate={setCalendarSelected} />
+                <DailyCalendar history={historyList} selectedDate={calendarSelected} onSelectDate={setCalendarSelected} onReplay={handleReplay} />
                 {historyLoading && <div className="daily-history-loading mono-hint">loading history…</div>}
               </div>
             </div>
@@ -511,12 +571,12 @@ const Daily = () => {
               <div>
                 <span className="eyebrow">Archive</span>
                 <h2>Past Boards</h2>
-                <span className="cal-subtitle">View-only · past dailies are not replayable</span>
+                <span className="cal-subtitle">Replay any past puzzle — practice, no streak</span>
               </div>
               <button className="daily-archive-close" onClick={() => setShowArchive(false)} aria-label="Close archive">✕</button>
             </div>
             <div className="daily-archive-modal-body">
-              <DailyCalendar history={historyList} selectedDate={calendarSelected} onSelectDate={setCalendarSelected} />
+              <DailyCalendar history={historyList} selectedDate={calendarSelected} onSelectDate={setCalendarSelected} onReplay={handleReplay} />
               {historyLoading && <div className="daily-history-loading mono-hint">loading history…</div>}
             </div>
           </div>

@@ -13,7 +13,7 @@
 - [x] Daily history & calendar view — calendar + history list (view-only, past not replayable) — `src/components/Daily/DailyCalendar.jsx:1` + `src/components/Daily/DailyHistory.jsx:1` + `src/lib/daily.js:204` — past replay deferred (no replay button; view-only detail + board preview)
 - [ ] Daily history — past dailies replayable (deferred, not counting toward streak)
 - [ ] Daily share card — spoiler-free result image/text (`Word Hunt 29/08/2026 - 847 pts - 12/38 words`)
-- [ ] Daily leaderboard (global + friends) for each day's board
+- [X] Daily leaderboard (global + friends) for each day's board
 - [ ] Daily archive and stats — average, best day, % of max score found
 - [ ] Push / in-app notification nudge for daily (opt-in)
 
