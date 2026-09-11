@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import List from '../List/List';
-import { IoArrowBack, IoRefresh } from 'react-icons/io5';
+import { IoArrowBack, IoRefresh, IoShareSocial } from 'react-icons/io5';
+import { formatDailyShareText, shareText } from '../../lib/share';
 import './Results.css';
 
 const Results = ({ 
@@ -8,7 +10,10 @@ const Results = ({
   allPossibleWords, 
   totalPossibleScore, 
   onPlayAgain, 
-  onBack 
+  onBack,
+  puzzleDate = null,
+  boardName = null,
+  shareText: shareTextProp = null,
 }) => {
   const foundSet = new Set(foundWords.map(f => f.word));
   
@@ -22,6 +27,26 @@ const Results = ({
     if (b.score !== a.score) return b.score - a.score;
     return a.word.localeCompare(b.word);
   });
+
+  const computedShareText = shareTextProp || formatDailyShareText({
+    puzzleDate,
+    score,
+    wordsFoundCount: foundWords.length,
+    totalPossibleWords: allPossibleWords.length,
+    boardName,
+  });
+  const [shareState, setShareState] = useState(null); // 'copied' | 'shared' | null
+
+  const handleShare = async () => {
+    const res = await shareText(computedShareText, puzzleDate ? `Word Hunt ${puzzleDate}` : 'Word Hunt');
+    if (res === 'copied') {
+      setShareState('copied');
+      setTimeout(() => setShareState(null), 1600);
+    } else if (res === 'shared') {
+      setShareState('shared');
+      setTimeout(() => setShareState(null), 1600);
+    }
+  };
 
   return (
     <section className="results-area">
@@ -57,6 +82,16 @@ const Results = ({
                 : 0}%
             </span>
           </div>
+        </div>
+
+        <div className="results-share-card">
+          <div className="share-text-preview" aria-live="polite">
+            <span className="share-label">Spoiler-free share</span>
+            <span className="share-text">{computedShareText}</span>
+          </div>
+          <button className="share-button" onClick={handleShare} aria-label="Share result">
+            <IoShareSocial /> {shareState === 'copied' ? 'Copied!' : shareState === 'shared' ? 'Shared!' : 'Share'}
+          </button>
         </div>
 
         <div className="results-list-section">

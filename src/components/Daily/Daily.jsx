@@ -25,6 +25,7 @@ import { useAuth } from '../../context/AuthContext'
 import DailyCalendar from './DailyCalendar'
 import DailyLeaderboard from './DailyLeaderboard'
 import { saveGame } from '../../lib/stats'
+import { formatDailyShareText, shareText as doShareText } from '../../lib/share'
 import './Daily.css'
 
 const DAILY_TIME = 90
@@ -63,6 +64,7 @@ const Daily = () => {
 
   const [replayTarget, setReplayTarget] = useState(null)
   const [replayResult, setReplayResult] = useState(null)
+  const [dailyShareState, setDailyShareState] = useState(null)
 
   useEffect(() => {
     const id = setInterval(() => setCountdown(daysUntilNextUTC()), 1000)
@@ -325,6 +327,8 @@ const Daily = () => {
         foundWords={gameResult.foundWords}
         allPossibleWords={gameResult.allPossibleWords}
         totalPossibleScore={gameResult.totalPossibleScore}
+        puzzleDate={daily.puzzle_date}
+        boardName={daily.board_name}
         // One attempt: replay is blocked — send user to locked completed view
         onPlayAgain={() => setGameResult(null)}
         onBack={() => setGameResult(null)}
@@ -342,6 +346,8 @@ const Daily = () => {
         foundWords={words}
         allPossibleWords={allWords}
         totalPossibleScore={totalScore}
+        puzzleDate={attempt.puzzle_date}
+        boardName={daily.board_name}
         onPlayAgain={() => setViewAttemptResult(false)}
         onBack={() => setViewAttemptResult(false)}
       />
@@ -350,12 +356,15 @@ const Daily = () => {
 
   // Past puzzle replay — practice, not counted toward streak/leaderboard
   if (replayResult) {
+    const boardName = replayResult.board_name || (() => { try { return createDailyBoard(replayResult.puzzle_date).board_name } catch { return null } })()
     return (
       <Results
         score={replayResult.score}
         foundWords={replayResult.foundWords}
         allPossibleWords={replayResult.allPossibleWords}
         totalPossibleScore={replayResult.totalPossibleScore}
+        puzzleDate={replayResult.puzzle_date}
+        boardName={boardName}
         onPlayAgain={() => {
           // replay same puzzle again
           const board = createDailyBoard(replayResult.puzzle_date)
@@ -451,7 +460,35 @@ const Daily = () => {
             <button className="daily-view-result-button" onClick={() => setViewAttemptResult(true)}>
               {hasFullResult ? 'View Results' : 'View Score'}
             </button>
-            <span className="daily-one-attempt-hint">One attempt per day per profile. Come back tomorrow.</span>
+            {(() => {
+              const wordsCountForShare = attempt.words_count ?? attempt.words_found?.length ?? attempt.wordsFound?.length ?? 0
+              const totalForShare = attempt.total_possible_words ?? attempt.totalPossibleWords ?? attempt.allPossibleWords?.length ?? attempt.all_possible_words?.length ?? '?'
+              const sharePreview = formatDailyShareText({
+                puzzleDate: attempt.puzzle_date || daily.puzzle_date,
+                score: attempt.score,
+                wordsFoundCount: wordsCountForShare,
+                totalPossibleWords: totalForShare,
+                boardName: daily.board_name,
+              })
+              return (
+                <div className="daily-share-card">
+                  <span className="daily-share-preview">{sharePreview}</span>
+                  <button
+                    className="daily-share-button"
+                    onClick={async () => {
+                      const res = await doShareText(sharePreview, `Word Hunt ${attempt.puzzle_date || daily.puzzle_date}`)
+                      if (res === 'copied' || res === 'shared') {
+                        setDailyShareState(res === 'copied' ? 'Copied!' : 'Shared!')
+                        setTimeout(() => setDailyShareState(null), 1600)
+                      }
+                    }}
+                  >
+                    {dailyShareState || 'Share'}
+                  </button>
+                </div>
+              )
+            })()}
+            <span className="daily-one-attempt-hint">One attempt per day per profile. Come back tomorrow. · Spoiler-free share</span>
           </div>
         </div>
 

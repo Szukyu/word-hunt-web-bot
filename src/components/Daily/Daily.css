@@ -273,6 +273,40 @@
 }
 .daily-view-result-button:hover { background: var(--highlight); color: var(--bg); }
 
+.daily-share-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--unhighlight);
+  border-radius: 10px;
+  margin-top: 2px;
+}
+.daily-share-preview {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
+}
+.daily-share-button {
+  flex-shrink: 0;
+  padding: 7px 12px;
+  background: var(--highlight);
+  color: var(--bg);
+  border: 1px solid var(--highlight);
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.64rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.daily-share-button:hover { opacity: 0.9; }
+
 .daily-one-attempt-hint {
   text-align: center;
   font-size: 0.62rem;

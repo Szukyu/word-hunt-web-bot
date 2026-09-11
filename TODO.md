@@ -28,7 +28,6 @@
 - [ ] History log — recent 20/50 games with score, board preview (`src/utils/boardPreview.js:1`), date
 - [ ] Streaks, playtime, and longest word ever found
 - [ ] Percentile vs. perfect — `% of allPossibleWords` / `% of totalPossibleScore` per game (`src/components/Play/Play.jsx:97`)
-- [ ] Export / import stats (JSON/CSV)
 - [ ] Privacy toggle — public vs. private stats for leaderboards
 
 ## 3. Multiplayer Competitive
