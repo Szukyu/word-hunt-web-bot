@@ -87,5 +87,10 @@
 .friends-icon-btn.danger:hover { border-color:var(--danger); color:var(--danger); }
 .friends-icon-btn:hover { border-color:var(--highlight); }
 
+.friends-loading { display:flex; align-items:center; gap:8px; padding:14px; background:var(--main); border:1px solid var(--unhighlight); border-radius:12px; }
+.friends-spinner { width:16px; height:16px; border:2px solid var(--unhighlight); border-top-color:var(--highlight); border-radius:50%; animation:friendsSpin 0.7s linear infinite; }
+@keyframes friendsSpin { to { transform: rotate(360deg); } }
+.friends-sub { font-size:0.62rem; color:var(--subalt); max-width:18ch; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
 .friends-foot-hint { font-size:0.60rem; color:var(--subalt); line-height:1.5; padding:6px 2px; }
 .friends-foot-hint code { background:var(--main); border:1px solid var(--unhighlight); border-radius:6px; padding:1px 4px; font-size:0.58rem; }
