@@ -25,6 +25,7 @@ import { useAuth } from '../../context/AuthContext'
 import DailyCalendar from './DailyCalendar'
 import DailyLeaderboard from './DailyLeaderboard'
 import { saveGame } from '../../lib/stats'
+import { formatDailyShareText, shareText as doShareText } from '../../lib/share'
 import './Daily.css'
 
 const DAILY_TIME = 90
@@ -55,12 +56,15 @@ const Daily = () => {
   const [checkingAttempt, setCheckingAttempt] = useState(true)
   const [viewAttemptResult, setViewAttemptResult] = useState(false)
 
-  // Daily history & calendar (view-only; past not replayable) — shown in modal via button
   const [historyList, setHistoryList] = useState([])
   const [historyLoading, setHistoryLoading] = useState(false)
   const [calendarSelected, setCalendarSelected] = useState(null)
   const [showArchive, setShowArchive] = useState(false)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
+
+  const [replayTarget, setReplayTarget] = useState(null)
+  const [replayResult, setReplayResult] = useState(null)
+  const [dailyShareState, setDailyShareState] = useState(null)
 
   useEffect(() => {
     const id = setInterval(() => setCountdown(daysUntilNextUTC()), 1000)
@@ -274,6 +278,30 @@ const Daily = () => {
     setIsPlaying(true)
   }
 
+  const handleReplay = (dateStr) => {
+    try {
+      const board = createDailyBoard(dateStr)
+      setReplayTarget(board)
+      setReplayResult(null)
+      setGameResult(null)
+      setViewAttemptResult(false)
+      setIsPlaying(false)
+      setShowArchive(false)
+    } catch (e) {
+      console.warn('[daily] handleReplay failed', e?.message)
+    }
+  }
+
+  const handleReplayEnd = (result) => {
+    const enriched = {
+      ...result,
+      puzzle_date: replayTarget?.puzzle_date ?? result.puzzle_date,
+      board_type: replayTarget?.board_type ?? result.boardType,
+    }
+    setReplayResult(enriched)
+    setReplayTarget(null)
+  }
+
   if (loading || checkingAttempt) {
     return (
       <div className="option-state-card">
@@ -299,6 +327,8 @@ const Daily = () => {
         foundWords={gameResult.foundWords}
         allPossibleWords={gameResult.allPossibleWords}
         totalPossibleScore={gameResult.totalPossibleScore}
+        puzzleDate={daily.puzzle_date}
+        boardName={daily.board_name}
         // One attempt: replay is blocked — send user to locked completed view
         onPlayAgain={() => setGameResult(null)}
         onBack={() => setGameResult(null)}
@@ -316,8 +346,47 @@ const Daily = () => {
         foundWords={words}
         allPossibleWords={allWords}
         totalPossibleScore={totalScore}
+        puzzleDate={attempt.puzzle_date}
+        boardName={daily.board_name}
         onPlayAgain={() => setViewAttemptResult(false)}
         onBack={() => setViewAttemptResult(false)}
+      />
+    )
+  }
+
+  // Past puzzle replay — practice, not counted toward streak/leaderboard
+  if (replayResult) {
+    const boardName = replayResult.board_name || (() => { try { return createDailyBoard(replayResult.puzzle_date).board_name } catch { return null } })()
+    return (
+      <Results
+        score={replayResult.score}
+        foundWords={replayResult.foundWords}
+        allPossibleWords={replayResult.allPossibleWords}
+        totalPossibleScore={replayResult.totalPossibleScore}
+        puzzleDate={replayResult.puzzle_date}
+        boardName={boardName}
+        onPlayAgain={() => {
+          // replay same puzzle again
+          const board = createDailyBoard(replayResult.puzzle_date)
+          setReplayResult(null)
+          setReplayTarget(board)
+        }}
+        onBack={() => setReplayResult(null)}
+      />
+    )
+  }
+
+  if (replayTarget) {
+    return (
+      <Play
+        boardType={replayTarget.board_type}
+        gameTime={DAILY_TIME}
+        initialLetters={replayTarget.board_letters}
+        disableRegenerate={true}
+        onBack={() => setReplayTarget(null)}
+        onGameEnd={handleReplayEnd}
+        englishWords={englishWords}
+        wordStarts={wordStarts}
       />
     )
   }
@@ -391,7 +460,35 @@ const Daily = () => {
             <button className="daily-view-result-button" onClick={() => setViewAttemptResult(true)}>
               {hasFullResult ? 'View Results' : 'View Score'}
             </button>
-            <span className="daily-one-attempt-hint">One attempt per day per profile. Come back tomorrow.</span>
+            {(() => {
+              const wordsCountForShare = attempt.words_count ?? attempt.words_found?.length ?? attempt.wordsFound?.length ?? 0
+              const totalForShare = attempt.total_possible_words ?? attempt.totalPossibleWords ?? attempt.allPossibleWords?.length ?? attempt.all_possible_words?.length ?? '?'
+              const sharePreview = formatDailyShareText({
+                puzzleDate: attempt.puzzle_date || daily.puzzle_date,
+                score: attempt.score,
+                wordsFoundCount: wordsCountForShare,
+                totalPossibleWords: totalForShare,
+                boardName: daily.board_name,
+              })
+              return (
+                <div className="daily-share-card">
+                  <span className="daily-share-preview">{sharePreview}</span>
+                  <button
+                    className="daily-share-button"
+                    onClick={async () => {
+                      const res = await doShareText(sharePreview, `Word Hunt ${attempt.puzzle_date || daily.puzzle_date}`)
+                      if (res === 'copied' || res === 'shared') {
+                        setDailyShareState(res === 'copied' ? 'Copied!' : 'Shared!')
+                        setTimeout(() => setDailyShareState(null), 1600)
+                      }
+                    }}
+                  >
+                    {dailyShareState || 'Share'}
+                  </button>
+                </div>
+              )
+            })()}
+            <span className="daily-one-attempt-hint">One attempt per day per profile. Come back tomorrow. · Spoiler-free share</span>
           </div>
         </div>
 
@@ -424,12 +521,12 @@ const Daily = () => {
                 <div>
                   <span className="eyebrow">Archive</span>
                   <h2>Past Boards</h2>
-                  <span className="cal-subtitle">View-only · past dailies are not replayable</span>
+                  <span className="cal-subtitle">Replay any past puzzle — practice, no streak</span>
                 </div>
                 <button className="daily-archive-close" onClick={() => setShowArchive(false)} aria-label="Close archive">✕</button>
               </div>
               <div className="daily-archive-modal-body">
-                <DailyCalendar history={historyList} selectedDate={calendarSelected} onSelectDate={setCalendarSelected} />
+                <DailyCalendar history={historyList} selectedDate={calendarSelected} onSelectDate={setCalendarSelected} onReplay={handleReplay} />
                 {historyLoading && <div className="daily-history-loading mono-hint">loading history…</div>}
               </div>
             </div>
@@ -511,12 +608,12 @@ const Daily = () => {
               <div>
                 <span className="eyebrow">Archive</span>
                 <h2>Past Boards</h2>
-                <span className="cal-subtitle">View-only · past dailies are not replayable</span>
+                <span className="cal-subtitle">Replay any past puzzle — practice, no streak</span>
               </div>
               <button className="daily-archive-close" onClick={() => setShowArchive(false)} aria-label="Close archive">✕</button>
             </div>
             <div className="daily-archive-modal-body">
-              <DailyCalendar history={historyList} selectedDate={calendarSelected} onSelectDate={setCalendarSelected} />
+              <DailyCalendar history={historyList} selectedDate={calendarSelected} onSelectDate={setCalendarSelected} onReplay={handleReplay} />
               {historyLoading && <div className="daily-history-loading mono-hint">loading history…</div>}
             </div>
           </div>

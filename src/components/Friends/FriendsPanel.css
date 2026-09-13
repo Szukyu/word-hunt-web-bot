@@ -1,0 +1,96 @@
+.friends-panel { display:flex; flex-direction:column; gap:14px; }
+
+.friends-invite-card {
+  background: var(--main);
+  border: 1px solid var(--unhighlight);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display:flex; flex-direction:column; gap:12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.friends-invite-head h3 { margin:4px 0 0; font-size:0.98rem; font-weight:800; letter-spacing:-0.02em; color:var(--text); }
+.friends-hint { margin:6px 0 0; font-size:0.68rem; color:var(--subalt); line-height:1.5; max-width:52ch; }
+.friends-hint em { font-style:normal; font-weight:800; color:var(--sub); }
+.friends-invite-body { display:flex; flex-direction:column; gap:10px; }
+.friends-invite-field {
+  display:flex; justify-content:space-between; gap:12px; align-items:center;
+  padding:10px 12px; background:var(--bg); border:1px solid var(--unhighlight); border-radius:10px;
+}
+.friends-invite-label { font-size:0.60rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--subalt); font-weight:700; }
+.friends-invite-value { font-weight:800; font-size:0.78rem; color:var(--text); word-break:break-all; text-align:right; }
+.friends-invite-value.mono { font-size:0.62rem; letter-spacing:0.02em; color:var(--sub); max-width:56%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.friends-invite-actions { display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap; }
+
+.friends-add-row { display:flex; gap:8px; align-items:center; }
+.friends-add-input-wrap {
+  flex:1; display:flex; align-items:center; gap:8px;
+  background:var(--main); border:1px solid var(--unhighlight); border-radius:12px; padding:0 10px;
+}
+.friends-add-icon { color:var(--subalt); flex-shrink:0; }
+.friends-add-input {
+  flex:1; padding:10px 0; background:transparent; border:none; outline:none;
+  color:var(--text); font-size:0.82rem; font-weight:600;
+}
+.friends-add-input::placeholder { color:var(--subalt); }
+
+.friends-btn {
+  padding:9px 14px; border-radius:999px; font-weight:800; font-size:0.70rem; letter-spacing:0.05em; text-transform:uppercase;
+  border:1px solid var(--unhighlight); background:var(--bg); color:var(--text); white-space:nowrap;
+}
+.friends-btn.primary { background:var(--highlight); color:var(--bg); border-color:var(--highlight); }
+.friends-btn.primary:hover { opacity:0.9; }
+.friends-btn.ghost:hover { border-color:var(--highlight); color:var(--highlight); }
+.friends-btn.small { padding:6px 10px; font-size:0.62rem; }
+.friends-btn:disabled { opacity:0.45; cursor:not-allowed; }
+
+.friends-msg { font-size:0.72rem; font-weight:700; padding:6px 2px; }
+.friends-msg.ok { color:var(--success); }
+.friends-msg.err { color:var(--danger); }
+.friends-notice { font-size:0.68rem; color:var(--subalt); background:color-mix(in srgb, var(--highlight) 6%, transparent); border:1px dashed var(--unhighlight); border-radius:10px; padding:8px 10px; }
+
+.friends-section { display:flex; flex-direction:column; gap:8px; }
+.friends-section-head { display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+.friends-section-head h4 { margin:0; font-size:0.78rem; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; color:var(--text); display:flex; gap:6px; align-items:center; }
+.friends-count { display:inline-grid; place-items:center; min-width:20px; height:20px; padding:0 6px; border-radius:999px; background:var(--bg); border:1px solid var(--unhighlight); font-size:0.66rem; color:var(--subalt); }
+.friends-meta { font-size:0.60rem; color:var(--subalt); }
+
+.friends-empty {
+  background:var(--main); border:1px dashed var(--unhighlight); border-radius:12px;
+  padding:16px 12px; display:flex; flex-direction:column; align-items:center; gap:6px; text-align:center;
+}
+.friends-empty-title { font-weight:800; font-size:0.84rem; color:var(--text); }
+.friends-empty-hint { font-size:0.68rem; color:var(--subalt); max-width:34ch; line-height:1.5; }
+
+.friends-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
+.friends-row {
+  display:flex; align-items:center; gap:8px;
+  padding:8px 10px; background:var(--main); border:1px solid var(--unhighlight); border-radius:12px;
+}
+.friends-row.pending { background:color-mix(in srgb, var(--main) 92%, var(--bg)); }
+.friends-avatar {
+  width:28px; height:28px; border-radius:50%; display:grid; place-items:center;
+  background:var(--bg); border:1px solid var(--unhighlight); font-weight:800; font-size:0.62rem; color:var(--sub); flex-shrink:0;
+}
+.friends-avatar.incoming { background:color-mix(in srgb, var(--success) 18%, var(--bg)); border-color:var(--success); color:var(--success); }
+.friends-avatar.outgoing { opacity:0.85; }
+.friends-name { flex:1; font-weight:800; font-size:0.80rem; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.friends-pill { padding:3px 8px; border-radius:999px; font-size:0.58rem; letter-spacing:0.06em; text-transform:uppercase; font-weight:800; border:1px solid var(--unhighlight); }
+.friends-pill.ok { background:color-mix(in srgb, var(--success) 16%, var(--bg)); color:var(--success); border-color:var(--success); }
+.friends-pill.pending { background:var(--bg); color:var(--subalt); }
+
+.friends-icon-btn {
+  width:30px; height:30px; border-radius:50%; display:grid; place-items:center;
+  background:var(--bg); border:1px solid var(--unhighlight); color:var(--text); flex-shrink:0;
+}
+.friends-icon-btn.ok { background:var(--success); color:var(--bg); border-color:var(--success); }
+.friends-icon-btn.ok:hover { opacity:0.9; }
+.friends-icon-btn.danger:hover { border-color:var(--danger); color:var(--danger); }
+.friends-icon-btn:hover { border-color:var(--highlight); }
+
+.friends-loading { display:flex; align-items:center; gap:8px; padding:14px; background:var(--main); border:1px solid var(--unhighlight); border-radius:12px; }
+.friends-spinner { width:16px; height:16px; border:2px solid var(--unhighlight); border-top-color:var(--highlight); border-radius:50%; animation:friendsSpin 0.7s linear infinite; }
+@keyframes friendsSpin { to { transform: rotate(360deg); } }
+.friends-sub { font-size:0.62rem; color:var(--subalt); max-width:18ch; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+.friends-foot-hint { font-size:0.60rem; color:var(--subalt); line-height:1.5; padding:6px 2px; }
+.friends-foot-hint code { background:var(--main); border:1px solid var(--unhighlight); border-radius:6px; padding:1px 4px; font-size:0.58rem; }

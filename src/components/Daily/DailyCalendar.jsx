@@ -45,7 +45,7 @@ const BOARD_COMPONENT = {
 
 const MONTH_LABELS = ['January','February','March','April','May','June','July','August','September','October','November','December']
 
-const DailyCalendar = ({ history = [], selectedDate, onSelectDate }) => {
+const DailyCalendar = ({ history = [], selectedDate, onSelectDate, onReplay }) => {
   const todayStr = todayUTC()
   const todayDate = useMemo(() => {
     const [y, m, d] = todayStr.split('-').map(Number)
@@ -147,7 +147,7 @@ const DailyCalendar = ({ history = [], selectedDate, onSelectDate }) => {
         <div>
           <span className="eyebrow">History</span>
           <h2 className="cal-title">Daily Calendar</h2>
-          <span className="cal-subtitle">View-only · past dailies are not replayable</span>
+          <span className="cal-subtitle">Tap any past date to play · replays are practice, no streak</span>
         </div>
         <div className="cal-month-nav">
           <button className="cal-nav-btn" onClick={goPrev} aria-label="Previous month" disabled={isPrevDisabled}>‹</button>
@@ -198,20 +198,24 @@ const DailyCalendar = ({ history = [], selectedDate, onSelectDate }) => {
         </div>
       </div>
 
-      {/* Selected day detail — only for completed past dailies (view-only) */}
+      {/* Selected day detail — playable past puzzles */}
       {selected && selected > todayStr ? (
         <div className="cal-detail">
           <div className="cal-detail-empty">Future puzzle — not yet available.</div>
         </div>
-      ) : selectedAttempt && selectedBoard ? (
+      ) : selected && selectedBoard ? (
         <div className="cal-detail">
           <div className="cal-detail-head">
             <div>
               <span className="preview-label">Selected</span>
               <h3>{formatDateUTC(selected)} — {selectedBoard.board_name}</h3>
-              <span className="cal-detail-meta">{selectedBoard.board_letters.length} letters · Completed · view-only</span>
+              <span className="cal-detail-meta">
+                {selectedBoard.board_letters.length} letters · {selectedAttempt ? 'Completed' : selected < todayStr ? 'Not played' : selected === todayStr ? 'Today' : 'Available'} · {selected < todayStr ? 'replayable' : 'playable'}
+              </span>
             </div>
-            <span className="cal-status-badge done">Completed</span>
+            <span className={`cal-status-badge ${selectedAttempt ? 'done' : selected < todayStr ? 'missed' : 'today'}`}>
+              {selectedAttempt ? 'Completed' : selected < todayStr ? 'Missed' : 'Today'}
+            </span>
           </div>
 
           <div className="cal-detail-body">
@@ -219,27 +223,60 @@ const DailyCalendar = ({ history = [], selectedDate, onSelectDate }) => {
               {renderMiniBoard()}
             </div>
             <div className="cal-detail-stats">
-              <div className="cal-stat-row">
-                <span className="cal-stat-label">Score</span>
-                <span className="cal-stat-value">{selectedAttempt.score} pts</span>
-              </div>
-              <div className="cal-stat-row">
-                <span className="cal-stat-label">Words</span>
-                <span className="cal-stat-value">{selectedAttempt.words_count ?? selectedAttempt.words_found?.length ?? 0}{selectedAttempt.total_possible_words ? ` / ${selectedAttempt.total_possible_words}` : ''}</span>
-              </div>
-              {selectedAttempt.percent_score != null && (
-                <div className="cal-stat-row">
-                  <span className="cal-stat-label">Accuracy</span>
-                  <span className="cal-stat-value">{Math.round(selectedAttempt.percent_score)}% of max</span>
-                </div>
+              {selectedAttempt ? (
+                <>
+                  <div className="cal-stat-row">
+                    <span className="cal-stat-label">Score</span>
+                    <span className="cal-stat-value">{selectedAttempt.score} pts</span>
+                  </div>
+                  <div className="cal-stat-row">
+                    <span className="cal-stat-label">Words</span>
+                    <span className="cal-stat-value">{selectedAttempt.words_count ?? selectedAttempt.words_found?.length ?? 0}{selectedAttempt.total_possible_words ? ` / ${selectedAttempt.total_possible_words}` : ''}</span>
+                  </div>
+                  {selectedAttempt.percent_score != null && (
+                    <div className="cal-stat-row">
+                      <span className="cal-stat-label">Accuracy</span>
+                      <span className="cal-stat-value">{Math.round(selectedAttempt.percent_score)}% of max</span>
+                    </div>
+                  )}
+                  {selectedAttempt.longest_word && (
+                    <div className="cal-stat-row">
+                      <span className="cal-stat-label">Longest</span>
+                      <span className="cal-stat-value longest">{String(selectedAttempt.longest_word).toUpperCase()}</span>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className="cal-stat-row">
+                    <span className="cal-stat-label">Status</span>
+                    <span className="cal-stat-value">{selected < todayStr ? 'Not played' : 'Ready to play'}</span>
+                  </div>
+                  <div className="cal-stat-row">
+                    <span className="cal-stat-label">Board</span>
+                    <span className="cal-stat-value">{selectedBoard.board_name}</span>
+                  </div>
+                </>
               )}
-              {selectedAttempt.longest_word && (
-                <div className="cal-stat-row">
-                  <span className="cal-stat-label">Longest</span>
-                  <span className="cal-stat-value longest">{String(selectedAttempt.longest_word).toUpperCase()}</span>
-                </div>
+              <div className="cal-detail-hint">Replays are practice — they don&apos;t count toward streak or overwrite your leaderboard score.</div>
+              {selected < todayStr && onReplay && (
+                <button
+                  className="cal-replay-button"
+                  onClick={() => onReplay(selected)}
+                  aria-label={`${selectedAttempt ? 'Replay' : 'Play'} ${selected}`}
+                >
+                  {selectedAttempt ? 'Replay' : 'Play'} {formatDateUTC(selected)}
+                </button>
               )}
-              <div className="cal-detail-hint">Past dailies are view-only and do not affect streak. Replay will be enabled in a future update.</div>
+              {selected === todayStr && selectedAttempt && onReplay && (
+                <button
+                  className="cal-replay-button secondary"
+                  onClick={() => onReplay(selected)}
+                  aria-label={`Practice replay ${selected}`}
+                >
+                  Practice Replay (no streak)
+                </button>
+              )}
             </div>
           </div>
         </div>

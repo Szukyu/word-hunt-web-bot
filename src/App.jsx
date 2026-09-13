@@ -87,7 +87,7 @@ const AppContent = () => {
 
   const renderView = () => {
     if (showAuth) return <Auth onClose={handleCloseAuth} />;
-    if (view === 'stats') return <Stats />;
+    if (view === 'stats') return <Stats onBack={handleBackToOption} />;
     if (view === 'themes') return <ThemePage onBack={handleBackToOption} />;
     if (view === 'daily') return <Daily />;
     if (view === 'leaderboard') return <Leaderboard onBack={handleBackToOption} />;

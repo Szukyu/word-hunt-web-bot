@@ -39,4 +39,38 @@
 .results-list-header h2 { margin: 0; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sub); }
 .results-list { padding: 0; }
 
-@media (max-width: 700px) { .results-stats { grid-template-columns: repeat(2, 1fr); } }
+.results-share-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--main);
+  border: 1px solid var(--unhighlight);
+  border-radius: var(--radius-md);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+.share-text-preview { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.share-label { font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--subalt); font-weight: 700; }
+.share-text { font-size: 0.78rem; font-weight: 700; color: var(--text); letter-spacing: -0.01em; word-break: break-word; }
+.share-button {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: var(--highlight);
+  color: var(--bg);
+  border: 1px solid var(--highlight);
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.share-button:hover { opacity: 0.9; }
+
+.daily-share-card { /* also used in Daily locked view via Results, keep fallback */ }
+
+@media (max-width: 700px) { .results-stats { grid-template-columns: repeat(2, 1fr); } .results-share-card { flex-direction: column; align-items: stretch; } .share-button { justify-content: center; } }
