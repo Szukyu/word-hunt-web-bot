@@ -1,8 +1,8 @@
-import { useState, useEffect, useMemo } from 'react'
-import { IoPersonCircle, IoStatsChart, IoPeople, IoArrowBack, IoDownload, IoLockClosed, IoGlobe } from 'react-icons/io5'
+import { useState, useEffect, useRef } from 'react'
+import { IoPersonCircle, IoStatsChart, IoPeople, IoArrowBack, IoDownload, IoCloudUpload, IoLockClosed, IoGlobe } from 'react-icons/io5'
 import { useAuth } from '../../context/AuthContext'
 import FriendsPanel from '../Friends/FriendsPanel'
-import { fetchStatsSummary, fetchProfile, updateProfilePrivacy, exportStatsJSON } from '../../lib/stats'
+import { fetchStatsSummary, fetchProfile, updateProfilePrivacy, exportStatsJSON, parseStatsImport, importStatsGames } from '../../lib/stats'
 import { getBoardLabel, getPreviewMetrics } from '../../utils/boardPreview'
 import Board from '../Boards/Board'
 import Boarder from '../Boards/Boarder'
@@ -81,6 +81,32 @@ function OverviewTab() {
     a.click(); URL.revokeObjectURL(url)
   }
 
+  const fileRef = useRef(null)
+  const [importState, setImportState] = useState(null) // string feedback
+  const handleImportClick = () => fileRef.current?.click()
+  const handleImportFile = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setImportState('Parsing…')
+    try {
+      const text = await file.text()
+      const { games } = parseStatsImport(text)
+      if (!games.length) throw new Error('No games in file')
+      setImportState(`Found ${games.length} games — importing…`)
+      const inserted = await importStatsGames(games)
+      setImportState(`Imported ${inserted.length}/${games.length} games`)
+      // reload summary
+      const s = await fetchStatsSummary(user.id)
+      setSummary(s)
+      setTimeout(()=>setImportState(null), 2500)
+    } catch (err) {
+      setImportState(err.message || 'Import failed')
+      setTimeout(()=>setImportState(null), 3000)
+    } finally {
+      if (fileRef.current) fileRef.current.value = ''
+    }
+  }
+
   if (!user) {
     return (
       <div className="stats-overview">
@@ -152,14 +178,19 @@ function OverviewTab() {
         <StatTile label="Playtime" value={profile?.total_playtime_seconds ? `${Math.round(profile.total_playtime_seconds/60)}m` : '—'} hint="tracked" />
       </div>
 
-      {/* Privacy + export */}
+      {/* Privacy + export/import */}
       <div className="stats-actions-row">
         <div className="stats-privacy-row">
           <span className="stats-privacy-label">{profile?.is_public ? <><IoGlobe/> Public</> : <><IoLockClosed/> Private</>} </span>
           <button className="stats-privacy-btn" onClick={handlePrivacyToggle} disabled={privacySaving || !profile}>{privacySaving ? '…' : profile?.is_public ? 'Make private' : 'Make public'}</button>
         </div>
-        <button className="stats-export-btn" onClick={handleExport}><IoDownload/> Export JSON</button>
+        <div className="stats-actions-row" style={{ gap: '8px' }}>
+          <button className="stats-export-btn" onClick={handleExport}><IoDownload/> Export JSON</button>
+          <button className="stats-export-btn" onClick={handleImportClick}><IoCloudUpload/> Import</button>
+          <input ref={fileRef} type="file" accept=".json,application/json" onChange={handleImportFile} style={{ display:'none' }} />
+        </div>
       </div>
+      {importState && <div className="stats-import-msg">{importState}</div>}
 
       {/* Per-board breakdown */}
       <div className="stats-section">
@@ -184,7 +215,33 @@ function OverviewTab() {
         )}
       </div>
 
-      {/* Word-length distribution */}
+      {/* High-score per board + time control */}
+      <div className="stats-section">
+        <h3 className="stats-section-title">High-score per board + time</h3>
+        {(() => {
+          const perTime = summary.perBoardTime || {}
+          const keys = Object.keys(perTime).sort((a,b)=>{
+            const [ba,ta]=a.split(':').map(Number); const [bb,tb]=b.split(':').map(Number)
+            if (ba!==bb) return ba-bb; return ta-tb
+          })
+          if (!keys.length) return <div className="stats-empty">No time data</div>
+          return (
+            <div className="stats-board-grid">
+              {keys.map(k=>{
+                const v = perTime[k]
+                return (
+                  <div key={k} className="stats-board-card">
+                    <span className="stats-board-label">{getBoardLabel(v.board_type)} · {v.game_time}s</span>
+                    <div className="stats-board-stats"><span><b>{v.bestScore}</b> best</span><span><b>{v.games}</b> games</span></div>
+                  </div>
+                )
+              })}
+            </div>
+          )
+        })()}
+      </div>
+
+      {/* Word-length & score distribution */}
       <div className="stats-section">
         <h3 className="stats-section-title">Word-length distribution</h3>
         <div className="stats-dist">
@@ -200,14 +257,27 @@ function OverviewTab() {
             )
           })}
         </div>
+        {summary.scoreBuckets && (
+          <div className="stats-dist" style={{ marginTop:'8px' }}>
+            <span className="stats-dist-title">Score buckets</span>
+            {Object.entries(summary.scoreBuckets).map(([bucket,cnt])=> (
+              <div key={bucket} className="stats-dist-row">
+                <span className="stats-dist-label" style={{ fontSize:'0.58rem' }}>{bucket}</span>
+                <div className="stats-dist-bar-wrap"><div className="stats-dist-bar alt" style={{ width: `${Math.round((cnt/Math.max(...Object.values(summary.scoreBuckets)))*100)}%` }} /></div>
+                <span className="stats-dist-count">{cnt}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* History log */}
+      {/* History log — 50 with percentile vs perfect */}
       <div className="stats-section">
-        <h3 className="stats-section-title">History — recent {summary.recentGames.length}</h3>
+        <h3 className="stats-section-title">History — recent {summary.recentGames.length} of {summary.gamesPlayed}</h3>
         <div className="stats-history">
           {summary.recentGames.map(g => {
-            const pct = g.total_possible_words ? Math.round((g.words_count / g.total_possible_words)*100) : null
+            const pctWords = g.total_possible_words ? Math.round((g.words_count / g.total_possible_words)*100) : null
+            const pctScore = g.total_possible_score ? Math.round((g.score / g.total_possible_score)*100) : null
             const date = new Date(g.created_at).toLocaleDateString()
             return (
               <div key={g.id} className="stats-history-row">
@@ -216,9 +286,9 @@ function OverviewTab() {
                   <span className="stats-history-board-label">{getBoardLabel(g.board_type)}</span>
                 </div>
                 <div className="stats-history-main">
-                  <span className="stats-history-score">{g.score} pts</span>
-                  <span className="stats-history-meta">{g.words_count}/{g.total_possible_words ?? '?'} words {pct!=null ? `· ${pct}%` : ''} · {date} {g.is_daily ? '· Daily' : ''}</span>
-                  {g.longest_word && <span className="stats-history-longest">{g.longest_word.toUpperCase()} ({g.longest_word_length})</span>}
+                  <span className="stats-history-score">{g.score} pts {pctScore!=null && <span className="stats-pct">· {pctScore}% of max</span>}</span>
+                  <span className="stats-history-meta">{g.words_count}/{g.total_possible_words ?? '?'} words {pctWords!=null ? `· ${pctWords}%` : ''} · {date} {g.is_daily ? '· Daily' : ''}</span>
+                  {g.longest_word && <span className="stats-history-longest">{g.longest_word.toUpperCase()} ({g.longest_word_length}) · {g.words_count}w</span>}
                 </div>
                 <span className="stats-history-time">{g.game_time}s</span>
               </div>
