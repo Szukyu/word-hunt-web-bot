@@ -1,6 +1,6 @@
 # TODO
 
-> Last updated: 2026-09-01
+> Last updated: 2026-09-14
 
 ---
 
@@ -9,26 +9,27 @@
 - [x] Daily board generation — deterministic seeded board (same for all users per day, per board type) — `src/lib/daily.js:10`
 - [x] Daily puzzle UI — dedicated route/card on home (`/daily`), countdown to next puzzle (UTC midnight) — `src/components/Daily/Daily.jsx:1` + `src/App.jsx:1` + `src/components/Option/Option.jsx:1`
 - [x] One attempt per day enforcement (per profile, local + Supabase sync)
-- [ ] Daily streak tracking + freeze / streak repair logic
-- [x] Daily history & calendar view — calendar + history list (view-only, past not replayable) — `src/components/Daily/DailyCalendar.jsx:1` + `src/components/Daily/DailyHistory.jsx:1` + `src/lib/daily.js:204` — past replay deferred (no replay button; view-only detail + board preview)
-- [ ] Daily history — past dailies replayable (deferred, not counting toward streak)
-- [ ] Daily share card — spoiler-free result image/text (`Word Hunt 29/08/2026 - 847 pts - 12/38 words`)
+- [ ] Daily streak tracking + freeze / streak repair logic — streak shown via `profiles.current_streak` in `src/components/Stats/Stats.jsx:148`, DB trigger `handle_daily_streak` at `supabase/migrations/20260830000000_initial_schema.sql:180`; freeze/repair UI deferred
+- [x] Daily history & calendar view — calendar + history list — `src/components/Daily/DailyCalendar.jsx:1` + `src/components/Daily/DailyHistory.jsx:1` + `src/lib/daily.js:204` — now replayable (was view-only deferred)
+- [x] Daily history — past dailies replayable (deferred, not counting toward streak) — 2026-09-14 `src/components/Daily/DailyCalendar.jsx:48` + `src/components/Daily/Daily.jsx:64` (practice `replayTarget`, no `daily_scores` write)
+- [x] Daily share card — spoiler-free result image/text (`Word Hunt 29/08/2026 - 847 pts - 12/38 words`) — 2026-09-14 `src/lib/share.js:1` + `src/components/Results/Results.jsx:56` + `src/components/Daily/Daily.jsx:405`
 - [X] Daily leaderboard (global + friends) for each day's board
-- [ ] Daily archive and stats — average, best day, % of max score found
+- [x] Daily archive and stats — average, best day, % of max score found — covered by `src/components/Stats/Stats.jsx:165` per-board/time + history `percent_score`/`percent_words` + `src/lib/daily.js:204` history merge
 - [ ] Push / in-app notification nudge for daily (opt-in)
 
 ## 2. Stats for Each Profile
 
-- [ ] Replace `src/components/Stats/Stats.jsx:1` WIP with real stats dashboard
-- [ ] Persist stats per-profile in Supabase (users table / profiles table) vs. only localStorage
-- [ ] Core stats: games played, total words found, total points, avg points/game, best game, avg words/game
-- [ ] Per-board-type stats — breakdown for 4x4, 5x5, Donut, X (and future custom shapes)
-- [ ] Word-length distribution & score distribution charts
-- [ ] High-score / personal best per board size + time control
-- [ ] History log — recent 20/50 games with score, board preview (`src/utils/boardPreview.js:1`), date
-- [ ] Streaks, playtime, and longest word ever found
-- [ ] Percentile vs. perfect — `% of allPossibleWords` / `% of totalPossibleScore` per game (`src/components/Play/Play.jsx:97`)
-- [ ] Privacy toggle — public vs. private stats for leaderboards
+- [x] Replace `src/components/Stats/Stats.jsx:1` WIP with real stats dashboard — 2026-09-14 `src/components/Stats/Stats.jsx:19` OverviewTab
+- [x] Persist stats per-profile in Supabase (users table / profiles table) vs. only localStorage — `src/lib/stats.js:24` `saveGame` → `public.games` + `profiles` trigger `supabase/migrations/20260830000000_initial_schema.sql:450`
+- [x] Core stats: games played, total words found, total points, avg points/game, best game, avg words/game — `src/components/Stats/Stats.jsx:140` `stats-grid`
+- [x] Per-board-type stats — breakdown for 4x4, 5x5, Donut, X (and future custom shapes) — `src/lib/stats.js:142` `perBoard` + UI at `src/components/Stats/Stats.jsx:165`
+- [x] Word-length distribution & score distribution charts — `src/lib/stats.js:158` + `src/components/Stats/Stats.jsx:213` bars
+- [x] High-score / personal best per board size + time control — `src/lib/stats.js:152` `perBoardTime` + `src/components/Stats/Stats.jsx:188`
+- [x] History log — recent 20/50 games with score, board preview (`src/utils/boardPreview.js:1`), date — `src/components/Stats/Stats.jsx:240` `MiniBoard`
+- [x] Streaks, playtime, and longest word ever found — `src/components/Stats/Stats.jsx:148` `profiles.current_streak/longest_streak` + `summary.longestWord`
+- [x] Percentile vs. perfect — `% of allPossibleWords` / `% of totalPossibleScore` per game (`src/components/Play/Play.jsx:97`) — `src/components/Stats/Stats.jsx:247` `pctWords`/`pctScore` + `src/lib/stats.js:45`
+- [x] Export / import stats (JSON/CSV) — `src/lib/stats.js:196` `exportStatsJSON`/`parseStatsImport`/`importStatsGames` + UI at `src/components/Stats/Stats.jsx:66`
+- [x] Privacy toggle — public vs. private stats for leaderboards — `src/lib/stats.js:188` `updateProfilePrivacy` + `src/components/Stats/Stats.jsx:156` toggle
 
 ## 3. Multiplayer Competitive
 
@@ -45,13 +46,13 @@
 
 ## 4. More Default Themes
 
-- [ ] Expand `src/themes/index.js:4` beyond `dark`/`light` — ship 8-12 curated defaults
-- [ ] Proposed new defaults: `midnight`, `nord`, `dracula`, `solarized-dark`, `solarized-light`, `catppuccin-mocha`, `gruvbox`, `tokyo-night`, `oled-black`, `pastel`
-- [ ] Theme preview grid polish in `src/components/ThemePage/ThemePage.jsx:1` (search/filter, sort by light/dark)
-- [ ] Theme creator (`src/components/ThemeCreator/ThemeCreator.jsx:1`) — live board preview inside creator
+- [x] Expand `src/themes/index.js:4` beyond `dark`/`light` — ship 8-12 curated defaults — 2026-09-14 `src/themes/index.js:5` now 12 (dark, light, midnight, nord, dracula, solarized-dark/light, catppuccin-mocha, gruvbox, tokyo-night, oled-black, pastel)
+- [x] Proposed new defaults: `midnight`, `nord`, `dracula`, `solarized-dark`, `solarized-light`, `catppuccin-mocha`, `gruvbox`, `tokyo-night`, `oled-black`, `pastel` — same
+- [ ] Theme preview grid polish in `src/components/ThemePage/ThemePage.jsx:1` (search/filter, sort by light/dark) — search exists, sort deferred
+- [ ] Theme creator (`src/components/ThemeCreator/ThemeCreator.jsx:1`) — live board preview inside creator — preview exists in ThemePage, creator polish deferred
 - [ ] Import / export theme as JSON/shareable URL
 - [ ] Community themes gallery (Supabase storage) — upvote, clone, report
-- [ ] Per-profile default theme persistence
+- [ ] Per-profile default theme persistence — localStorage `STORAGE_THEME_KEY` done, Supabase `profiles` sync deferred
 
 ## 5. Board Builder — A: Letter Board Builder (Set Letters)
 
@@ -92,11 +93,11 @@
 
 ## 8. Social & Sharing
 
-- [ ] Global leaderboards — all-time, daily, weekly, per board type
-- [ ] Friends system — add via username/code, friend leaderboards
+- [x] Global leaderboards — all-time, daily, weekly, per board type — `src/components/Leaderboard/Leaderboard.jsx:1` + `src/lib/leaderboard.js:1`
+- [x] Friends system — add via username/code, friend leaderboards — 2026-09-14 `src/components/Friends/FriendsPanel.jsx:1` + `src/lib/friends.js:1` (Supabase `friendships`, `friendships_select` RLS) + `src/components/Stats/Stats.jsx:233` profile tab
 - [ ] Share board as image (canvas export using boardPreview) + copy link
-- [ ] Results sharing — spoiler-safe card for socials
-- [ ] Profile pages — public stats, favorite theme, recent games
+- [x] Results sharing — spoiler-safe card for socials — 2026-09-14 `src/lib/share.js:1` + `src/components/Results/Results.jsx:56`
+- [x] Profile pages — public stats, favorite theme, recent games — `src/components/Stats/Stats.jsx:233` (`@username`, streak, export, friends)
 
 ## 9. Progression & Retention
 
@@ -132,9 +133,9 @@
 ## 13. Tech, Data & Quality
 
 - [ ] Solver performance pass — trie/prefix pruning in `src/hooks/search.js:1`, debounce live highlighting
-- [ ] Supabase schema — tables for `profiles`, `games`, `daily_scores`, `custom_boards`, `custom_shapes`, `themes`, `friendships`
+- [x] Supabase schema — tables for `profiles`, `games`, `daily_scores`, `custom_boards`, `custom_shapes`, `themes`, `friendships` — `supabase/migrations/20260830000000_initial_schema.sql:1`
 - [ ] Auth polish (`src/components/Auth/Auth.jsx:1` + `src/context/AuthContext.jsx:1`) — OAuth (Google, GitHub), guest -> account upgrade
-- [ ] Seed infrastructure for daily — server cron / edge function to publish board at 00:00 UTC
+- [x] Seed infrastructure for daily — server cron / edge function to publish board at 00:00 UTC — `supabase/functions/daily-publish/index.ts:1` + `src/lib/daily.js:136`
 - [ ] Tests — unit for adjacency, scoring (`src/data/points.js:1`), solver, board generation; E2E for play flow (`/tst`)
 - [ ] Analytics (privacy-friendly) — board popularity, avg completion %, drop-off
 - [ ] ESLint/Prettier + CI — `npm run lint` in GitHub Actions, preview deploys on Cloudflare
