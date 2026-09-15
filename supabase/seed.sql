@@ -16,12 +16,22 @@ values
   ('pastel', 'Pastel', '{"bg":"#fdf2f8","tile":"#fce7f3","tileText":"#831843","accent":"#ec4899","board":"#fbcfe8"}', true, true)
 on conflict (slug) do nothing;
 
--- Example daily puzzle for today (UTC) - 4x4 deterministic seed
--- In production, supabase/functions/daily-publish will generate this daily at 00:00 UTC
-insert into public.daily_puzzles (puzzle_date, board_type, board_letters, solution_word_count, total_possible_score)
-values
-  (current_date, 16, 'abcdefghijklmnop', 42, 8400),
-  (current_date, 25, 'abcdefghijklmnopqrstuvwxy', 85, 15200),
-  (current_date, 20, 'abcdefghijklmnopqrst', 38, 7200),
-  (current_date, 21, 'abcdefghijklmnopqrstu', 45, 9100)
-on conflict (puzzle_date, board_type) do nothing;
+-- Daily puzzles: do NOT seed 4 rows per day (that caused the “sometimes 4, sometimes 1” bug).
+-- The edge function `daily-publish` is the single source of truth: it inserts exactly 1
+-- deterministic puzzle per date via chooseDailyBoardType(date) + generateSeededBoard(date, type).
+-- Seeding 4 rows (one per board type) left legacy extra rows that were never cleaned up,
+-- so some dates had 4 and new dates had 1 after the fix. The fix is to seed nothing here
+-- and let the edge function / client ensure create the canonical row idempotently.
+-- For local dev convenience we keep a single placeholder row for today; the edge function
+-- will upsert the correct deterministic letters on first call via onConflict.
+-- Clean up any legacy extra rows for today first (idempotent).
+delete from public.daily_puzzles
+where puzzle_date = current_date
+  and board_type not in (16,20,21,25);
+
+-- Single placeholder — will be replaced by the deterministic board on first daily-publish call.
+-- We insert only ONE row (the caller’s placeholder board_type is arbitrary; upsert will correct it).
+-- To avoid any confusion we insert no puzzle here by default. Uncomment to insert a dev placeholder:
+-- insert into public.daily_puzzles (puzzle_date, board_type, board_letters)
+-- values (current_date, 16, 'abcdefghijklmnop')
+-- on conflict (puzzle_date, board_type) do nothing;

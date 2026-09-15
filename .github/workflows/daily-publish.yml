@@ -29,19 +29,27 @@ jobs:
         run: |
           set -e
           URL="${SUPABASE_URL}/functions/v1/daily-publish"
-          # Determine query string
+          # Determine query string and matching JSON body — they must agree.
+          # Previously body was always {"date":""} even when QS was ?backfill=7,
+          # causing ambiguous requests and inconsistent row counts.
           QS=""
+          BODY="{}"
           if [ -n "$INPUT_BACKFILL" ]; then
             QS="?backfill=${INPUT_BACKFILL}"
+            BODY="{\"backfill\": ${INPUT_BACKFILL}}"
           elif [ -n "$INPUT_DATE" ]; then
             QS="?date=${INPUT_DATE}"
+            BODY="{\"date\": \"${INPUT_DATE}\"}"
+          else
+            # Scheduled run: publish today (no body needed — edge defaults to today)
+            BODY="{}"
           fi
-          echo "Calling $URL$QS"
+          echo "Calling $URL$QS with body $BODY"
           HTTP_CODE=$(curl -s -o /tmp/resp.json -w "%{http_code}" -X POST \
             -H "apikey: ${SUPABASE_PUBLISHABLE_KEY}" \
             -H "Authorization: Bearer ${SUPABASE_PUBLISHABLE_KEY}" \
             -H "Content-Type: application/json" \
-            -d "{\"date\": \"${INPUT_DATE:-}\"}" \
+            -d "$BODY" \
             "${URL}${QS}" || true)
           echo "HTTP $HTTP_CODE"
           cat /tmp/resp.json || true
