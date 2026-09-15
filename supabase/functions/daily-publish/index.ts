@@ -113,7 +113,28 @@ Deno.serve(async (req) => {
     const { data, error } = await supabase.from('daily_puzzles').upsert(allRows, { onConflict: 'puzzle_date,board_type', ignoreDuplicates: false }).select()
     if (error) throw error
 
-    return jsonResponse({ ok: true, dates, count: allRows.length, inserted: data })
+    // Enforce invariant: exactly 1 puzzle per day (the chosen board type). Clean up legacy rows
+    // where older deployments or seed.sql inserted 4 rows per day (one per board type).
+    // This makes the push idempotent and fixes the “sometimes 4, sometimes 1” symptom.
+    try {
+      for (const dateStr of dates) {
+        const chosen = createDailyBoard(dateStr).board_type
+        const { error: delErr } = await supabase
+          .from('daily_puzzles')
+          .delete()
+          .eq('puzzle_date', dateStr)
+          .neq('board_type', chosen)
+        if (delErr) console.warn(`cleanup ${dateStr} failed:`, delErr.message)
+      }
+    } catch (_cleanupErr) {
+      // non-fatal — upsert already succeeded
+      console.warn('cleanup warning', String(_cleanupErr))
+    }
+
+    // Re-fetch to return canonical state (exactly 1 per date after cleanup)
+    const { data: finalData } = await supabase.from('daily_puzzles').select('*').in('puzzle_date', dates)
+
+    return jsonResponse({ ok: true, dates, count: allRows.length, inserted: data, canonical: finalData })
   } catch (e) {
     return jsonResponse({ ok: false, error: String(e) }, 500)
   }

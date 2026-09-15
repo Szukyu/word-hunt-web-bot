@@ -17,7 +17,6 @@ import {
   fetchUserDailyHistory,
   getAllLocalDailyAttempts,
   mergeDailyHistory,
-  ensureTodaysDailyPuzzles,
   ensureRecentDailyPuzzles,
 } from '../../lib/daily'
 import { getPreviewMetrics } from '../../utils/boardPreview'
@@ -71,11 +70,11 @@ const Daily = () => {
     return () => clearInterval(id)
   }, [])
 
-  // Ensure daily puzzles exist in Supabase (first visitor creates them) — fixes "only 2 puzzles because only ran 2 days"
-  // Server cron (pg_cron + GitHub Actions) is primary; this client ensure is fallback + backfills missed days.
+  // Ensure daily puzzles exist (client fallback). App.jsx already ensures today's puzzle
+  // on every app load via ensureTodaysDailyPuzzles(); here we only backfill the last 7 days
+  // once per 24h to cover cold starts / downtime. Backfill includes today, so no need
+  // to call ensureTodaysDailyPuzzles() again here — avoids duplicate edge calls.
   useEffect(() => {
-    // fire-and-forget, non-blocking
-    ensureTodaysDailyPuzzles().catch(() => {})
     try {
       const key = 'daily_backfill:last'
       const last = window.localStorage.getItem(key)
