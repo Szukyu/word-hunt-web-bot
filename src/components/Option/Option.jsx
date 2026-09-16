@@ -22,7 +22,7 @@ function Option() {
       id: 'play',
       num: '02',
       title: 'Practice',
-      desc: '4 boards · 10—120s',
+      desc: '4 boards · timed + ∞ zen',
       cta: 'Open',
     },
     {

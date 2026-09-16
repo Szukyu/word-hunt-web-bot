@@ -108,6 +108,23 @@
 }
 .timer-preset:hover { border-color: var(--subalt); color: var(--text); }
 .timer-preset.active { background: var(--highlight); border-color: var(--highlight); color: var(--bg); }
+.timer-preset.zen.active { background: var(--success, var(--highlight)); border-color: var(--success, var(--highlight)); }
+
+.timer-custom-row { display: flex; gap: 6px; }
+.timer-custom-input {
+  flex: 1; min-width: 0;
+  padding: 7px 10px; background: var(--bg); border: 1px solid var(--unhighlight);
+  border-radius: 999px; color: var(--text); font-size: 0.72rem; font-weight: 600;
+}
+.timer-custom-input:focus { outline: none; border-color: var(--highlight); }
+.timer-custom-apply {
+  padding: 7px 14px; background: transparent; border: 1px solid var(--unhighlight);
+  border-radius: 999px; color: var(--subalt); font-size: 0.68rem; font-weight: 800;
+  letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; white-space: nowrap;
+}
+.timer-custom-apply:hover:not(:disabled) { border-color: var(--highlight); color: var(--text); }
+.timer-custom-apply:disabled { opacity: 0.4; cursor: default; }
+.zen-hint { font-size: 0.66rem; letter-spacing: 0.04em; color: var(--subalt); }
 
 .eyebrow { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--subalt); }
 
