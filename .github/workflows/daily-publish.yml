@@ -2,8 +2,7 @@ name: daily-publish
 
 on:
   schedule:
-    # Run daily at 00:05 UTC — ensures daily_puzzles exist even if nobody opens the app
-    - cron: '5 0 * * *'
+    - cron: '0 0 * * *'
   workflow_dispatch:
     inputs:
       date:
@@ -11,73 +10,95 @@ on:
         required: false
         type: string
       backfill:
-        description: 'Backfill last N days (e.g. 7)'
+        description: 'Backfill last N days (1-90, e.g. 7)'
         required: false
         type: string
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL || 'https://ssnqvqpovljjarewxgta.supabase.co' }}
+      SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY || secrets.SUPABASE_ANON_KEY || 'sb_publishable_mRwhl7o_3lkM_YuwNmPoRQ_c-QFDGHA' }}
     steps:
-      - name: Publish today's daily puzzle via edge function
+      - name: Publish daily puzzle via edge function
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL || 'https://ssnqvqpovljjarewxgta.supabase.co' }}
-          # Use publishable key (public) or anon key — edge function uses service_role internally, no secret needed
-          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY || secrets.SUPABASE_ANON_KEY || 'sb_publishable_mRwhl7o_3lkM_YuwNmPoRQ_c-QFDGHA' }}
           INPUT_DATE: ${{ inputs.date }}
           INPUT_BACKFILL: ${{ inputs.backfill }}
         run: |
-          set -e
+          set -euo pipefail
           URL="${SUPABASE_URL}/functions/v1/daily-publish"
-          # Determine query string and matching JSON body — they must agree.
-          # Previously body was always {"date":""} even when QS was ?backfill=7,
-          # causing ambiguous requests and inconsistent row counts.
           QS=""
           BODY="{}"
-          if [ -n "$INPUT_BACKFILL" ]; then
+          if [ -n "${INPUT_BACKFILL:-}" ]; then
             QS="?backfill=${INPUT_BACKFILL}"
             BODY="{\"backfill\": ${INPUT_BACKFILL}}"
-          elif [ -n "$INPUT_DATE" ]; then
+          elif [ -n "${INPUT_DATE:-}" ]; then
             QS="?date=${INPUT_DATE}"
             BODY="{\"date\": \"${INPUT_DATE}\"}"
-          else
-            # Scheduled run: publish today (no body needed — edge defaults to today)
-            BODY="{}"
           fi
-          echo "Calling $URL$QS with body $BODY"
-          HTTP_CODE=$(curl -s -o /tmp/resp.json -w "%{http_code}" -X POST \
+          echo "POST $URL$QS"
+          echo "body: $BODY"
+          HTTP_CODE=$(curl -sS -o /tmp/resp.json -w "%{http_code}" -X POST \
             -H "apikey: ${SUPABASE_PUBLISHABLE_KEY}" \
             -H "Authorization: Bearer ${SUPABASE_PUBLISHABLE_KEY}" \
             -H "Content-Type: application/json" \
             -d "$BODY" \
-            "${URL}${QS}" || true)
+            "${URL}${QS}")
           echo "HTTP $HTTP_CODE"
-          cat /tmp/resp.json || true
+          cat /tmp/resp.json; echo ""
           if [ "$HTTP_CODE" -ge 400 ]; then
-            echo "::warning::Edge function call failed with $HTTP_CODE, trying GET fallback"
-            HTTP_CODE2=$(curl -s -o /tmp/resp2.json -w "%{http_code}" \
-              -H "apikey: ${SUPABASE_PUBLISHABLE_KEY}" \
-              -H "Authorization: Bearer ${SUPABASE_PUBLISHABLE_KEY}" \
-              "${URL}${QS}" || true)
-            echo "HTTP $HTTP_CODE2 (GET)"
-            cat /tmp/resp2.json || true
-            if [ "$HTTP_CODE2" -ge 400 ]; then
-              echo "::error::Both POST and GET failed"
-              exit 1
-            fi
+            echo "::error::Edge function returned $HTTP_CODE"
+            exit 1
           fi
-          echo "Daily publish succeeded"
+          VERSION=$(python3 -c "import json;print(json.load(open('/tmp/resp.json')).get('version'))")
+          echo "edge version: $VERSION"
+          if [ "$VERSION" != "2" ]; then
+            echo "::error::Stale edge function (version=$VERSION, expected 2). Deploy supabase/functions/daily-publish."
+            exit 1
+          fi
 
-      # Optional: verify puzzles exist
-      - name: Verify puzzles exist
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL || 'https://ssnqvqpovljjarewxgta.supabase.co' }}
-          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY || secrets.SUPABASE_ANON_KEY || 'sb_publishable_mRwhl7o_3lkM_YuwNmPoRQ_c-QFDGHA' }}
+      - name: Assert exactly 1 puzzle for today (direct DB check)
         run: |
-          TODAY=$(date -u +%F)
-          echo "Checking puzzles for $TODAY"
-          curl -s \
-            -H "apikey: ${SUPABASE_PUBLISHABLE_KEY}" \
-            -H "Authorization: Bearer ${SUPABASE_PUBLISHABLE_KEY}" \
-            "${SUPABASE_URL}/rest/v1/daily_puzzles?puzzle_date=eq.${TODAY}&select=puzzle_date,board_type,board_letters" | head -c 2000
-          echo ""
+          python3 - <<'EOF'
+          import datetime, json, os, sys, urllib.parse, urllib.request
+          base = os.environ["SUPABASE_URL"].rstrip("/")
+          key  = os.environ["SUPABASE_PUBLISHABLE_KEY"]
+          today = datetime.datetime.utcnow().strftime("%Y-%m-%d")
+          qs = urllib.parse.urlencode({
+            "puzzle_date": f"eq.{today}",
+            "select": "puzzle_date,board_type,board_letters",
+          })
+          req = urllib.request.Request(
+            f"{base}/rest/v1/daily_puzzles?{qs}",
+            headers={"apikey": key, "Authorization": f"Bearer {key}"},
+          )
+          with urllib.request.urlopen(req) as r:
+            rows = json.loads(r.read())
+          print(json.dumps(rows, indent=2))
+          if len(rows) != 1:
+            print(f"::error::Expected exactly 1 puzzle for {today}, got {len(rows)}")
+            sys.exit(1)
+          print(f"Invariant OK: exactly 1 daily puzzle for {today}")
+          EOF
+
+      - name: Warn about absurd future rows (e.g. 2099)
+        run: |
+          python3 - <<'EOF'
+          import datetime, json, os, urllib.parse, urllib.request
+          base = os.environ["SUPABASE_URL"].rstrip("/")
+          key  = os.environ["SUPABASE_PUBLISHABLE_KEY"]
+          cutoff = (datetime.datetime.utcnow() + datetime.timedelta(days=366)).strftime("%Y-%m-%d")
+          qs = urllib.parse.urlencode({"puzzle_date": f"gt.{cutoff}", "select": "puzzle_date"})
+          req = urllib.request.Request(
+            f"{base}/rest/v1/daily_puzzles?{qs}",
+            headers={"apikey": key, "Authorization": f"Bearer {key}"},
+          )
+          with urllib.request.urlopen(req) as r:
+            rows = json.loads(r.read())
+          if rows:
+            print(f"::warning::Found {len(rows)} absurd future rows (e.g. 2099).")
+            print(f"  Run: DELETE FROM daily_puzzles WHERE puzzle_date > '{cutoff}';")
+          else:
+            print("No absurd future rows.")
+          EOF
