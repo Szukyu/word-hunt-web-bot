@@ -1,6 +1,6 @@
 # TODO
 
-> Last updated: 2026-09-14
+> Last updated: 2026-09-16
 
 ---
 
@@ -82,9 +82,9 @@
 
 ## 7. Gameplay & Modes — New Ideas
 
-- [ ] Zen / untimed practice mode (no timer, focus on 100% completion)
+- [x] Zen / untimed practice mode (no timer, focus on 100% completion) — 2026-09-16 untimed count-up in `src/hooks/timer.js:1` (`start(0)` → `elapsed`), `∞ zen` toggle in `src/components/Setup/Setup.jsx:1`, manual Finish + `∞ elapsed` display in `src/components/Play/Play.jsx:1`; zen games persist elapsed seconds as `game_time` (satisfies `games.game_time > 0`)
 - [ ] Puzzle / challenge mode — find the 5 highest-scoring words, longest word, or pangram-style challenges
-- [ ] Time controls — 30s, 60s, 90s, 120s, 180s via `src/hooks/timer.js:1` + custom input in Setup (`src/components/Setup/Setup.jsx:1`)
+- [x] Time controls — 30s, 60s, 90s, 120s, 180s via `src/hooks/timer.js:1` + custom input in Setup (`src/components/Setup/Setup.jsx:1`) — 2026-09-16 presets now `10, 15, 30, 60, 90, 120, 180` + custom 10–600s input (clamped, Enter to apply)
 - [ ] Hints system — reveal a word, highlight first tile, or show word count by length
 - [ ] Undo / backtrack polish + full path line drawn between selected tiles
 - [ ] Scoring variants — classic vs. length-bonus vs. rarity-weighted

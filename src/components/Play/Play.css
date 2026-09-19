@@ -29,6 +29,7 @@
 .stat { display: flex; align-items: center; gap: 6px; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--sub); }
 .stat-icon { font-size: 0.95rem; }
 .stat .urgent { color: var(--danger); }
+.zen-time { color: var(--success, var(--highlight)); }
 
 .play-content { display: grid; grid-template-columns: 1fr 320px; gap: 16px; }
 
@@ -85,6 +86,8 @@
 .control-button:hover:not(:disabled) { border-color: var(--subalt); color: var(--text); }
 .control-button.submit { background: var(--highlight); color: var(--bg); border-color: var(--highlight); }
 .control-button.submit:hover:not(:disabled) { opacity: 0.9; }
+.control-button.finish { background: var(--success, var(--highlight)); color: var(--bg); border-color: var(--success, var(--highlight)); }
+.control-button.finish:hover:not(:disabled) { opacity: 0.9; }
 .control-button:disabled { opacity: 0.4; }
 
 .play-sidebar {

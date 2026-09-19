@@ -5,7 +5,7 @@ import Boarder from '../Boards/Boarder';
 import Donut from '../Boards/Donut';
 import X from '../Boards/X';
 import List from '../List/List';
-import { IoTimeOutline, IoCheckmarkCircle, IoArrowBack, IoRefresh, IoClose } from 'react-icons/io5';
+import { IoTimeOutline, IoCheckmarkCircle, IoArrowBack, IoRefresh, IoClose, IoFlag } from 'react-icons/io5';
 import useTimer from '../../hooks/timer';
 import { useBoard } from '../../hooks/board';
 import { useKeyboardInput } from '../../hooks/keyboardInput';
@@ -19,7 +19,9 @@ const BOARD_CONFIG = {
 };
 
 const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords, wordStarts, initialLetters = null, disableRegenerate = false }) => {
-  const { secondsLeft, isRunning, start, pause } = useTimer();
+  const { secondsLeft, elapsed, isUntimed, isRunning, start, pause } = useTimer();
+  // Zen / untimed practice: gameTime of 0 (or missing) counts up, ends via Finish button
+  const isZen = !gameTime || gameTime <= 0;
   const isRunningRef = useRef(isRunning);
   const hasStartedRef = useRef(false);
   const [selectedTiles, setSelectedTiles] = useState([]);
@@ -83,43 +85,71 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords, wordStarts
   }, [boardLetters, gameOver]);
 
   // Track that timer has actually started (isRunning became true) to avoid immediate gameOver on mount
+  // (Zen mode never auto-ends, so the flag only matters for timed games.)
   useEffect(() => {
     if (isRunning) hasStartedRef.current = true;
   }, [isRunning]);
 
+  const calculateScore = (length) => {
+    if (length < 3 || length > 10) return 0;
+    return POINTS[length - 3];
+  };
+
+  const completeGame = useCallback((finalScore, finalFoundWords, effectiveTime) => {
+    const allWords = getValidWords();
+    const wordsWithScores = allWords
+      .map(word => ({ word, score: calculateScore(word.length) }))
+      .sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        return a.word.localeCompare(b.word);
+      });
+
+    const total = wordsWithScores.reduce((sum, w) => sum + w.score, 0);
+    setAllPossibleWords(wordsWithScores);
+    setTotalPossibleScore(total);
+
+    onGameEnd?.({
+      score: finalScore,
+      foundWords: finalFoundWords,
+      allPossibleWords: wordsWithScores,
+      totalPossibleScore: total,
+      boardLetters,
+      boardType,
+      gameTime: effectiveTime,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [boardLetters, boardType, onGameEnd]);
+
 	// Game Over — only after timer has actually started, and run solver off main thread tick
+  // (skipped entirely in Zen mode — the player ends via Finish instead)
   useEffect(() => {
+    if (isZen) return;
     if (secondsLeft === 0 && boardLetters && !gameOver && hasStartedRef.current) {
       setGameOver(true);
       pause();
       // Defer heavy solver to next tick so UI can paint "Game Over" without blocking
       const t = setTimeout(() => {
-        const allWords = getValidWords();
-        const wordsWithScores = allWords
-          .map(word => ({ word, score: calculateScore(word.length) }))
-          .sort((a, b) => {
-            if (b.score !== a.score) return b.score - a.score;
-            return a.word.localeCompare(b.word);
-          });
-
-        const total = wordsWithScores.reduce((sum, w) => sum + w.score, 0);
-        setAllPossibleWords(wordsWithScores);
-        setTotalPossibleScore(total);
-
-        onGameEnd?.({
-          score,
-          foundWords,
-          allPossibleWords: wordsWithScores,
-          totalPossibleScore: total,
-          boardLetters,
-          boardType,
-          gameTime,
-        });
+        completeGame(score, foundWords, gameTime);
       }, 50);
       return () => clearTimeout(t);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [secondsLeft]);
+  }, [secondsLeft, isZen]);
+
+  // Zen manual finish — same solver path, elapsed seconds recorded as gameTime
+  const handleFinishZen = useCallback(() => {
+    if (gameOverRef.current || !isZen) return;
+    // Flush any in-progress drag selection first
+    isDraggingRef.current = false;
+    setIsDragging(false);
+    setGameOver(true);
+    gameOverRef.current = true;
+    pause();
+    const t = setTimeout(() => {
+      completeGame(foundWordsRef.current, foundWordsRef.current, Math.max(1, elapsed));
+    }, 50);
+    return () => clearTimeout(t);
+  }, [isZen, pause, completeGame, elapsed]);
 
   // Clear Message on New Word
   useEffect(() => {
@@ -127,11 +157,6 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords, wordStarts
       setMessage(null);
     }
   }, [currentWord, message]);
-
-  const calculateScore = (length) => {
-    if (length < 3 || length > 10) return 0;
-    return POINTS[length - 3];
-  };
 
   const handleClear = useCallback(() => {
     selectedTilesRef.current = [];
@@ -492,9 +517,13 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords, wordStarts
           <IoArrowBack />
         </button>
         <div className="play-stats">
-          <div className="stat">
+          <div className="stat" title={isZen ? 'Zen — untimed, finish manually' : undefined}>
             <IoTimeOutline className="stat-icon" />
-            <span className={secondsLeft <= 10 ? 'urgent' : ''}>{formatTime(secondsLeft)}</span>
+            {isZen || isUntimed ? (
+              <span className="zen-time">∞ {formatTime(elapsed)}</span>
+            ) : (
+              <span className={secondsLeft <= 10 ? 'urgent' : ''}>{formatTime(secondsLeft)}</span>
+            )}
           </div>
           <div className="stat">
             <IoCheckmarkCircle className="stat-icon" />
@@ -533,6 +562,16 @@ const Play = ({ boardType, gameTime, onBack, onGameEnd, englishWords, wordStarts
             >
               Submit
             </button>
+            {isZen && (
+              <button
+                className="control-button finish"
+                onClick={handleFinishZen}
+                disabled={gameOver}
+                title="End Zen run and see results"
+              >
+                <IoFlag /> Finish
+              </button>
+            )}
           </div>
         </div>
 

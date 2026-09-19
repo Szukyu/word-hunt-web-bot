@@ -12,6 +12,8 @@ import './Setup.css';
 const Setup = ({ englishWords, wordStarts }) => {
   const [selectedBoard, setSelectedBoard] = useState(0);
   const [gameTime, setGameTime] = useState(30);
+  const [customTime, setCustomTime] = useState('');
+  const [isZen, setIsZen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [gameResult, setGameResult] = useState(null);
 
@@ -42,7 +44,7 @@ const Setup = ({ englishWords, wordStarts }) => {
     }
   ];
 
-  const timeOptions = [10, 15, 30, 60, 90, 120];
+  const timeOptions = [10, 15, 30, 60, 90, 120, 180];
 
   const renderBoard = (option) => {
     const props = { letters: option.letters, positions: [] };
@@ -63,6 +65,16 @@ const Setup = ({ englishWords, wordStarts }) => {
     return `${sec}s`;
   };
 
+  const applyCustomTime = () => {
+    const parsed = parseInt(customTime, 10);
+    if (Number.isNaN(parsed)) return;
+    // Clamp custom durations to a sane range (10s-10min)
+    const clamped = Math.min(600, Math.max(10, parsed));
+    setGameTime(clamped);
+    setIsZen(false);
+    setCustomTime('');
+  };
+
   const startGame = () => {
     setIsPlaying(true);
   };
@@ -74,12 +86,14 @@ const Setup = ({ englishWords, wordStarts }) => {
   const handleGameEnd = async (result) => {
     setGameResult(result);
     setIsPlaying(false);
+    // Zen games report elapsed seconds; clamp to >= 1 to satisfy games.game_time > 0
+    const effectiveTime = Math.max(1, result.gameTime ?? (isZen ? 1 : gameTime));
     // Persist to Supabase for global leaderboards (all-time / weekly / per board)
     try {
       await saveGame({
         boardType: result.boardType ?? activeBoard.size,
         boardLetters: result.boardLetters ?? activeBoard.letters,
-        gameTime,
+        gameTime: effectiveTime,
         score: result.score,
         foundWords: result.foundWords,
         totalPossibleScore: result.totalPossibleScore,
@@ -118,7 +132,7 @@ const Setup = ({ englishWords, wordStarts }) => {
     return (
       <Play 
         boardType={activeBoard.size}
-        gameTime={gameTime}
+        gameTime={isZen ? 0 : gameTime}
         onBack={handleBackToSetup}
         onGameEnd={handleGameEnd}
         englishWords={englishWords}
@@ -135,7 +149,7 @@ const Setup = ({ englishWords, wordStarts }) => {
           <h1>Choose Your Board and Time</h1>
         </div>
         <button className="start-button" onClick={startGame}>
-          Start Practice
+          {isZen ? 'Start Zen' : 'Start Practice'}
         </button>
       </div>
 
@@ -149,7 +163,7 @@ const Setup = ({ englishWords, wordStarts }) => {
               </div>
               <div className="preview-meta">
                 <span>{activeBoard.letters.length} letters</span>
-                <span>{formatTime(gameTime)}</span>
+                <span>{isZen ? '∞ zen' : formatTime(gameTime)}</span>
               </div>
             </div>
             <div
@@ -189,18 +203,45 @@ const Setup = ({ englishWords, wordStarts }) => {
               <h3>Game Duration</h3>
             </div>
             <div className="timer-controls">
-              <div className="timer-display">{formatTime(gameTime)}</div>
+              <div className="timer-display">{isZen ? '∞ zen' : formatTime(gameTime)}</div>
               <div className="timer-presets">
                 {timeOptions.map((time) => (
                   <button
                     key={time}
-                    className={`timer-preset ${gameTime === time ? 'active' : ''}`}
-                    onClick={() => setGameTime(time)}
+                    className={`timer-preset ${!isZen && gameTime === time ? 'active' : ''}`}
+                    onClick={() => { setGameTime(time); setIsZen(false); }}
                   >
                     {time}s
                   </button>
                 ))}
+                <button
+                  className={`timer-preset zen ${isZen ? 'active' : ''}`}
+                  onClick={() => setIsZen((v) => !v)}
+                  title="Untimed practice — finish manually, aim for 100%"
+                >
+                  ∞ zen
+                </button>
               </div>
+              <div className="timer-custom-row">
+                <input
+                  className="timer-custom-input"
+                  type="number"
+                  min={10}
+                  max={600}
+                  step={5}
+                  placeholder="Custom seconds (10–600)"
+                  value={customTime}
+                  onChange={(e) => setCustomTime(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') applyCustomTime(); }}
+                  aria-label="Custom game duration in seconds"
+                />
+                <button className="timer-custom-apply" onClick={applyCustomTime} disabled={!customTime}>
+                  Set
+                </button>
+              </div>
+              {isZen && (
+                <span className="zen-hint">No timer — play until you hit 100%, then Finish.</span>
+              )}
             </div>
           </div>
         </div>
