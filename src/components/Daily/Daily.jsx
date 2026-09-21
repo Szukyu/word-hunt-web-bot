@@ -328,6 +328,8 @@ const Daily = () => {
         totalPossibleScore={gameResult.totalPossibleScore}
         puzzleDate={daily.puzzle_date}
         boardName={daily.board_name}
+        boardLetters={gameResult.boardLetters ?? daily.board_letters}
+        boardType={gameResult.boardType ?? daily.board_type}
         // One attempt: replay is blocked — send user to locked completed view
         onPlayAgain={() => setGameResult(null)}
         onBack={() => setGameResult(null)}
@@ -347,6 +349,8 @@ const Daily = () => {
         totalPossibleScore={totalScore}
         puzzleDate={attempt.puzzle_date}
         boardName={daily.board_name}
+        boardLetters={daily.board_letters}
+        boardType={daily.board_type}
         onPlayAgain={() => setViewAttemptResult(false)}
         onBack={() => setViewAttemptResult(false)}
       />
@@ -356,6 +360,8 @@ const Daily = () => {
   // Past puzzle replay — practice, not counted toward streak/leaderboard
   if (replayResult) {
     const boardName = replayResult.board_name || (() => { try { return createDailyBoard(replayResult.puzzle_date).board_name } catch { return null } })()
+    const replayLetters = replayResult.boardLetters || (() => { try { return createDailyBoard(replayResult.puzzle_date).board_letters } catch { return null } })()
+    const replayType = replayResult.boardType ?? replayResult.board_type ?? (replayLetters ? replayLetters.length : null)
     return (
       <Results
         score={replayResult.score}
@@ -364,6 +370,8 @@ const Daily = () => {
         totalPossibleScore={replayResult.totalPossibleScore}
         puzzleDate={replayResult.puzzle_date}
         boardName={boardName}
+        boardLetters={replayLetters}
+        boardType={replayType}
         onPlayAgain={() => {
           // replay same puzzle again
           const board = createDailyBoard(replayResult.puzzle_date)

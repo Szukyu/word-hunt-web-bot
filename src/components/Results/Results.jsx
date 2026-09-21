@@ -1,19 +1,28 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import List from '../List/List';
+import Board from '../Boards/Board';
+import Boarder from '../Boards/Boarder';
+import Donut from '../Boards/Donut';
+import X from '../Boards/X';
 import { IoArrowBack, IoRefresh, IoShareSocial } from 'react-icons/io5';
 import { formatDailyShareText, shareText } from '../../lib/share';
+import { buildAdjacencyMap, findPath } from '../../hooks/utils.js';
 import './Results.css';
 
-const Results = ({ 
-  score, 
-  foundWords, 
-  allPossibleWords, 
-  totalPossibleScore, 
-  onPlayAgain, 
+const REVIEW_BOARD_COMPONENT = { 16: Board, 25: Boarder, 20: Donut, 21: X };
+
+const Results = ({
+  score,
+  foundWords,
+  allPossibleWords,
+  totalPossibleScore,
+  onPlayAgain,
   onBack,
   puzzleDate = null,
   boardName = null,
   shareText: shareTextProp = null,
+  boardLetters = null,
+  boardType = null,
 }) => {
   const foundSet = new Set(foundWords.map(f => f.word));
   
@@ -36,6 +45,31 @@ const Results = ({
     boardName,
   });
   const [shareState, setShareState] = useState(null); // 'copied' | 'shared' | null
+
+  // --- Solver-style review: hovering a word highlights its path on the board ---
+  // Found words carry their exact `pos` from play; missed words are solved live.
+  const reviewLetters = boardLetters || null;
+  const reviewType = boardType ?? (reviewLetters ? reviewLetters.length : null);
+  const adjacencyMap = useMemo(() => {
+    if (!reviewLetters) return null;
+    try {
+      return buildAdjacencyMap(reviewLetters);
+    } catch {
+      return null;
+    }
+  }, [reviewLetters]);
+  const ReviewBoard = reviewType ? REVIEW_BOARD_COMPONENT[reviewType] : null;
+  const canReview = !!(reviewLetters && adjacencyMap && ReviewBoard);
+  const [boardPositions, setBoardPositions] = useState([]);
+
+  const handleItemHover = (item) => {
+    if (!canReview || !item?.word) return;
+    if (Array.isArray(item.pos) && item.pos.length === item.word.length) {
+      setBoardPositions(item.pos);
+    } else {
+      setBoardPositions(findPath(item.word, adjacencyMap, reviewLetters) || []);
+    }
+  };
 
   const handleShare = async () => {
     const res = await shareText(computedShareText, puzzleDate ? `Word Hunt ${puzzleDate}` : 'Word Hunt');
@@ -94,23 +128,48 @@ const Results = ({
           </button>
         </div>
 
-        <div className="results-list-section">
-          <div className="results-list-header">
-            <h2>All Possible Words</h2>
+        {canReview ? (
+          <div className="review-container">
+            <div className="review-board-section">
+              <ReviewBoard letters={reviewLetters} positions={boardPositions} />
+            </div>
+            <div className="review-words-section">
+              <div className="review-words-header">
+                <span className="eyebrow">{allPossibleWords.length} words</span>
+              </div>
+              <div className="review-words-list">
+                <List
+                  items={sortedByFound}
+                  onItemHover={handleItemHover}
+                  showGradients={true}
+                  enableArrowNavigation={false}
+                  listSize={500}
+                  className="results-list-component"
+                  showPoints={true}
+                  highlightFound={true}
+                />
+              </div>
+            </div>
           </div>
-          <div className="results-list">
-            <List
-              items={sortedByFound}
-              onItemHover={() => {}}
-              showGradients={true}
-              enableArrowNavigation={false}
-              listSize={500}
-              className="results-list-component"
-              showPoints={true}
-              highlightFound={true}
-            />
+        ) : (
+          <div className="results-list-section">
+            <div className="results-list-header">
+              <h2>All Possible Words</h2>
+            </div>
+            <div className="results-list">
+              <List
+                items={sortedByFound}
+                onItemHover={() => {}}
+                showGradients={true}
+                enableArrowNavigation={false}
+                listSize={500}
+                className="results-list-component"
+                showPoints={true}
+                highlightFound={true}
+              />
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </section>
   );

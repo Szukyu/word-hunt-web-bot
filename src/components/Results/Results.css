@@ -39,6 +39,35 @@
 .results-list-header h2 { margin: 0; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sub); }
 .results-list { padding: 0; }
 
+/* Solver-style review: board beside the word list (mirrors Input/solver layout) */
+.review-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.review-board-section, .review-words-section {
+  background: var(--main);
+  border: 1px solid var(--unhighlight);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  min-height: 380px;
+}
+
+.review-board-section { display: flex; align-items: center; justify-content: center; }
+.review-board-section .board-container { display: inline-flex; flex-direction: column; gap: 6px; }
+.review-board-section .app { background: transparent; display: contents; }
+.review-board-section .board-row { display: flex; gap: 6px; }
+
+.review-words-section { display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
+.review-words-header { padding-bottom: 8px; border-bottom: 1px solid var(--unhighlight); }
+.review-words-header .eyebrow { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--subalt); }
+.review-words-list { flex: 1; min-height: 0; overflow: hidden; }
+
+@media (max-width: 860px) { .review-container { grid-template-columns: 1fr; } .review-board-section, .review-words-section { min-height: 0; } .review-words-section { min-height: 360px; } }
+@media (max-width: 560px) { .review-board-section, .review-words-section { padding: 14px; } }
+
 .results-share-card {
   display: flex;
   align-items: center;

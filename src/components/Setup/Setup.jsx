@@ -122,6 +122,8 @@ const Setup = ({ englishWords, wordStarts }) => {
         foundWords={gameResult.foundWords}
         allPossibleWords={gameResult.allPossibleWords}
         totalPossibleScore={gameResult.totalPossibleScore}
+        boardLetters={gameResult.boardLetters ?? activeBoard.letters}
+        boardType={gameResult.boardType ?? activeBoard.size}
         onPlayAgain={handlePlayAgain}
         onBack={() => setGameResult(null)}
       />
