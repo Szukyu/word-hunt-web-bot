@@ -11,6 +11,9 @@ import './Results.css';
 
 const REVIEW_BOARD_COMPONENT = { 16: Board, 25: Boarder, 20: Donut, 21: X };
 
+// Same list heights as the solver (Input.jsx) so the board + list cards match
+const REVIEW_LIST_SIZE = { 16: 320, 20: 402, 21: 402, 25: 402 };
+
 const Results = ({
   score,
   foundWords,
@@ -143,7 +146,7 @@ const Results = ({
                   onItemHover={handleItemHover}
                   showGradients={true}
                   enableArrowNavigation={false}
-                  listSize={500}
+                  listSize={REVIEW_LIST_SIZE[reviewType] || 360}
                   className="results-list-component"
                   showPoints={true}
                   highlightFound={true}
