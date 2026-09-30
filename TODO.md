@@ -1,6 +1,6 @@
 # TODO
 
-> Last updated: 2026-09-16
+> Last updated: 2026-09-21
 
 ---
 
@@ -89,7 +89,7 @@
 - [ ] Undo / backtrack polish + full path line drawn between selected tiles
 - [ ] Scoring variants — classic vs. length-bonus vs. rarity-weighted
 - [ ] Word definitions on tap/hover (dictionary API) for found & missed words
-- [ ] End-game review — tap missed word to animate its path on board (`src/components/Results/Results.jsx:1`)
+- [x] End-game review — tap missed word to animate its path on board (`src/components/Results/Results.jsx:1`) — 2026-09-21 solver-parity layout (board beside word list, hover highlights path) in `src/components/Results/Results.jsx:49`; found words reuse stored `pos`, missed words solved live via `findPath` (`src/hooks/utils.js:1`); wired `boardLetters`/`boardType` through `src/components/Setup/Setup.jsx:118` + `src/components/Daily/Daily.jsx:322` (today, attempt view, past-puzzle replay)
 
 ## 8. Social & Sharing
 
