@@ -24,7 +24,42 @@ export function validateUsername(input) {
   if (u.includes('@')) {
     throw new Error('Do not use an email — just a username')
   }
+  // Prevent reserved usernames
+  const reserved = ['admin', 'root', 'system', 'api', 'www', 'mail', 'ftp', 'localhost', 'support', 'help', 'security', 'abuse', 'noreply', 'no-reply']
+  if (reserved.includes(u)) {
+    throw new Error('This username is reserved')
+  }
   return u
+}
+
+// Password strength validation
+export function validatePassword(password) {
+  if (!password || password.length < 8) {
+    throw new Error('Password must be at least 8 characters')
+  }
+  if (!/[a-z]/.test(password)) {
+    throw new Error('Password must contain at least one lowercase letter')
+  }
+  if (!/[A-Z]/.test(password)) {
+    throw new Error('Password must contain at least one uppercase letter')
+  }
+  if (!/[0-9]/.test(password)) {
+    throw new Error('Password must contain at least one number')
+  }
+  // Check for common weak patterns
+  const weakPatterns = [
+    /password/i,
+    /123456/,
+    /qwerty/i,
+    /abc123/i,
+    /wordhunt/i,
+  ]
+  for (const pattern of weakPatterns) {
+    if (pattern.test(password)) {
+      throw new Error('Password is too common — choose something harder to guess')
+    }
+  }
+  return true
 }
 
 export function toVirtualEmail(username) {
@@ -52,6 +87,7 @@ export const AuthProvider = ({ children }) => {
 
   const signUp = async (username, password) => {
     const normalized = validateUsername(username)
+    validatePassword(password)
     const virtualEmail = `${normalized}@${INTERNAL_DOMAIN}`;
 
     const { data: authData, error: authError } = await supabase.auth.signUp({

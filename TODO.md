@@ -33,12 +33,12 @@
 
 ## 3. Multiplayer Competitive
 
-- [ ] Real-time head-to-head (1v1) on same board, same timer — first design: WebSocket / Supabase Realtime
-- [ ] Matchmaking — quick play, invite by link/code, vs. friend
-- [ ] Lobby flow — waiting room, ready check, board reveal countdown (3-2-1)
-- [ ] Live opponent progress (ghost score / word count) without spoiling words until end
-- [ ] Post-game compare screen — overlapping vs. unique words, score breakdown
-- [ ] Ranked / casual queues + ELO/MMR per board type
+- [x] Real-time head-to-head (1v1) on same board, same timer — Supabase Realtime — 2026-10-08 `src/lib/multiplayer.js:1` + `src/components/Multiplayer/*`
+- [x] Matchmaking — quick play, invite by link/code, vs. friend — `src/lib/multiplayer.js:200` `findQuickMatch`/`createFriendInvite`/`acceptFriendInvite`
+- [x] Lobby flow — waiting room, ready check, board reveal countdown (3-2-1) — `src/components/Multiplayer/MultiplayerLobby.jsx:1`
+- [x] Live opponent progress (ghost score / word count) without spoiling words until end — `src/components/Multiplayer/MultiplayerPlay.jsx:1` + Realtime subscription
+- [x] Post-game compare screen — overlapping vs. unique words, score breakdown — `src/components/Multiplayer/MultiplayerResults.jsx:1`
+- [ ] Ranked / casual queues + ELO/MMR per board type — ELO column added to profiles, ranked mode scaffolded
 - [ ] Private lobbies with custom settings (board type, gameTime from `src/components/Option/Option.jsx:1`, custom boards)
 - [ ] Spectator / replay mode — watch finished multiplayer games
 - [ ] Anti-cheat basics — server-side word validation, timer authority

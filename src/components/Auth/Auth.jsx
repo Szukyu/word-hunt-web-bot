@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useAuth } from '../../context/AuthContext'
+import { useState, useMemo } from 'react'
+import { useAuth, validatePassword } from '../../context/AuthContext'
 import './Auth.css'
 
 const Auth = ({ onClose }) => {
@@ -9,6 +9,27 @@ const Auth = ({ onClose }) => {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  // Client-side password strength meter
+  const passwordStrength = useMemo(() => {
+    if (!password) return { score: 0, label: '', checks: {} }
+    const checks = {
+      length: password.length >= 8,
+      lower: /[a-z]/.test(password),
+      upper: /[A-Z]/.test(password),
+      number: /[0-9]/.test(password),
+      // Bonus: special char
+      special: /[^a-zA-Z0-9]/.test(password),
+      // Penalty: common patterns
+      notCommon: !/(password|123456|qwerty|abc123|wordhunt)/i.test(password),
+    }
+    const passed = Object.values(checks).filter(Boolean).length
+    // Score 0-4 (5 checks, but 'special' is bonus)
+    let score = passed
+    if (!checks.notCommon) score = Math.max(0, score - 2) // heavy penalty
+    const labels = ['Very Weak', 'Weak', 'Fair', 'Strong', 'Very Strong']
+    return { score: Math.min(4, score), label: labels[Math.min(4, score)], checks }
+  }, [password])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -26,6 +47,22 @@ const Auth = ({ onClose }) => {
     if (!/^[a-zA-Z0-9_]+$/.test(trimmed)) {
       setError('Only letters, numbers, _')
       return
+    }
+    // Reserved usernames check
+    const reserved = ['admin', 'root', 'system', 'api', 'www', 'mail', 'ftp', 'localhost', 'support', 'help', 'security', 'abuse', 'noreply', 'no-reply']
+    if (reserved.includes(trimmed.toLowerCase())) {
+      setError('This username is reserved')
+      return
+    }
+
+    // Validate password on client side for signup
+    if (!isLogin) {
+      try {
+        validatePassword(password)
+      } catch (err) {
+        setError(err.message)
+        return
+      }
     }
 
     setLoading(true)
@@ -47,6 +84,8 @@ const Auth = ({ onClose }) => {
       setLoading(false)
     }
   }
+
+  const strengthColors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#16a34a']
 
   return (
     <div className="auth-container">
@@ -70,18 +109,37 @@ const Auth = ({ onClose }) => {
             autoCorrect="off"
             spellCheck={false}
           />
-          <input
-            id="wh-password"
-            name="password"
-            type="password"
-            className="auth-input"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-            autoComplete={isLogin ? 'current-password' : 'new-password'}
-          />
+          <div className="password-field">
+            <input
+              id="wh-password"
+              name="password"
+              type="password"
+              className="auth-input"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={8}
+              autoComplete={isLogin ? 'current-password' : 'new-password'}
+              aria-describedby={!isLogin ? 'pw-strength' : undefined}
+            />
+            {!isLogin && (
+              <div id="pw-strength" className="password-strength" role="progressbar" aria-valuenow={passwordStrength.score} aria-valuemin={0} aria-valuemax={4} aria-label="Password strength">
+                <div className="strength-bar">
+                  <div
+                    className="strength-fill"
+                    style={{
+                      width: `${((passwordStrength.score + 1) / 5) * 100}%`,
+                      backgroundColor: strengthColors[passwordStrength.score],
+                    }}
+                  />
+                </div>
+                <span className="strength-label" style={{ color: strengthColors[passwordStrength.score] }}>
+                  {passwordStrength.label}
+                </span>
+              </div>
+            )}
+          </div>
           {error && <p className="auth-error">{error}</p>}
           <button type="submit" className="auth-button" disabled={loading}>
             {loading ? '...' : isLogin ? 'Sign In' : 'Sign Up'}
