@@ -80,20 +80,38 @@ export async function abandonMatch(matchId) {
 
 /** Fetch full match state (for lobby / replay) */
 export async function fetchMatch(matchId) {
-  const { data, error } = await supabase
+  // Fetch match and players first
+  const { data: match, error: matchError } = await supabase
     .from('matches')
     .select(`
       *,
       match_players (
         id, user_id, slot, is_ready, connected_at, disconnected_at,
-        score, words_found, words_list, live_score, live_words_count,
-        profiles:user_id (username, display_name, avatar_url)
+        score, words_found, words_list, live_score, live_words_count
       )
     `)
     .eq('id', matchId)
     .single()
-  if (error) throw error
-  return data
+  if (matchError) throw matchError
+
+  // Fetch profiles for all players in this match
+  const playerUserIds = match.match_players?.map(p => p.user_id) || []
+  if (playerUserIds.length > 0) {
+    const { data: profiles, error: profilesError } = await supabase
+      .from('profiles')
+      .select('id, username, display_name, avatar_url')
+      .in('id', playerUserIds)
+    if (profilesError) throw profilesError
+
+    // Attach profiles to players
+    const profileMap = new Map(profiles?.map(p => [p.id, p]) || [])
+    match.match_players = match.match_players.map(p => ({
+      ...p,
+      profiles: profileMap.get(p.user_id) || null
+    }))
+  }
+
+  return match
 }
 
 /** Fetch match with words for post-game comparison */
