@@ -3,6 +3,7 @@ import Input from '../Input/Input';
 import Setup from '../Setup/Setup';
 import Daily from '../Daily/Daily';
 import Leaderboard from '../Leaderboard/Leaderboard';
+import Multiplayer from '../Multiplayer/Multiplayer';
 import useLoad from '../../hooks/load';
 import './Option.css';
 
@@ -26,15 +27,22 @@ function Option() {
       cta: 'Open',
     },
     {
-      id: 'cheat',
+      id: 'multiplayer',
       num: '03',
+      title: 'Multiplayer',
+      desc: '1v1 · real-time · invite friends',
+      cta: 'Open',
+    },
+    {
+      id: 'cheat',
+      num: '04',
       title: 'Solver',
       desc: '16 / 20 / 21 / 25 · path',
       cta: 'Open',
     },
     {
       id: 'leaderboard',
-      num: '04',
+      num: '05',
       title: 'Leaderboard',
       desc: 'Global · weekly · friends',
       cta: 'Open',
@@ -87,6 +95,7 @@ function Option() {
       <div className="option-active-panel">
         {activeComponent === 'daily' && <Daily />}
         {activeComponent === 'play' && <Setup englishWords={englishWords} wordStarts={wordStarts} />}
+        {activeComponent === 'multiplayer' && <Multiplayer onBack={() => setActiveComponent(null)} />}
         {activeComponent === 'cheat' && <Input englishWords={englishWords} wordStarts={wordStarts} />}
         {activeComponent === 'leaderboard' && <Leaderboard onBack={() => setActiveComponent(null)} />}
       </div>

@@ -43,3 +43,9 @@
 }
 .auth-switch:hover { color: var(--highlight); }
 .auth-error { color: var(--danger); font-size: 0.74rem; border-left: 2px solid var(--danger); padding-left: 8px; margin: 0; }
+
+.password-field { position: relative; display: flex; flex-direction: column; gap: 6px; }
+.password-strength { display: flex; align-items: center; gap: 8px; font-size: 0.7rem; }
+.strength-bar { flex: 1; height: 4px; background: var(--unhighlight); border-radius: 999px; overflow: hidden; }
+.strength-fill { height: 100%; transition: width 0.3s ease, background-color 0.3s ease; border-radius: 999px; }
+.strength-label { min-width: 80px; text-align: right; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }

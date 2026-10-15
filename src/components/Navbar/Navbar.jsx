@@ -1,7 +1,7 @@
-import { IoPersonOutline, IoLogOutOutline } from 'react-icons/io5';
+import { IoPersonOutline, IoLogOutOutline, IoGameController } from 'react-icons/io5';
 import './Navbar.css';
 
-const Navbar = ({ onReset, onOpenTheme, onViewThemes, onLogin, user, onSignOut, onViewStats, onViewDaily, onViewLeaderboard }) => {
+const Navbar = ({ onReset, onOpenTheme, onViewThemes, onLogin, user, onSignOut, onViewStats, onViewDaily, onViewLeaderboard, onViewMultiplayer }) => {
   const handleThemeClick = onViewThemes || onOpenTheme;
   const handleProfileClick = () => {
     if (user) onViewStats?.();
@@ -24,6 +24,12 @@ const Navbar = ({ onReset, onOpenTheme, onViewThemes, onLogin, user, onSignOut, 
           {onViewLeaderboard && (
             <button className="nav-pill" type="button" onClick={onViewLeaderboard} aria-label="Leaderboards">
               Leaderboard
+            </button>
+          )}
+          {onViewMultiplayer && (
+            <button className="nav-pill" type="button" onClick={() => onViewMultiplayer('casual')} aria-label="Multiplayer">
+              <IoGameController className="nav-pill-icon" aria-hidden />
+              Multiplayer
             </button>
           )}
           <button className="nav-pill" type="button" onClick={handleThemeClick} aria-label="Open themes">
