@@ -97,10 +97,15 @@ alter table public.match_players enable row level security;
 alter table public.match_words enable row level security;
 
 -- Matches: creator and players can read; anyone can read public finished matches
+-- Using exists to avoid circular policy dependency with match_players
 create policy "matches_read_creator_or_player" on public.matches
   for select using (
     auth.uid() = creator_id
-    or auth.uid() in (select user_id from public.match_players where match_id = matches.id)
+    or exists (
+      select 1 from public.match_players
+      where match_id = matches.id
+        and user_id = auth.uid()
+    )
     or (status = 'finished' and is_public = true)
   );
 
@@ -112,7 +117,11 @@ create policy "matches_insert_creator" on public.matches
 create policy "matches_update_participants" on public.matches
   for update using (
     auth.uid() = creator_id
-    or auth.uid() in (select user_id from public.match_players where match_id = matches.id)
+    or exists (
+      select 1 from public.match_players
+      where match_id = matches.id
+        and user_id = auth.uid()
+    )
   );
 
 -- Match Players: participants can read
@@ -120,7 +129,12 @@ create policy "match_players_read_participants" on public.match_players
   for select using (
     auth.uid() = user_id
     or auth.uid() = (select creator_id from public.matches where id = match_players.match_id)
-    or auth.uid() in (select user_id from public.match_players mp2 where mp2.match_id = match_players.match_id)
+    or exists (
+      select 1 from public.match_players mp2
+      where mp2.match_id = match_players.match_id
+        and mp2.user_id = auth.uid()
+        and mp2.id <> match_players.id
+    )
   );
 
 -- Match Players: user can insert themselves (join match)
@@ -136,7 +150,11 @@ create policy "match_words_read_participants" on public.match_words
   for select using (
     auth.uid() = user_id
     or auth.uid() = (select creator_id from public.matches where id = match_words.match_id)
-    or auth.uid() in (select user_id from public.match_players where match_id = match_words.match_id)
+    or exists (
+      select 1 from public.match_players
+      where match_id = match_words.match_id
+        and user_id = auth.uid()
+    )
   );
 
 -- Match Words: participants can insert their own words

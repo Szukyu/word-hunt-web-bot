@@ -79,23 +79,59 @@ export async function abandonMatch(matchId) {
 // ----- Fetching -----
 
 /** Fetch full match state (for lobby / replay) */
+// Note: RLS on matches only allows creator to read. 
+// For participants, we fetch match_players first (they can read their own row),
+// then get match data from the match_players.match_id relation.
 export async function fetchMatch(matchId) {
-  // Fetch match and players first
-  const { data: match, error: matchError } = await supabase
-    .from('matches')
-    .select(`
-      *,
-      match_players (
-        id, user_id, slot, is_ready, connected_at, disconnected_at,
-        score, words_found, words_list, live_score, live_words_count
-      )
-    `)
-    .eq('id', matchId)
-    .single()
-  if (matchError) throw matchError
+  const userId = await getCurrentUserId()
 
-  // Fetch profiles for all players in this match
-  const playerUserIds = match.match_players?.map(p => p.user_id) || []
+  // First, try to fetch match directly (works for creator)
+  let match = null
+  const { data: directMatch, error: directError } = await supabase
+    .from('matches')
+    .select('*')
+    .eq('id', matchId)
+    .maybeSingle()
+
+  if (!directError && directMatch) {
+    match = directMatch
+  } else {
+    // Not creator - fetch via match_players (participants can read their own row)
+    const { data: playerRow, error: playerError } = await supabase
+      .from('match_players')
+      .select(`
+        match_id,
+        matches!inner (*)
+      `)
+      .eq('match_id', matchId)
+      .eq('user_id', userId)
+      .maybeSingle()
+
+    if (playerError || !playerRow) {
+      // Fallback: try to fetch match_players for this match (might work if RLS allows)
+      const { data: anyPlayer } = await supabase
+        .from('match_players')
+        .select('matches!inner(*)')
+        .eq('match_id', matchId)
+        .limit(1)
+        .maybeSingle()
+      match = anyPlayer?.matches || null
+    } else {
+      match = playerRow.matches
+    }
+  }
+
+  if (!match) throw new Error('Match not found or access denied')
+
+  // Fetch all players for this match
+  const { data: players, error: playersError } = await supabase
+    .from('match_players')
+    .select('id, user_id, slot, is_ready, connected_at, disconnected_at, score, words_found, words_list, live_score, live_words_count')
+    .eq('match_id', matchId)
+  if (playersError) throw playersError
+
+  // Fetch profiles for all players
+  const playerUserIds = players?.map(p => p.user_id) || []
   if (playerUserIds.length > 0) {
     const { data: profiles, error: profilesError } = await supabase
       .from('profiles')
@@ -103,15 +139,11 @@ export async function fetchMatch(matchId) {
       .in('id', playerUserIds)
     if (profilesError) throw profilesError
 
-    // Attach profiles to players
     const profileMap = new Map(profiles?.map(p => [p.id, p]) || [])
-    match.match_players = match.match_players.map(p => ({
-      ...p,
-      profiles: profileMap.get(p.user_id) || null
-    }))
+    players.forEach(p => { p.profiles = profileMap.get(p.user_id) || null })
   }
 
-  return match
+  return { ...match, match_players: players || [] }
 }
 
 /** Fetch match with words for post-game comparison */
